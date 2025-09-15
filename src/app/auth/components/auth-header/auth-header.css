@@ -1,0 +1,61 @@
+.auth-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 3rem;
+  box-sizing: border-box;
+}
+
+/* Añadir estilos para los contenedores izquierdo y derecho */
+.auth-header-left {
+  margin-left: 14rem; /* Ajusta este valor según necesites */
+  margin-top: 1rem;
+}
+
+.auth-header-right {
+  margin-right: 14rem; /* Ajusta este valor según necesites */
+  margin-top: 2rem;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0;
+  /* También puedes ajustar el margen aquí si es necesario */
+  /* margin-left: 1rem; */
+}
+
+.logo-circle {
+  background: #0e345f;
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.2rem;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-title {
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.login-link {
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 500;
+  /* Puedes ajustar los márgenes aquí */
+  margin-right: 1rem;
+}
+
+.login-link a {
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  margin-left: 0.5rem;
+}
