@@ -21,6 +21,10 @@
   display: flex;
   flex: 1;
   width: 100%;
+  /* Ajustamos el padding para que el contenido quede mejor centrado */
+  padding-top: 2rem;
+  /* Centramos todo el contenido verticalmente */
+  align-items: center;
 }
 
 .auth-left {
@@ -28,6 +32,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 100%;
+  /* Aseguramos que el contenido se alinee correctamente */
+  padding-bottom: 2rem;
 }
 
 .auth-right {
@@ -35,4 +42,5 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 100%;
 }
