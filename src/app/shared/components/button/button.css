@@ -1,0 +1,17 @@
+button {
+  border-radius: 12px;
+  outline: none;
+  cursor: pointer;
+  border: none;
+  font-size: large;
+  font-weight: 600;
+  transition: filter 0.2s, transform 0.2s;
+}
+
+button:focus,
+button:hover {
+  outline: none;
+  box-shadow: none;
+  filter: brightness(0.85);
+  transform: scale(1.04);
+}
