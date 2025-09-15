@@ -7,8 +7,15 @@
     </div>
     <div class="auth-header-right">
         <div class="login-link">
-            ¿Ya tienes una cuenta?
-            <a href="/login">Iniciar sesión</a>
+            <!-- Mensaje dinámico según la ruta -->
+            <ng-container *ngIf="isLoginPage; else signupMessage">
+                ¿No tienes cuenta?
+                <a [routerLink]="['/sign-up']">Crear cuenta</a>
+            </ng-container>
+            <ng-template #signupMessage>
+                ¿Ya tienes una cuenta?
+                <a [routerLink]="['/login']">Iniciar sesión</a>
+            </ng-template>
         </div>
     </div>
 </div>
