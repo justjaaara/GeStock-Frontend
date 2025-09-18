@@ -23,9 +23,19 @@ export class RegisterCard {
 
   constructor(private formBuilder: FormBuilder, private authService: Auth) {
     this.registerForm = this.formBuilder.group({
-      name: ['', [Validators.required, Validators.minLength(2)]],
+      name: [
+        '',
+        [Validators.required, Validators.minLength(2), Validators.pattern(/^[a-zA-ZÀ-ÿ\s]+$/)],
+      ],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(6),
+          Validators.pattern(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{6,}$/),
+        ],
+      ],
     });
   }
 
@@ -78,6 +88,12 @@ export class RegisterCard {
       if (field.errors['email']) return 'Email inválido';
       if (field.errors['minlength'])
         return `${fieldName} debe tener al menos ${field.errors['minlength'].requiredLength} caracteres`;
+      if (field.errors['pattern']) {
+        if (fieldName === 'name') return 'El nombre solo puede contener letras';
+        if (fieldName === 'email') return 'Formato de email inválido';
+        if (fieldName === 'password')
+          return 'La contraseña debe contener al menos una letra y un número';
+      }
     }
     return '';
   }
