@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { RegisterRequestBackend, RegisterResponse } from '../interfaces/auth';
-import { Observable } from 'rxjs';
+import { RegisterRequestBackend, AuthResponse } from '../interfaces/auth';
+import { catchError, Observable, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -10,10 +10,17 @@ import { environment } from '../../../environments/environment';
 export class Auth {
   constructor(private http: HttpClient) {}
 
-  register(registerData: RegisterRequestBackend): Observable<RegisterResponse> {
-    return this.http.post<RegisterResponse>(
-      `${environment.backendBaseUrl}/auth/register`,
-      registerData
-    );
+  register(registerData: RegisterRequestBackend): Observable<AuthResponse> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+    });
+    return this.http
+      .post<AuthResponse>(`${environment.backendBaseUrl}/auth/register`, registerData, { headers })
+      .pipe(
+        catchError((error) => {
+          console.error('Error en registro:', error);
+          return throwError(() => error);
+        })
+      );
   }
 }

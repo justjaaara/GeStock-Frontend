@@ -40,12 +40,23 @@ export class RegisterCard {
       this.authService.register(registerData).subscribe({
         next: (response) => {
           this.isLoading = false;
-          this.successMessage = response.description;
+          this.successMessage = 'Usuario registrado exitosamente';
           this.registerForm.reset();
+
+          localStorage.setItem('access_token', response.access_token);
+          localStorage.setItem('user', JSON.stringify(response.user));
         },
         error: (error) => {
           this.isLoading = false;
-          this.errorMessage = error.error?.description || 'Error al registrar usuario';
+
+          if (error.status === 400) {
+            this.errorMessage = 'Datos inválidos. Por favor revisar los campos';
+          } else if (error.status === 409) {
+            this.errorMessage = 'Este email ya está registrado';
+          } else {
+            this.errorMessage =
+              error.error?.message || 'Error al registrar usuario. Intenta nuevamente.';
+          }
         },
       });
     } else {

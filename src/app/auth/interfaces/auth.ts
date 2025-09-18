@@ -12,7 +12,12 @@ export interface RegisterRequest extends RegisterRequestBackend {
   confirmPassword: string; // Interfaz del frontend
 }
 
-export interface RegisterResponse {
-  status: number;
-  description: string;
+export interface AuthResponse {
+  access_token: string;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+    role: string;
+  };
 }
