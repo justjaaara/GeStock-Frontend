@@ -1,8 +1,8 @@
 import { Component, inject } from '@angular/core';
 
 // todo: revisar si estos 2 componentes si son necesarios
-import { Button } from '../../../shared/components/button/button';
-import { InputField } from '../../../shared/components/input/input-field';
+import { Button } from '../../../../shared/components/button/button';
+import { InputField } from '../../../../shared/components/input/input-field';
 
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Auth } from '../../services/auth';

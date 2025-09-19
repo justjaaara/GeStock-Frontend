@@ -1,8 +1,8 @@
+import { environment } from './../../../environments/environment.example';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { RegisterRequestBackend, AuthResponse } from '../interfaces/auth';
 import { catchError, Observable, throwError } from 'rxjs';
-import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
