@@ -1,7 +1,7 @@
-import { environment } from './../../../environments/environment';
+import { environment } from '@environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { RegisterRequestBackend, AuthResponse, LoginRequest } from '../interfaces/auth';
+import { RegisterRequestBackend, AuthResponse, LoginRequest } from '@/auth/interfaces/auth';
 import { catchError, Observable, throwError } from 'rxjs';
 
 @Injectable({

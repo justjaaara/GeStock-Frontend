@@ -3,9 +3,9 @@ import { Component, computed, inject, signal } from '@angular/core';
 // import { Button } from '../../../shared/components/button/button';
 // import { InputField } from '../../../shared/components/input/input-field';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Auth } from '../../services/auth';
+import { Auth } from '@/auth/services/auth';
 import { Router } from '@angular/router';
-import { LoginRequest } from '../../interfaces/auth';
+import { LoginRequest } from '@/auth/interfaces/auth';
 
 @Component({
   selector: 'app-login-card',
