@@ -1,24 +1,39 @@
-import { environment } from './../../../environments/environment.example';
+import { environment } from './../../../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { RegisterRequestBackend, AuthResponse } from '../interfaces/auth';
+import { inject, Injectable } from '@angular/core';
+import { RegisterRequestBackend, AuthResponse, LoginRequest } from '../interfaces/auth';
 import { catchError, Observable, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class Auth {
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
+  private headers = new HttpHeaders({
+    'Content-Type': 'application/json',
+  });
 
   register(registerData: RegisterRequestBackend): Observable<AuthResponse> {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-    });
     return this.http
-      .post<AuthResponse>(`${environment.backendBaseUrl}/auth/register`, registerData, { headers })
+      .post<AuthResponse>(`${environment.backendBaseUrl}/auth/register`, registerData, {
+        headers: this.headers,
+      })
       .pipe(
         catchError((error) => {
           console.error('Error en registro:', error);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  login(loginData: LoginRequest): Observable<AuthResponse> {
+    return this.http
+      .post<AuthResponse>(`${environment.backendBaseUrl}/auth/login`, loginData, {
+        headers: this.headers,
+      })
+      .pipe(
+        catchError((error) => {
+          console.error('Error en el login', error);
           return throwError(() => error);
         })
       );

@@ -1,6 +1,45 @@
 <div class="register-card">
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="email">Email:</label>
+      <input
+        type="email"
+        id="email"
+        formControlName="email"
+        [class.error]="getFieldError('email')"
+        placeholder="Ingresa tu email"
+      />
+      @if (getFieldError('email')){
+      <span class="error-message">{{ getFieldError('email') }}</span>
+      }
+    </div>
 
-    <div class="form">
+    <div class="form-group">
+      <label for="password">Contraseña:</label>
+      <input
+        type="password"
+        id="password"
+        formControlName="password"
+        [class.error]="getFieldError('password')"
+        placeholder="Ingresa tu contraseña"
+      />
+      @if (getFieldError('password')) {
+      <span class="error-message">{{ getFieldError('password') }}</span>
+      }
+    </div>
+
+    <div class="messages">
+      @if (errorMessage()) {
+      <div class="error-message">{{ errorMessage() }}</div>
+      }
+    </div>
+
+    <button type="submit" [disabled]="isLoading() || loginForm.invalid" class="submit-button">
+      {{ isLoading() ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
+    </button>
+  </form>
+
+  <!-- <div class="form">
         <label for="name">NOMBRE</label> <app-input-field id="name" placeholder="Nombre" textColor="#174376"
             backgroundColor="#F3F6FA" width="100%" height="40px"></app-input-field>
 
@@ -10,5 +49,5 @@
 
         <app-button text="Iniciar Sesión" textColor="white" backgroundColor="#174376" width="100%"
             height="50px"></app-button>
-    </div>
+    </div> -->
 </div>
