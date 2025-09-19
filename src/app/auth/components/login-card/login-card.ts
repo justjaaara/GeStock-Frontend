@@ -39,11 +39,6 @@ export class LoginCard {
       this.authService.login(loginData).subscribe({
         next: (response) => {
           this.isLoading.set(false);
-
-          // Se guarda el token y datos de usuario
-          localStorage.setItem('access_token', response.access_token);
-          localStorage.setItem('user', JSON.stringify(response.user));
-
           // Redirige al dashboard
           this.router.navigate(['/dashboard']);
         },
