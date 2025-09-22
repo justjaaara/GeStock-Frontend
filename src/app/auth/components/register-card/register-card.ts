@@ -8,6 +8,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Auth } from '../../services/auth';
 import { CommonModule } from '@angular/common';
 import { RegisterRequestBackend } from '../../interfaces/auth';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register-card',
@@ -16,12 +17,16 @@ import { RegisterRequestBackend } from '../../interfaces/auth';
   styleUrl: './register-card.css',
 })
 export class RegisterCard {
+  private formBuilder = inject(FormBuilder);
+  private authService = inject(Auth);
+  private router = inject(Router);
+
   registerForm: FormGroup;
   isLoading = false;
   errorMessage = '';
   successMessage = '';
 
-  constructor(private formBuilder: FormBuilder, private authService: Auth) {
+  constructor() {
     this.registerForm = this.formBuilder.group({
       name: [
         '',
@@ -55,6 +60,7 @@ export class RegisterCard {
 
           localStorage.setItem('access_token', response.access_token);
           localStorage.setItem('user', JSON.stringify(response.user));
+          this.router.navigate(['/dashboard']);
         },
         error: (error) => {
           this.isLoading = false;
