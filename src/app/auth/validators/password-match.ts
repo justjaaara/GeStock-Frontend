@@ -1,8 +1,8 @@
 import { AbstractControl, ValidationErrors } from '@angular/forms';
 
 export function passwordMatchValidator(form: AbstractControl): ValidationErrors | null {
-  const password = form.get('password');
-  const rePassword = form.get('rePassword');
+  const password = form.get('Contraseña');
+  const rePassword = form.get('Confirmar contraseña');
 
   if (password && rePassword && password.value !== rePassword.value) {
     rePassword.setErrors({ passwordMismatch: true });

@@ -26,12 +26,12 @@ export class RegisterCard {
   ) {
     this.registerForm = this.formBuilder.group(
       {
-        name: [
+        Nombre: [
           '',
           [Validators.required, Validators.minLength(2), Validators.pattern(/^[a-zA-ZÀ-ÿ\s]+$/)],
         ],
-        email: ['', [Validators.required, Validators.email]],
-        password: [
+        Email: ['', [Validators.required, Validators.email]],
+        Contraseña: [
           '',
           [
             Validators.required,
@@ -39,7 +39,7 @@ export class RegisterCard {
             Validators.pattern(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{6,}$/),
           ],
         ],
-        rePassword: ['', [Validators.required]],
+        'Confirmar contraseña': ['', [Validators.required]],
       },
       { validators: passwordMatchValidator } // ← USAR EL VALIDADOR IMPORTADO (sin 'this')
     );
@@ -63,9 +63,9 @@ export class RegisterCard {
     this.isLoading = true;
 
     const registerData: RegisterRequestBackend = {
-      name: formData.name,
-      email: formData.email,
-      password: formData.password,
+      name: formData.Nombre,
+      email: formData.Email,
+      password: formData.Contraseña,
     };
 
     this.authService.register(registerData).subscribe({
@@ -88,11 +88,7 @@ export class RegisterCard {
     this.successMessage = 'Usuario registrado exitosamente';
     this.registerForm.reset();
 
-    // TODO: Mover esto a AuthService
-    localStorage.setItem('access_token', response.access_token);
-    localStorage.setItem('user', JSON.stringify(response.user));
-
-    this.router.navigate(['/dashboard']); // TODO: Verificar que esta ruta existe
+    this.router.navigate(['/dashboard']);
   }
 
   private handleRegistrationError(error: any): void {
@@ -141,7 +137,7 @@ export class RegisterCard {
 
   private getFieldErrorMessage(fieldName: string, errors: any): string {
     if (errors['required']) return `${fieldName} es requerido`;
-    if (errors['email']) return 'Email inválido';
+    if (errors['Email']) return 'Email inválido';
     if (errors['minlength']) {
       return `${fieldName} debe tener al menos ${errors['minlength'].requiredLength} caracteres`;
     }
