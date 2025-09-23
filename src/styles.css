@@ -1,5 +1,20 @@
-/* You can add global styles to this file, and also import other style files */
+* {
+  box-sizing: border-box;
+}
 
 body {
   font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Estilos base para inputs y forms */
+input,
+button {
+  font-family: inherit;
+}
+
+/* Reset de estilos para forms */
+form {
+  margin: 0;
 }
