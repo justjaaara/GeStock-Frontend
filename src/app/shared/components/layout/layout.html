@@ -1,0 +1,50 @@
+<div class="shell">
+  <app-sidebar appName="GeStock"></app-sidebar>
+  <main class="content">
+    <!-- Topbar -->
+    <header class="topbar">
+      <button class="icon-btn" aria-label="toggle menu">≡</button>
+      <input *ngIf="header.showSearch()" class="search" placeholder="Buscar productos, proveedores..." />
+
+      <!-- acciones Topbar -->
+      <nav class="actions">
+        <a *ngFor="let a of header.actionsTopbar()" [routerLink]="a.link || null" (click)="a.onClick?.()" class="btn"
+          [class.primary]="a.variant==='primary'">
+          <span *ngIf="a.icon" class="ico">{{a.icon}}</span>{{a.label}}
+        </a>
+      </nav>
+    </header>
+
+    <!-- Breadcrumbs -->
+    <div class="breadcrumbs" *ngIf="header.breadcrumbs().length">
+      <ng-container *ngFor="let bc of header.breadcrumbs(); let last = last">
+        <!-- Si tiene link, es <a>; si no, texto plano muted -->
+        <a *ngIf="bc.link; else plain" [routerLink]="bc.link">{{ bc.label }}</a>
+        <ng-template #plain><span class="muted">{{ bc.label }}</span></ng-template>
+
+        <!-- Separador solo si NO es el último -->
+        <span class="sep" *ngIf="!last">/</span>
+      </ng-container>
+    </div>
+
+    <!-- Page title -->
+    <div class="title-row" *ngIf="header.title() || header.actionsTitle().length">
+      <h2 class="page-title">{{ header.title() }}</h2>
+
+      <nav class="actions title-actions" *ngIf="header.actionsTitle().length">
+        <a *ngFor="let a of header.actionsTitle()"
+           [routerLink]="a.link || null"
+           (click)="a.onClick?.()"
+           class="btn"
+           [class.primary]="a.variant==='primary'">
+          <span *ngIf="a.icon" class="ico">{{a.icon}}</span>{{a.label}}
+        </a>
+      </nav>
+    </div>
+
+    <!-- Main page content -->
+    <section class="page">
+      <router-outlet></router-outlet>
+    </section>
+  </main>
+</div>

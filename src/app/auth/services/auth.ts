@@ -1,4 +1,4 @@
-import { environment } from '@environments/environment';
+import { environment } from '@environments/environment.development';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { RegisterRequestBackend, AuthResponse, LoginRequest } from '@/auth/interfaces/auth';

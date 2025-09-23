@@ -1,0 +1,37 @@
+.card {
+    background: #fff;
+    border: 1px solid #e5eaf2;
+    border-radius: 14px;
+    padding: 16px;
+    min-height: 92px
+}
+
+.title {
+    font-size: 12px;
+    color: #6b7a90;
+    letter-spacing: .3px;
+    text-transform: uppercase
+}
+
+.value {
+    font-size: 28px;
+    font-weight: 700;
+    margin-top: 4px
+}
+
+.badge {
+    margin-top: 10px;
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: #eef1f6;
+    font-size: 12px
+}
+
+.badge.good {
+    background: #e9f7ef
+}
+
+.badge.bad {
+    background: #fdeceb
+}

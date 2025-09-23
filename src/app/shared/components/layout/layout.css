@@ -1,0 +1,103 @@
+.shell {
+    display: flex;
+    min-height: 100vh;
+    background: #f4f7fb;
+}
+
+.content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #ffffff;
+    border-bottom: 1px solid #e5eaf2;
+    padding: 10px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.icon-btn {
+    background: #ffffff;
+    border: 1px solid #e5eaf2;
+    border-radius: 10px;
+    padding: 6px 10px;
+    cursor: pointer;
+}
+
+.search {
+    flex: 1;
+    min-width: 0;
+    ;
+    max-width: none;
+    padding: 10px 14px;
+    border: 1px solid #e5eaf2;
+    border-radius: 10px;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn {
+    font-size: 15px;
+    padding: 8px 12px;
+    border: 1px solid #e5eaf2;
+    border-radius: 10px;
+    text-decoration: none;
+    background: #ffffff;
+    cursor: pointer;
+}
+
+.btn.primary {
+    background: #eef4ff;
+}
+
+.user {
+    margin-left: 8px;
+    font-weight: 600;
+}
+
+.breadcrumbs {
+    padding: 12px 16px;
+    color: #6b7a90;
+    font-size: 12px;
+}
+
+.breadcrumbs a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.breadcrumbs a.muted {
+    pointer-events: none;
+}
+
+.breadcrumbs .sep {
+    margin: 0 6px;
+}
+
+.title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px 12px;
+    gap: 12px;
+}
+
+.page-title {
+    font-size: 22px;
+    font-weight: 700;
+    padding: 0 16px 12px;
+}
+
+.page {
+    padding: 0 16px 16px;
+}

@@ -1,1 +1,120 @@
-<p>dashboard works!</p>
+<div class="grid">
+    <app-stat-card title="Productos" [value]="245" badge="↑ 6% mes" tone="good" />
+    <app-stat-card title="Stock Bajo" [value]="12" badge="↓ 2 hoy" tone="bad" />
+    <app-stat-card title="Movimientos Hoy" [value]="58" badge="↑ 11%" tone="good" />
+    <app-stat-card title="Rotación Prom." value="34d" badge="↑ Mejoró" tone="good" />
+    <app-stat-card title="Pedidos Pendientes" [value]="7" badge="Revisar" />
+    <app-stat-card title="Órdenes Compra" [value]="14" badge="+3 nuevas" tone="good" />
+</div>
+
+<div class="grid-panels">
+    <section class="panel">
+        <header class="panel-header">Movimientos Recientes</header>
+
+        <!-- Filtros -->
+        <div class="controls">
+            <div class="field">
+                <label>Desde</label>
+                <input type="text" placeholder="mm/dd/yyyy">
+            </div>
+            <div class="field">
+                <label>Hasta</label>
+                <input type="text" placeholder="mm/dd/yyyy">
+            </div>
+            <div class="field">
+                <label>Tipo</label>
+                <select>
+                    <option>Todos</option>
+                    <option>Entrada</option>
+                    <option>Salida</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Estatus</label>
+                <select>
+                    <option>Vigente</option>
+                    <option>Anulado</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>&nbsp;</label>
+                <button class="btn primary">Filtrar</button>
+            </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Fecha</th>
+                        <th>Producto</th>
+                        <th>Tipo</th>
+                        <th>Cant.</th>
+                        <th>Usuario</th>
+                        <th>Estatus</th>
+                        <th>Saldo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let m of movs">
+                        <td>#{{m.id}}</td>
+                        <td>{{m.date}}</td>
+                        <td>{{m.product}}</td>
+                        <td><span class="chip" [class.in]="m.type==='Entrada'"
+                                [class.out]="m.type==='Salida'">{{m.type}}</span></td>
+                        <td [class.neg]="m.cant<0">{{ m.cant }}</td>
+                        <td>{{m.user}}</td>
+                        <td><span class="pill" [class.ok]="m.status==='OK'"
+                                [class.rev]="m.status==='Rev.'">{{m.status}}</span></td>
+                        <td>{{m.balance}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="panel">
+        <header class="panel-header">Stock Bajo (TOP)</header>
+
+        <!-- Mini barras -->
+        <div class="mini-bars">
+            <div class="bar" *ngFor="let s of stockTop" [style.height.%]="barHeight(s.value)"
+                [title]="s.label + ' ' + s.value">
+            </div>
+        </div>
+
+        <!-- Lista con contadores -->
+        <ul class="stock-list">
+            <li *ngFor="let s of stockTop">
+                <span class="name">{{ s.label }}</span>
+                <span class="counter">{{ s.value }}</span>
+            </li>
+        </ul>
+    </section>
+</div>
+
+<div class="grid-3">
+    <section class="panel">
+        <header class="panel-header">Proyección Consumo</header>
+        <div class="placeholder"></div>
+    </section>
+    <section class="panel">
+        <header class="panel-header">Órdenes de Compra</header>
+        <div class="placeholder"></div>
+    </section>
+    <section class="panel">
+        <header class="panel-header">Alertas</header>
+        <div class="alerts">
+            <div class="alert" *ngFor="let a of alerts">
+                <span class="sev" [class.crit]="a.sev==='Crítico'" [class.low]="a.sev==='Bajo'"
+                    [class.info]="a.sev==='Info'">
+                    {{ a.sev }}
+                </span>
+                <span class="txt">{{ a.text }}</span>
+                <button class="btn ghost">Ver</button>
+            </div>
+        </div>
+    </section>
+</div>
