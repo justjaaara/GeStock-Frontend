@@ -126,3 +126,45 @@
         </div>
     </section>
 </div>
+
+<!-- Modal Nuevo Movimiento -->
+
+<app-ui-modal [(open)]="newOpen" [(lockScroll)]="true">
+  <div class="mv-head"><h3 id="modalTitle">Nuevo Movimiento</h3></div>
+
+  <form class="mv-form" (submit)="saveNew($event)">
+    <div class="row">
+      <div class="col col-6">
+        <label class="label">Producto</label>
+        <input class="input" type="text" placeholder="Buscar producto">
+      </div>
+
+      <div class="col col-3">
+        <label class="label">Tipo</label>
+        <select class="input">
+          <option>Entrada</option>
+          <option>Salida</option>
+        </select>
+      </div>
+
+      <div class="col col-3">
+        <label class="label">Cantidad</label>
+        <input class="input" type="number" value="0" min="0">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col col-12">
+        <label class="label">Comentario</label>
+        <input class="input" type="text" placeholder="Detalle opcional">
+      </div>
+    </div>
+
+    <div class="mv-footer">
+      <small class="hint">Sólo visual, no guarda datos.</small>
+      <div class="spacer"></div>
+      <button type="button" class="btn ghost" (click)="closeNew()">Cancelar</button>
+      <button type="submit" class="btn primary-blue">Guardar</button>
+    </div>
+  </form>
+</app-ui-modal>

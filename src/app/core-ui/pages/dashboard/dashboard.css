@@ -293,3 +293,112 @@
 .btn.ghost {
     background: #fff
 }
+
+/* encabezado modal */
+.mv-head h3 {
+    margin: 0 0 10px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1b2b3c
+}
+
+/* formulario modal */
+.mv-form {
+    padding: 6px 4px 2px
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 10px
+}
+
+.col {
+    flex: 1
+}
+
+.col-6 {
+    flex-basis: calc(50% - 6px)
+}
+
+.col-3 {
+    flex-basis: calc(25% - 9px)
+}
+
+.col-12 {
+    flex-basis: 100%
+}
+
+.label {
+    display: block;
+    font-size: 11px;
+    color: #6b7a90;
+    text-transform: uppercase;
+    letter-spacing: .3px;
+    margin-bottom: 6px
+}
+
+.input {
+    width: 100%;
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid #cfe0d8;
+    border-radius: 12px;
+    background: #f8fcf9;
+    outline: 0;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, .03);
+}
+
+.input:focus {
+    border-color: #8cb6a5;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(74, 158, 119, .12)
+}
+
+select.input {
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 2 L6 7 L11 2' fill='none' stroke='%23354a61' stroke-width='2' stroke-linecap='round'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 12px 8px
+}
+
+/* footer modal */
+.mv-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 6px
+}
+
+.hint {
+    color: #9aa8b8
+}
+
+.spacer {
+    flex: 1
+}
+
+/* botones modal*/
+.btn {
+    padding: 8px 12px;
+    border: 1px solid #e3e9f2;
+    border-radius: 12px;
+    background: #fff;
+    cursor: pointer
+}
+
+.btn.ghost {
+    background: #fff
+}
+
+.btn.primary-blue {
+    background: #1f4e7a;
+    color: #fff;
+    border-color: #1f4e7a
+}
+
+.btn.primary-blue:hover {
+    filter: brightness(1.05)
+}

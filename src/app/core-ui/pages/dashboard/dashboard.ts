@@ -1,4 +1,5 @@
 import { StatCard } from '@/shared/components/stat-card/stat-card';
+import { UiModal } from '@/shared/components/ui-modal/ui-modal';
 import { Header } from '@/shared/services/header';
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
@@ -17,11 +18,13 @@ type Movimiento = {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [StatCard, CommonModule],
+  imports: [StatCard, CommonModule, UiModal],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
 export class Dashboard implements OnInit, OnDestroy {
+
+  newOpen = false;
 
   constructor(private header: Header) { }
 
@@ -31,7 +34,7 @@ export class Dashboard implements OnInit, OnDestroy {
     this.header.showSearch.set(true);
     this.header.actionsTopbar.set([
       { label: '', icon: '🌙', onClick: () => console.log('Nuevo') },
-      { label: 'Nuevo', icon: '➕', onClick: () => console.log('Exportar') },
+      { label: 'Nuevo', icon: '➕', onClick: () => this.openNew() },
       { label: 'Admin v1', icon: '🟢', onClick: () => console.log('Admin') }
     ]);
     this.header.actionsTitle.set([
@@ -69,4 +72,18 @@ export class Dashboard implements OnInit, OnDestroy {
     { sev: 'Bajo',    text: 'Papel A4 punto de reorden' },
     { sev: 'Info',    text: 'Nueva orden pendiente aprobación' },
   ];
+
+  openNew() {
+    this.newOpen = true;
+  }
+
+  closeNew() {
+    this.newOpen = false;
+  }
+
+  saveNew(e: Event) {
+    e.preventDefault();
+    console.log('Simulacro guardado');
+    this.closeNew();
+  }
 }

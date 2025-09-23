@@ -18,3 +18,7 @@ button {
 form {
   margin: 0;
 }
+
+body.modal.opnen {
+  overflow: hidden;
+}

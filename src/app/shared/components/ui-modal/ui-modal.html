@@ -1,0 +1,8 @@
+@if (open) {
+    <div class="overlay" (click)="close()" (keydown.escape)="close()" tabindex="-1">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" (click)="$event.stopPropagation()">
+            <button class="close" (click)="close()" aria-label="Cerrar">×</button>
+            <ng-content></ng-content>
+        </div>
+    </div>
+}
