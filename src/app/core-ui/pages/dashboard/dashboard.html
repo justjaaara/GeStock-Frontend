@@ -129,7 +129,7 @@
 
 <!-- Modal Nuevo Movimiento -->
 
-<app-ui-modal [(open)]="newOpen" [(lockScroll)]="true">
+<app-ui-modal [(open)]="newOpen" [lockScroll]="true">
   <div class="mv-head"><h3 id="modalTitle">Nuevo Movimiento</h3></div>
 
   <form class="mv-form" (submit)="saveNew($event)">

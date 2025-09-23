@@ -5,6 +5,7 @@ import { Dashboard } from './core-ui/pages/dashboard/dashboard';
 import { guestGuard } from './auth/guards/guest.guard';
 import { authGuard } from './auth/guards/auth.guard';
 import { Layout } from './shared/components/layout/layout';
+import { Inventory } from './core-ui/pages/inventory/inventory';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -16,6 +17,10 @@ export const routes: Routes = [
         path: '',
         component: Dashboard
       },
+    ], canActivate: [authGuard] },
+  { path: 'inventario', component: Layout,
+    children:[
+      { path: '', component: Inventory }
     ], canActivate: [authGuard] },
   { path: '**', redirectTo: '/login' },
 ];
