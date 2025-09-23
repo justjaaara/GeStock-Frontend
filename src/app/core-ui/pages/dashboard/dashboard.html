@@ -58,18 +58,20 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let m of movs">
-                        <td>#{{m.id}}</td>
-                        <td>{{m.date}}</td>
-                        <td>{{m.product}}</td>
-                        <td><span class="chip" [class.in]="m.type==='Entrada'"
-                                [class.out]="m.type==='Salida'">{{m.type}}</span></td>
-                        <td [class.neg]="m.cant<0">{{ m.cant }}</td>
-                        <td>{{m.user}}</td>
-                        <td><span class="pill" [class.ok]="m.status==='OK'"
-                                [class.rev]="m.status==='Rev.'">{{m.status}}</span></td>
-                        <td>{{m.balance}}</td>
-                    </tr>
+                    @for (m of movs; track m.id) {
+                        <tr>
+                            <td>#{{m.id}}</td>
+                            <td>{{m.date}}</td>
+                            <td>{{m.product}}</td>
+                            <td><span class="chip" [class.in]="m.type==='Entrada'"
+                                    [class.out]="m.type==='Salida'">{{m.type}}</span></td>
+                            <td [class.neg]="m.cant<0">{{ m.cant }}</td>
+                            <td>{{m.user}}</td>
+                            <td><span class="pill" [class.ok]="m.status==='OK'"
+                                    [class.rev]="m.status==='Rev.'">{{m.status}}</span></td>
+                            <td>{{m.balance}}</td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>
@@ -80,17 +82,21 @@
 
         <!-- Mini barras -->
         <div class="mini-bars">
-            <div class="bar" *ngFor="let s of stockTop" [style.height.%]="barHeight(s.value)"
-                [title]="s.label + ' ' + s.value">
-            </div>
+            @for (s of stockTop; track s.label) {
+                <div class="bar" [style.height.%]="barHeight(s.value)"
+                    [title]="s.label + ' ' + s.value">
+                </div>
+            }
         </div>
 
         <!-- Lista con contadores -->
         <ul class="stock-list">
-            <li *ngFor="let s of stockTop">
-                <span class="name">{{ s.label }}</span>
-                <span class="counter">{{ s.value }}</span>
-            </li>
+            @for (s of stockTop; track s.label) {
+                <li>
+                    <span class="name">{{ s.label }}</span>
+                    <span class="counter">{{ s.value }}</span>
+                </li>
+            }
         </ul>
     </section>
 </div>
@@ -107,14 +113,16 @@
     <section class="panel">
         <header class="panel-header">Alertas</header>
         <div class="alerts">
-            <div class="alert" *ngFor="let a of alerts">
-                <span class="sev" [class.crit]="a.sev==='Crítico'" [class.low]="a.sev==='Bajo'"
-                    [class.info]="a.sev==='Info'">
-                    {{ a.sev }}
-                </span>
-                <span class="txt">{{ a.text }}</span>
-                <button class="btn ghost">Ver</button>
-            </div>
+            @for (a of alerts; track a.text) {
+                <div class="alert">
+                    <span class="sev" [class.crit]="a.sev==='Crítico'" [class.low]="a.sev==='Bajo'"
+                        [class.info]="a.sev==='Info'">
+                        {{ a.sev }}
+                    </span>
+                    <span class="txt">{{ a.text }}</span>
+                    <button class="btn ghost">Ver</button>
+                </div>
+            }
         </div>
     </section>
 </div>

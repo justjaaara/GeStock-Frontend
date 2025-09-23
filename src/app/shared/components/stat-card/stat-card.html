@@ -1,7 +1,9 @@
 <div class="card">
   <div class="title">{{ title }}</div>
   <div class="value">{{ value }}</div>
-  <div *ngIf="badge" class="badge" [class.good]="tone==='good'" [class.bad]="tone==='bad'">
-    {{ badge }}
-  </div>
+  @if (badge) {
+    <div class="badge" [class.good]="tone==='good'" [class.bad]="tone==='bad'">
+      {{ badge }}
+    </div>
+  }
 </div>
