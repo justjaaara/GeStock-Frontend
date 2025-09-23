@@ -2,13 +2,15 @@
   <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
     <div class="form-group">
       <label for="email">Email:</label>
-      <input
-        type="email"
-        id="email"
+      <app-input-field 
         formControlName="email"
-        [class.error]="getFieldError('email')"
+        type="email"
         placeholder="Ingresa tu email"
-      />
+        textColor="#174376"
+        backgroundColor="#F3F6FA"
+        width="100%"
+        height="40px">
+      </app-input-field>
       @if (getFieldError('email')){
       <span class="error-message">{{ getFieldError('email') }}</span>
       }
@@ -16,13 +18,16 @@
 
     <div class="form-group">
       <label for="password">Contraseña:</label>
-      <input
-        type="password"
-        id="password"
+      <app-input-field 
         formControlName="password"
-        [class.error]="getFieldError('password')"
+        type="password"
+        [showPasswordToggle]="true"
         placeholder="Ingresa tu contraseña"
-      />
+        textColor="#174376"
+        backgroundColor="#F3F6FA"
+        width="100%"
+        height="40px">
+      </app-input-field>
       @if (getFieldError('password')) {
       <span class="error-message">{{ getFieldError('password') }}</span>
       }

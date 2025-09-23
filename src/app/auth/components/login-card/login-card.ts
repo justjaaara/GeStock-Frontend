@@ -1,15 +1,13 @@
 import { Component, computed, inject, signal } from '@angular/core';
-// TODO: VERIFICAR ESTOS COMPONENTES?
-// import { Button } from '../../../shared/components/button/button';
-// import { InputField } from '../../../shared/components/input/input-field';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Auth } from '@/auth/services/auth';
 import { Router } from '@angular/router';
 import { LoginRequest } from '@/auth/interfaces/auth';
+import { InputField } from '../../../shared/components/input/input-field';
 
 @Component({
   selector: 'app-login-card',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, InputField],
   templateUrl: './login-card.html',
   styleUrl: './login-card.css',
 })
@@ -43,10 +41,18 @@ export class LoginCard {
           this.router.navigate(['/dashboard']);
         },
         error: (error) => {
-          this.isLoading.set(false);
+          this.isLoading.set(false); // ← IMPORTANTE: Siempre habilitar el botón
 
-          if (error.status === 401) {
+          console.error('Error en login:', error);
+
+          if (error.status === 0) {
+            this.errorMessage.set('No se puede conectar al servidor. Verifica que el backend esté ejecutándose.');
+          } else if (error.status === 401) {
             this.errorMessage.set('Credenciales inválidas. Verifica tu email y contraseña.');
+          } else if (error.status === 404) {
+            this.errorMessage.set('Servidor no encontrado. Verifica que el backend esté ejecutándose en el puerto 3000.');
+          } else if (error.status >= 500) {
+            this.errorMessage.set('Error interno del servidor. Intenta más tarde.');
           } else {
             this.errorMessage.set('Error al iniciar sesión. Intenta nuevamente.');
           }
