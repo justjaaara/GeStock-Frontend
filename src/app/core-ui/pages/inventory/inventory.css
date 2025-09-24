@@ -225,3 +225,14 @@ td.actions {
     opacity: .5;
     cursor: not-allowed;
 }
+
+.link-id {
+  color: #1b2b3c;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: default;
+}
+
+.link-id:hover {
+  text-decoration: none;
+}

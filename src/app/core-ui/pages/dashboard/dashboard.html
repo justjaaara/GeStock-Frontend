@@ -60,7 +60,7 @@
                 <tbody>
                     @for (m of movs; track m.id) {
                         <tr>
-                            <td>#{{m.id}}</td>
+                            <td class="link-id">#{{m.id}}</td>
                             <td>{{m.date}}</td>
                             <td>{{m.product}}</td>
                             <td><span class="chip" [class.in]="m.type==='Entrada'"

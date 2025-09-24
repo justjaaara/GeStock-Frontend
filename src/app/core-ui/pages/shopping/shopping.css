@@ -1,0 +1,535 @@
+/* ========== GRID & PANELES ========== */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(220px, 1fr));
+    gap: 14px;
+}
+
+.panel {
+    margin-top: 16px;
+    background: #fff;
+    border: 1px solid #e5eaf2;
+    border-radius: 14px;
+    padding: 16px;
+}
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.panel-header h4 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* ========== CONTROLES / FORM ========== */
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-bottom: 12px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 0 0 auto;
+}
+
+.controls .field label {
+    display: block;
+    margin: 0 0 6px 2px;
+    font-size: 12px;
+    line-height: 1;
+    color: #6b7a90;
+    font-weight: 500;
+}
+
+.field input,
+.field select {
+    height: 36px;
+    padding: 0 12px;
+    border: 1px solid #e3e9f2;
+    border-radius: 10px;
+    background: #fff;
+    outline: none;
+}
+
+.controls select {
+    height: 36px;
+    padding: 0 36px 0 12px;
+    border: 1px solid #e3e9f2;
+    border-radius: 12px;
+    background: #fff;
+    outline: 0;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 2 L6 7 L11 2' fill='none' stroke='%23354a61' stroke-width='2' stroke-linecap='round'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 12px 8px;
+}
+
+/* Botones */
+.btn {
+    height: 36px;
+    padding: 0 14px;
+    border: 1px solid #e3e9f2;
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.controls .btn.primary {
+    border-radius: 12px;
+    border: 1px solid #d6e3ff;
+    background: #eef4ff;
+    color: #2e547f;
+    font-weight: 600;
+    transition: background .15s, box-shadow .15s, border-color .15s;
+}
+
+.controls .btn.primary:hover {
+    background: #e6efff;
+}
+
+.controls .btn.primary:focus {
+    box-shadow: 0 0 0 3px rgba(46, 84, 127, .15);
+    outline: 0;
+}
+
+/* ========== TABLA ========== */
+.table-wrap {
+    overflow: auto;
+    border: 1px solid #e3e9f2;
+    border-radius: 10px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table thead th {
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+    color: #5b6b80;
+    background: #f7fafc;
+    padding: 10px 12px;
+    border-bottom: 1px solid #e3e9f2;
+}
+
+.table tbody td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #eef2f6;
+    font-size: 14px;
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.table tbody tr:hover td {
+    background: #fbfdff;
+}
+
+/* Fila activa (línea azul izquierda) */
+.table tbody tr.is-active td {
+    box-shadow: inset 3px 0 0 #2e547f;
+}
+
+/* ========== CELDAS / TEXTO ========== */
+.bold {
+    font-weight: 700;
+}
+
+.cell-product .name {
+    font-weight: 600;
+    color: #1b2b3c;
+    text-decoration: none;
+}
+
+.cell-product .name:hover {
+    text-decoration: underline;
+}
+
+.cell-product .sub {
+    font-size: 12px;
+    color: #8aa0b5;
+    margin-top: 2px;
+}
+
+.link-id {
+    color: #1b2b3c;
+    text-decoration: none;
+    font-weight: 600;
+    cursor: default;
+}
+
+.link-id:hover {
+    text-decoration: none;
+}
+
+.cell-datetime small {
+    display: block;
+}
+
+.muted {
+    color: #8aa0b5;
+}
+
+.ta-right {
+    text-align: right;
+}
+
+/* Cantidades (+ / -) */
+td.ta-right.pos {
+    color: #1e7e34;
+    font-weight: 700;
+}
+
+td.ta-right.neg {
+    color: #e74c3c;
+    font-weight: 700;
+}
+
+/* ========== CHIPS / TAGS ========== */
+/* Tipo de movimiento */
+.tag {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    border: 1px solid transparent;
+}
+
+.tag.entrada {
+    background: #e9f7ef;
+    color: #1e7e34;
+    border-color: #cfeedd;
+}
+
+.tag.salida {
+    background: #fdeceb;
+    color: #c0392b;
+    border-color: #f7c6c1;
+}
+
+.tag.ajuste {
+    background: #eef4ff;
+    color: #2e547f;
+    border-color: #cfe0ff;
+}
+
+/* Estado (estilo “pill” suave) */
+.status {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    border: 1px solid transparent;
+}
+
+/* Los que ya tenías */
+.status.confirmado {
+    background: #e9f7ef;
+    color: #27ae60;
+    border-color: #cfeedd;
+}
+
+.status.pendiente {
+    background: #fff4e5;
+    color: #b8791b;
+    border-color: #f4d3a1;
+}
+
+.status.anulado {
+    background: #f1f2f6;
+    color: #6b7a90;
+    border-color: #e1e6ef;
+}
+
+/* Los de la maqueta (añadidos) */
+.status.enviada {
+    background: #e0ecff;
+    color: #1e40af;
+    border-color: #bfdbfe;
+}
+
+.status.recibida {
+    background: #e7f9ee;
+    color: #065f46;
+    border-color: #bbf7d0;
+}
+
+.status.cerrada {
+    background: #eaf2ef;
+    color: #707070;
+    border-color: #cbd5e1;
+}
+
+.status.retrasada {
+    background: #fde8ef;
+    color: #9f1239;
+    border-color: #fecdd3;
+}
+
+/* ========== ACCIONES ========== */
+td.actions {
+    white-space: nowrap;
+    text-align: right;
+}
+
+.icon-btn {
+    width: 30px;
+    height: 30px;
+    display: inline-grid;
+    place-items: center;
+    border: 1px solid #e3e9f2;
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+    margin-left: 6px;
+}
+
+.icon-btn:hover {
+    background: #f4f7fb;
+}
+
+/* ========== FOOTER / PAGINACIÓN ========== */
+.panel-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 12px;
+}
+
+.page-info {
+    font-size: 13px;
+    color: #6b7a90;
+}
+
+.btn.nav {
+    padding: 8px 12px;
+    border: 1px solid #e3e9f2;
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.btn.nav.primary {
+    background: #eef4ff;
+}
+
+.btn.nav:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+/* Layout de dos columnas para la sección */
+.grid-side {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 16px;
+    align-items: start;
+}
+
+/* botón + Orden pequeño tipo pill */
+.btn.pill {
+    height: 30px;
+    padding: 0 10px;
+    border: 1px solid #d6e3ff;
+    border-radius: 12px;
+    background: #eef4ff;
+    color: #2e547f;
+    font-weight: 600;
+}
+
+.btn.pill:hover {
+    background: #e6efff;
+}
+
+/* color stock bajo */
+.low {
+    color: #e37a20;
+}
+
+/* Tarjeta lateral */
+.mini-card {
+    background: #fff;
+    border: 1px solid #e5eaf2;
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.mini-card h5 {
+    margin: 4px 0 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1b2b3c;
+}
+
+/* Barras mini-chart (sin librerías) */
+.bars {
+    display: flex;
+    align-items: end;
+    gap: 8px;
+    height: 64px;
+    padding: 6px 4px;
+}
+
+.bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 26px;
+}
+
+.bar-col {
+    width: 100%;
+    background: #cfe0ff;
+    border: 1px solid #bfd3ff;
+    border-radius: 6px;
+    height: 10%;
+    /* será sobrescrito por style height.% */
+}
+
+.bars .bar:nth-child(3) .bar-col {
+    background: #2f7dfc22;
+    border-color: #2f7dfc55;
+}
+
+/* resalta el mes actual */
+
+.mini-card hr {
+    border: 0;
+    border-top: 1px solid #eef2f6;
+    margin: 10px 0;
+}
+
+/* KPIs */
+.stats .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 12px;
+    border: 1px solid #bbf7d0;
+    background: #e7f9ee;
+    color: #065f46;
+}
+
+/* --- FIX mini chart barras --- */
+/* Área de barras */
+.bars {
+  display: flex;
+  align-items: flex-end;   /* TODAS desde el piso */
+  justify-content: space-between; /* más aire entre barras */
+  gap: 14px;               /* separador extra */
+  height: 120px;           /* altura total de las barras */
+  padding: 6px 4px 24px;   /* deja espacio abajo para labels */
+  position: relative;
+}
+
+/* Cada bar ocupa solo el área de barra */
+.bar {
+  flex: 1;
+  max-width: 32px;         /* ancho fijo de cada columna */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  position: relative;
+}
+
+/* La columna misma */
+.bar-col {
+  width: 100%;
+  border-radius: 6px;
+  background: #cfe0ff;
+  border: 1px solid #bfd3ff;
+  transition: height .2s;
+}
+
+/* Label independiente del alto */
+.bar small {
+  position: absolute;
+  bottom: -18px;          /* se coloca fuera del área de barra */
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  color: #6b7a90;
+  white-space: nowrap;
+}
+
+/* resalte mes actual */
+.bars .bar.is-current .bar-col {
+  background: #2f7dfc22;
+  border-color: #2f7dfc55;
+}
+/* FIX: que las barras tengan base y crezcan desde el piso */
+.bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+  height: 120px;          /* alto total del área */
+  padding: 6px 4px 24px;  /* espacio para labels abajo */
+  position: relative;
+}
+
+.bar {
+  position: relative;
+  flex: 1;
+  max-width: 32px;
+  height: calc(100% - 24px); /* <<< altura real para las barras */
+  display: flex;
+  align-items: flex-end;      /* pegan al piso */
+  justify-content: center;
+}
+
+.bar-col {
+  width: 100%;
+  border-radius: 6px;
+  background: #cfe0ff;
+  border: 1px solid #bfd3ff;
+  min-height: 6px;           /* para que nunca quede como línea */
+  transition: height .2s;
+}
+
+.bar small {
+  position: absolute;
+  bottom: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  color: #6b7a90;
+  white-space: nowrap;
+}
+
+/* resalta el mes actual (si usas .is-current) */
+.bars .bar.is-current .bar-col {
+  background: #2f7dfc22;
+  border-color: #2f7dfc55;
+}

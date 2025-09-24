@@ -405,3 +405,13 @@ select.input {
 .btn.primary-blue:hover {
     filter: brightness(1.05)
 }
+
+.link-id {
+  color: #1b2b3c;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: default;
+}
+.link-id:hover {
+  text-decoration: none;
+}

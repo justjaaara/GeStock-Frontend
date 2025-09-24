@@ -7,6 +7,7 @@ import { authGuard } from './auth/guards/auth.guard';
 import { Layout } from './shared/components/layout/layout';
 import { Inventory } from './core-ui/pages/inventory/inventory';
 import { MovementHistory } from './core-ui/pages/movement-history/movement-history';
+import { Shopping } from './core-ui/pages/shopping/shopping';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -32,6 +33,13 @@ export const routes: Routes = [
       { 
         path: '', 
         component: MovementHistory 
+      },
+    ], canActivate: [authGuard] },
+  { path: 'compras', component: Layout,
+    children:[
+      { 
+        path: '', 
+        component: Shopping 
       },
     ], canActivate: [authGuard] },
   { path: '**', redirectTo: '/login' },

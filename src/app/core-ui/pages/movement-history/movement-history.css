@@ -237,12 +237,13 @@ td.actions {
 
 /* link de ID */
 .link-id {
-    color: #2e547f;
-    text-decoration: none;
+  color: #1b2b3c;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: default;
 }
-
 .link-id:hover {
-    text-decoration: underline;
+  text-decoration: none;
 }
 
 /* fecha/hora en dos líneas */
@@ -345,27 +346,35 @@ td.actions {
 }
 
 /* Labels grises y pequeños encima del campo */
-.controls .field label{
-  display:block;
-  margin: 0 0 6px 2px;
-  font-size: 12px;
-  line-height: 1;
-  color: #6b7a90;
-  font-weight: 500;
+.controls .field label {
+    display: block;
+    margin: 0 0 6px 2px;
+    font-size: 12px;
+    line-height: 1;
+    color: #6b7a90;
+    font-weight: 500;
 }
 
 /* Botón “Filtrar” estilo pill azul */
-.controls .btn.primary{
-  height: 36px;
-  padding: 0 14px;
-  border-radius: 12px;
-  border: 1px solid #d6e3ff;
-  background: #eef4ff;
-  color: #2e547f;
-  font-weight: 600;
-  cursor: pointer;
-  appearance: none;             /* quita estilos nativos */
-  transition: background .15s, box-shadow .15s, border-color .15s;
+.controls .btn.primary {
+    height: 36px;
+    padding: 0 14px;
+    border-radius: 12px;
+    border: 1px solid #d6e3ff;
+    background: #eef4ff;
+    color: #2e547f;
+    font-weight: 600;
+    cursor: pointer;
+    appearance: none;
+    /* quita estilos nativos */
+    transition: background .15s, box-shadow .15s, border-color .15s;
 }
-.controls .btn.primary:hover{ background:#e6efff; }
-.controls .btn.primary:focus{ box-shadow:0 0 0 3px rgba(46,84,127,.15); outline:0; }
+
+.controls .btn.primary:hover {
+    background: #e6efff;
+}
+
+.controls .btn.primary:focus {
+    box-shadow: 0 0 0 3px rgba(46, 84, 127, .15);
+    outline: 0;
+}
