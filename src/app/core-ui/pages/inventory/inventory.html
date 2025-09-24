@@ -1,1 +1,91 @@
-<p>inventory works!</p>
+<div class="grid">
+    <app-stat-card title="Total Productos" [value]="245" badge="↑ 8 nuevos" tone="good" />
+    <app-stat-card title="Stock critico" [value]="12" badge="↓ urgente" tone="bad" />
+    <app-stat-card title="Valor total" [value]="'$145,580'" badge="↑ 3.2%" tone="good" />
+    <app-stat-card title="Sin movimiento" [value]="18" badge="⌛ 30+ días" />
+</div>
+
+<section class="panel">
+    <header class="panel-header">
+        <h4>Lista de productos</h4>
+
+        <!-- Filtros -->
+        <div class="controls">
+            <div class="field">
+                <select>
+                    <option>Todos los estados</option>
+                    <option>Entrada</option>
+                    <option>Salida</option>
+                </select>
+            </div>
+            <div class="field">
+                <select>
+                    <option>Todas las categorias</option>
+                    <option>Vigente</option>
+                    <option>Anulado</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <!-- Tabla -->
+    <div class="table-wrap">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Codigo</th>
+                    <th>Producto</th>
+                    <th>Categoria</th>
+                    <th>Stock Actual</th>
+                    <th>Stock Minimo</th>
+                    <th>Precio Unit.</th>
+                    <th>Proveedor</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (p of products; track p.code) {
+                <tr>
+                    <td>{{ p.code }}</td>
+                    <td>
+                        <div class="cell-product">
+                            <a class="name" href="javascript:void(0)">{{ p.name }}</a>
+                            @if (p.subtitle) {
+                            <div class="sub">{{ p.subtitle }}</div>
+                            }
+                        </div>
+                    </td>
+                    <td>{{ p.category }}</td>
+                    <td [class.bold]="true" [class.neg]="p.stock < p.min">{{ p.stock }}</td>
+                    <td>{{ p.min }}</td>
+                    <td>{{ p.price | currency:'USD':'symbol':'1.2-2' }}</td>
+                    <td>{{ p.provider }}</td>
+                    <td>
+                        <span class="pill" [class.ok]="p.status==='Activo'" [class.warn]="p.status==='Stock Bajo'"
+                            [class.crit]="p.status==='Crítico'">
+                            {{ p.status }}
+                        </span>
+                    </td>
+
+                    <!-- Acciones con icon buttons -->
+                    <td class="actions">
+                        <button class="icon-btn" title="Editar">✏️</button>
+                        <button class="icon-btn" title="Ver">👁️</button>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <footer class="panel-foot">
+        <button class="btn nav" [disabled]="page===1" (click)="prevPage()">← Anterior</button>
+
+        <div class="page-info">
+            Página {{ page }} de {{ totalPages }} ({{ totalProducts }} productos)
+        </div>
+
+        <button class="btn nav primary" [disabled]="page===totalPages" (click)="nextPage()">Siguiente →</button>
+    </footer>
+</section>
