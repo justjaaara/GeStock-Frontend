@@ -6,6 +6,7 @@ import { guestGuard } from './auth/guards/guest.guard';
 import { authGuard } from './auth/guards/auth.guard';
 import { Layout } from './shared/components/layout/layout';
 import { Inventory } from './core-ui/pages/inventory/inventory';
+import { MovementHistory } from './core-ui/pages/movement-history/movement-history';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -20,7 +21,18 @@ export const routes: Routes = [
     ], canActivate: [authGuard] },
   { path: 'inventario', component: Layout,
     children:[
-      { path: '', component: Inventory }
+      { 
+        path: '', 
+        component: Inventory 
+      },
+    ], canActivate: [authGuard] },
+
+  { path: 'movimientos', component: Layout,
+    children:[
+      { 
+        path: '', 
+        component: MovementHistory 
+      },
     ], canActivate: [authGuard] },
   { path: '**', redirectTo: '/login' },
 ];

@@ -1,0 +1,132 @@
+<div class="grid">
+    <app-stat-card title="Movimientos hoy" [value]="58" badge="↑ 11% vs ayer" tone="good" />
+    <app-stat-card title="Entradas" [value]="32" badge="↑ 8 productos" tone="good" />
+    <app-stat-card title="Salidas" [value]="26" badge="↑ normal" tone="good" />
+    <app-stat-card title="Valor movido" [value]="'$4,280'" badge="↑ 15%" tone="good" />
+</div>
+
+<section class="panel">
+    <header class="panel-header">
+        <h4>Historial de Movimientos</h4>
+
+        <!-- Filtros -->
+        <div class="controls">
+            <div class="field">
+                <label>Desde</label>
+                <input type="text" placeholder="mm/dd/yyyy">
+            </div>
+            <div class="field">
+                <label>Hasta</label>
+                <input type="text" placeholder="mm/dd/yyyy">
+            </div>
+            <div class="field">
+                <label>Tipo</label>
+                <select>
+                    <option>Todos</option>
+                    <option>Entrada</option>
+                    <option>Salida</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Estatus</label>
+                <select>
+                    <option>Vigente</option>
+                    <option>Anulado</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>&nbsp;</label>
+                <button class="btn primary">Filtrar</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Tabla -->
+    <div class="table-wrap">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Fecha/Hora</th>
+                    <th>Producto</th>
+                    <th>Tipo</th>
+                    <th>Cantidad</th>
+                    <th>Saldo Ant.</th>
+                    <th>Saldo Nuevo</th>
+                    <th>Usuario</th>
+                    <th>Motivo</th>
+                    <th>Estado</th>
+                    <th class="ta-right">Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @for (m of movements; track m.id) {
+                <tr>
+                    <td>
+                        <a class="link-id" href="javascript:void(0)">#{{ m.id }}</a>
+                    </td>
+
+                    <td>
+                        <div class="cell-datetime">
+                            <div>{{ m.date | date:'dd/MM/yyyy' }}</div>
+                            <small class="muted">{{ m.date | date:'hh:mm a' }}</small>
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="cell-product">
+                            <a class="name" href="javascript:void(0)">{{ m.product }}</a>
+                            <div class="sub">#{{ m.productCode }}</div>
+                        </div>
+                    </td>
+
+                    <td>
+                        <span class="tag" [class.entrada]="m.type==='Entrada'" [class.salida]="m.type==='Salida'"
+                            [class.ajuste]="m.type==='Ajuste'">
+                            {{ m.type }}
+                        </span>
+                    </td>
+
+                    <td class="ta-right" [class.pos]="m.qty>0" [class.neg]="m.qty<0">
+                        {{ m.qty>0 ? '+'+m.qty : m.qty }}
+                    </td>
+
+                    <td class="ta-right">{{ m.balancePrev }}</td>
+                    <td class="ta-right bold">{{ m.balanceNew }}</td>
+
+                    <td>{{ m.user }}</td>
+                    <td>{{ m.reason }}</td>
+
+                    <td>
+                        <span class="status" [class.confirmado]="m.status==='Confirmado'"
+                            [class.pendiente]="m.status==='Pendiente'" [class.anulado]="m.status==='Anulado'">
+                            {{ m.status }}
+                        </span>
+                    </td>
+
+                    <td class="actions">
+                        <button class="icon-btn" title="Ver">👁️</button>
+                        <button class="icon-btn" title="Editar">✏️</button>
+                        @if (m.status==='Pendiente') {
+                        <button class="icon-btn" title="Confirmar">✅</button>
+                        }
+                        <button class="icon-btn" title="Auditar">🔎</button>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+
+    <footer class="panel-foot">
+        <button class="btn nav" [disabled]="page===1" (click)="prevPage()">← Anterior</button>
+
+        <div class="page-info">
+            Página {{ page }} de {{ totalPages }} ({{ totalProducts }} productos)
+        </div>
+
+        <button class="btn nav primary" [disabled]="page===totalPages" (click)="nextPage()">Siguiente →</button>
+    </footer>
+</section>

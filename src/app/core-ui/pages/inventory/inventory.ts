@@ -24,8 +24,6 @@ type Product = {
 })
 export class Inventory implements OnInit, OnDestroy {
 
-  newOpen = false;
-
   constructor(private header: Header) { }
 
   ngOnInit(): void {
@@ -34,7 +32,7 @@ export class Inventory implements OnInit, OnDestroy {
     this.header.showSearch.set(true);
     this.header.actionsTopbar.set([
       { label: '', icon: '🌙', onClick: () => console.log('Modo Oscuro') },
-      { label: 'Nuevo producto', icon: '➕', onClick: () => this.openNew() },
+      { label: 'Nuevo producto', icon: '➕', onClick: () => console.log('Nuevo producto') },
       { label: 'Admin v1', icon: '🟢', onClick: () => console.log('Admin') }
     ]);
     this.header.actionsTitle.set([
@@ -46,20 +44,6 @@ export class Inventory implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.header.reset();
-  }
-
-  openNew() {
-    this.newOpen = true;
-  }
-
-  closeNew() {
-    this.newOpen = false;
-  }
-
-  saveNew(e: Event) {
-    e.preventDefault();
-    console.log('Simulacro guardado');
-    this.closeNew();
   }
 
   products: Product[] = [
