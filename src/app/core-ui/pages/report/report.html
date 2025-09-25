@@ -1,0 +1,123 @@
+<div class="grid">
+  <app-stat-card title="Reportes generados" [value]="28" badge="↑ 4 este mes" tone="good" />
+  <app-stat-card title="Automáticos" [value]="12" badge="↑ Programados" tone="good" />
+  <app-stat-card title="Descargados" [value]="'85%'" badge="↑ Alta utilización" tone="good" />
+  <app-stat-card title="Último reporte" [value]="'Hoy'" badge="↑ Actualizado" tone="good" />
+</div>
+
+<section class="panel">
+  <div class="action-grid">
+    @for (a of reportActions; track a.title) {
+      <app-report-card [icon]="a.icon" [title]="a.title" [description]="a.desc"
+                       (generate)="a.onClick()" />
+    }
+  </div>
+</section>
+
+<section class="panel">
+  <header class="panel-header">
+    <h4>Historial de Reportes</h4>
+
+    <div class="controls">
+      <div class="field">
+        <label>Tipo</label>
+        <select>
+            <option>Todos</option>
+            <option>Inventario general</option>
+            <option>Movimientos diarios</option>
+            <option>Compras mensuales</option>
+            <option>Analisis ABC</option>
+            <option>Rotacion de stock</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Período</label>
+        <select>
+          <option>Últimos 30 días</option>
+          <option>Este mes</option>
+          <option>Mes anterior</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Estado</label>
+        <select>
+          <option>Todos</option>
+          <option>Generado</option>
+          <option>Enviado</option>
+          <option>Descargado</option>
+          <option>Error</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>&nbsp;</label><button class="btn primary">Filtrar</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Tipo de Reporte</th>
+          <th>Periodo</th>
+          <th>Generado</th>
+          <th>Usuario</th>
+          <th>Tamaño</th>
+          <th>Descargas</th>
+          <th>Estado</th>
+          <th class="ta-right">Acciones</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (r of reports; track r.id) {
+        <tr>
+          <td><a class="link-id" href="javascript:void(0)">#{{ r.id }}</a></td>
+
+          <td>
+            <div class="cell-report">
+              <a class="name" href="javascript:void(0)">{{ r.title }}</a>
+              <div class="sub">{{ r.subtitle }}</div>
+            </div>
+          </td>
+
+          <td>{{ r.period }}</td>
+
+          <td class="cell-datetime">
+            {{ r.generated | date:'dd/MM/yyyy' }}
+            <small class="sub">{{ r.generated | date:'hh:mm a' }}</small>
+          </td>
+
+          <td>{{ r.user }}</td>
+          <td>{{ r.size }}</td>
+          <td>{{ r.downloads }}</td>
+
+          <td>
+            <span class="status"
+                  [class.gen]="r.status==='Generado'"
+                  [class.sent]="r.status==='Enviado'"
+                  [class.down]="r.status==='Descargado'"
+                  [class.err]="r.status==='Error'">
+              {{ r.status }}
+            </span>
+          </td>
+
+          <td class="actions ta-right">
+            <button class="icon-btn download" title="Descargar">⬇️</button>
+            <button class="icon-btn view" title="Ver">👁️</button>
+            <button class="icon-btn share" title="Compartir">🔗</button>
+            <button class="icon-btn delete" title="Eliminar">🗑️</button>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <footer class="panel-foot">
+    <button class="btn nav" [disabled]="page===1" (click)="prevPage()">← Anterior</button>
+    <div class="page-info">Página {{ page }} de {{ totalPages }} ({{ totalProducts }} reportes)</div>
+    <button class="btn nav primary" [disabled]="page===totalPages" (click)="nextPage()">Siguiente →</button>
+  </footer>
+</section>

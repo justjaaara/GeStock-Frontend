@@ -10,6 +10,7 @@ import { MovementHistory } from './core-ui/pages/movement-history/movement-histo
 import { Shopping } from './core-ui/pages/shopping/shopping';
 import { Supplier } from './core-ui/pages/supplier/supplier';
 import { Client } from './core-ui/pages/client/client';
+import { Report } from './core-ui/pages/report/report';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -56,6 +57,13 @@ export const routes: Routes = [
       {
         path: '',
         component: Client
+      },
+    ], canActivate: [authGuard] },
+  { path: 'reportes', component: Layout,
+    children:[
+      {
+        path: '',
+        component: Report
       },
     ], canActivate: [authGuard] },
   { path: '**', redirectTo: '/login' },

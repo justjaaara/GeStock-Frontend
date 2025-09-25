@@ -18,6 +18,7 @@ type TypeTotal = { label: string; total: number; };
 
 @Component({
   selector: 'app-client',
+  standalone: true,
   imports: [StatCard, CommonModule],
   templateUrl: './client.html',
   styleUrl: './client.css'
