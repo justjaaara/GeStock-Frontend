@@ -1,0 +1,267 @@
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(220px, 1fr));
+    gap: 14px;
+}
+
+.panel {
+    margin-top: 16px;
+    background: #fff;
+    border: 1px solid #e5eaf2;
+    border-radius: 14px;
+    padding: 16px;
+}
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.panel-header h4 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+
+
+.field input,
+.field select {
+    height: 36px;
+    padding: 0 12px;
+    border: 1px solid #e3e9f2;
+    border-radius: 10px;
+    background: #fff;
+    outline: none;
+}
+
+.table-wrap {
+    overflow: auto;
+    border: 1px solid #e3e9f2;
+    border-radius: 10px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table thead th {
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+    color: #5b6b80;
+    background: #f7fafc;
+    padding: 10px 12px;
+    border-bottom: 1px solid #e3e9f2;
+}
+
+.table tbody td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #eef2f6;
+    font-size: 14px;
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.table tbody tr:hover td {
+    background: #fbfdff;
+}
+
+/* marca una fila “activa” (línea azul a la izquierda) */
+.table tbody tr.is-active td {
+    box-shadow: inset 3px 0 0 #2e547f;
+}
+
+/* provider: nombre + subtítulo */
+.cell-provider .name {
+    font-weight: 600;
+    color: #1b2b3c;
+    text-decoration: none;
+}
+
+.cell-provider .name:hover {
+    text-decoration: underline;
+}
+
+.cell-provider .sub {
+    font-size: 12px;
+    color: #8aa0b5;
+    margin-top: 2px;
+}
+
+/* contacto (dos líneas con iconitos) */
+.cell-contact .line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1.2;
+}
+
+.cell-contact .ico {
+    width: 16px;
+    display: inline-block;
+    text-align: center;
+}
+
+.cell-contact .mail {
+    color: #2e547f;
+    text-decoration: none;
+}
+
+.cell-contact .mail:hover {
+    text-decoration: underline;
+}
+
+/* números */
+.bold {
+    font-weight: 700;
+}
+
+.neg {
+    color: #e74c3c;
+    font-weight: 700;
+}
+
+/* pill de estado (reusa esquema de chips que ya tienes) */
+.pill {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    background: #eef1f6;
+    border: 1px solid #dfe7f2;
+}
+
+.pill.ok {
+    background: #e9f7ef;
+    color: #27ae60;
+    border-color: #cfeedd;
+}
+
+.pill.warn {
+    background: #fff4e5;
+    color: #b8791b;
+    border-color: #f4d3a1;
+}
+
+.pill.crit {
+    background: #fdeceb;
+    color: #e74c3c;
+    border-color: #f7c6c1;
+}
+
+.pill.info {
+    background: #e0ecff;
+    color: #1e40af;
+    border-color: #bfdbfe;
+}
+
+/* acciones */
+td.actions {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.icon-btn {
+    width: 30px;
+    height: 30px;
+    display: inline-grid;
+    place-items: center;
+    border: 1px solid #e3e9f2;
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+    margin-left: 6px;
+}
+
+.icon-btn:hover {
+    background: #f4f7fb;
+}
+
+.controls {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-bottom: 12px;
+}
+
+.controls .field {
+    flex: 0 0 auto;
+}
+
+.controls select {
+    height: 36px;
+    padding: 0 36px 0 12px;
+    border: 1px solid #e3e9f2;
+    border-radius: 12px;
+    background: #fff;
+    outline: 0;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 2 L6 7 L11 2' fill='none' stroke='%23354a61' stroke-width='2' stroke-linecap='round'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 12px 8px;
+}
+
+.panel-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 12px;
+}
+
+.page-info {
+    font-size: 13px;
+    color: #6b7a90;
+}
+
+.btn.nav {
+    padding: 8px 12px;
+    border: 1px solid #e3e9f2;
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.btn.nav.primary {
+    background: #eef4ff;
+}
+
+.btn.nav:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.link-id {
+    color: #1b2b3c;
+    text-decoration: none;
+    font-weight: 600;
+    cursor: default;
+}
+
+.link-id:hover {
+    text-decoration: none;
+}
