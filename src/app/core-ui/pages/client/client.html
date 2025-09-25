@@ -1,0 +1,163 @@
+<div class="grid">
+  <app-stat-card title="Total Clientes" [value]="87" badge="↑ 5 nuevos" tone="good" />
+  <app-stat-card title="Activos" [value]="72" badge="↑ Buen nivel" tone="good" />
+  <app-stat-card title="Pedidos mes" [value]="34" badge="↑ 12%" tone="good" />
+  <app-stat-card title="Ventas mes" [value]="'$45,280'" badge="↑ 18%" tone="good" />
+</div>
+
+<section class="panel">
+  <header class="panel-header">
+    <h4>Lista de clientes</h4>
+
+    <div class="controls">
+      <div class="field">
+        <label>Estado</label>
+        <select>
+          <option>Todos</option><option>Activo</option><option>Moroso</option><option>Inactivo</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Tipo</label>
+        <select>
+          <option>Todos</option><option>Mayorista</option><option>Distribuidor</option><option>Minorista</option><option>Interno</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Ciudad</label>
+        <select>
+          <option>Todas</option><option>Lima</option><option>Arequipa</option><option>Trujillo</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>&nbsp;</label>
+        <button class="btn primary">Filtrar</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Cliente</th>
+          <th>Contacto</th>
+          <th>Tipo</th>
+          <th>Pedidos</th>
+          <th>Última Venta</th>
+          <th class="ta-right">Total Vendido</th>
+          <th class="ta-right">Crédito</th>
+          <th>Estado</th>
+          <th class="ta-right">Acciones</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (c of clients; track c.code) {
+        <tr>
+          <td><a class="link-id" href="javascript:void(0)">#{{ c.code }}</a></td>
+
+          <td>
+            <div class="cell-client">
+              <a class="name" href="javascript:void(0)">{{ c.name }}</a>
+              <div class="sub">RUC: {{ c.ruc }}</div>
+              <div class="addr muted">{{ c.city }}, {{ c.country }}</div>
+            </div>
+          </td>
+
+          <td>
+            <div class="cell-contact">
+              <div class="line"><span class="ico">📞</span><span>{{ c.phone }}</span></div>
+              <div class="line"><span class="ico">✉️</span><a class="mail" href="mailto:{{ c.email }}">{{ c.email }}</a></div>
+            </div>
+          </td>
+
+          <td><span class="tag"
+                    [class.mayorista]="c.type==='Mayorista'"
+                    [class.distribuidor]="c.type==='Distribuidor'"
+                    [class.minorista]="c.type==='Minorista'"
+                    [class.interno]="c.type==='Interno'">{{ c.type }}</span></td>
+
+          <td>{{ c.orders }}</td>
+          <td>{{ c.lastSale | date:'dd/MM/yyyy' }}</td>
+          <td class="ta-right">{{ c.total | currency:'USD':'symbol':'1.0-0' }}</td>
+          <td class="ta-right">{{ c.credit !== null ? (c.credit | currency:'USD':'symbol':'1.0-0') : 'N/A' }}</td>
+
+          <td>
+            <span class="status"
+                  [class.activo]="c.status==='Activo'"
+                  [class.moroso]="c.status==='Moroso'"
+                  [class.inactivo]="c.status==='Inactivo'">
+              {{ c.status }}
+            </span>
+          </td>
+
+          <td class="actions ta-right">
+            <button class="icon-btn" title="Recordatorio">⏰</button>
+            <button class="icon-btn" title="Correo">✉️</button>
+            <button class="icon-btn" title="Llamar">📞</button>
+            <button class="icon-btn" title="Notas">🗒️</button>
+            <button class="icon-btn" title="Bloquear">🚫</button>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <footer class="panel-foot">
+    <button class="btn nav" [disabled]="page===1" (click)="prevPage()">← Anterior</button>
+    <div class="page-info">Página {{ page }} de {{ totalPages }} ({{ totalClients }} clientes)</div>
+    <button class="btn nav primary" [disabled]="page===totalPages" (click)="nextPage()">Siguiente →</button>
+  </footer>
+</section>
+
+<!-- Paneles inferiores -->
+<div class="grid-side">
+  <section class="panel">
+    <h4>Top Clientes (Ventas)</h4>
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr><th>Cliente</th><th>Pedidos</th><th class="ta-right">Total</th><th class="ta-right">Promedio</th></tr>
+        </thead>
+        <tbody>
+          @for (t of topClients; track t.name) {
+          <tr>
+            <td>{{ t.name }}</td>
+            <td>{{ t.orders }}</td>
+            <td class="ta-right">{{ t.total | currency:'USD':'symbol':'1.0-0' }}</td>
+            <td class="ta-right">{{ t.avg | currency:'USD':'symbol':'1.0-0' }}</td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <aside class="mini-card">
+      <h5>Ventas por Tipo</h5>
+
+      <div class="bars">
+        @for (b of typeSeries; track b.label) {
+        <div class="bar">
+          <div class="bar-col" [style.height.%]="b.percent"></div>
+          <small class="muted">{{ b.label }}</small>
+        </div>
+        }
+      </div>
+
+      <hr>
+
+      <div class="stats">
+        @for (s of typeTotals; track s.label) {
+        <div class="row">
+          <span class="muted">{{ s.label }}</span>
+          <strong>{{ s.total | currency:'USD':'symbol':'1.0-0' }}</strong>
+        </div>
+        }
+      </div>
+    </aside>
+  </section>
+</div>

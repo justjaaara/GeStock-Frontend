@@ -9,6 +9,7 @@ import { Inventory } from './core-ui/pages/inventory/inventory';
 import { MovementHistory } from './core-ui/pages/movement-history/movement-history';
 import { Shopping } from './core-ui/pages/shopping/shopping';
 import { Supplier } from './core-ui/pages/supplier/supplier';
+import { Client } from './core-ui/pages/client/client';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -48,6 +49,13 @@ export const routes: Routes = [
       {
         path: '',
         component: Supplier
+      },
+    ], canActivate: [authGuard] },
+  { path: 'clientes', component: Layout,
+    children:[
+      {
+        path: '',
+        component: Client
       },
     ], canActivate: [authGuard] },
   { path: '**', redirectTo: '/login' },
