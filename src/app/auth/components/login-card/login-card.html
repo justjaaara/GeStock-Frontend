@@ -1,8 +1,9 @@
 <div class="register-card">
   <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
     <div class="form-group">
-      <label for="Email">Email:</label>
+      <label for="email" (click)="focusField('email')">Email:</label>
       <app-input-field
+        id="email"
         formControlName="Email"
         type="email"
         placeholder="Ingresa tu email"
@@ -12,14 +13,15 @@
         height="40px"
       >
       </app-input-field>
-      @if (getFieldError('email')){
-      <span class="error-message">{{ getFieldError('email') }}</span>
+      @if (getFieldError('Email')){
+      <span class="error-message">{{ getFieldError('Email') }}</span>
       }
     </div>
 
     <div class="form-group">
-      <label for="Contraseña">Contraseña:</label>
+      <label for="password" (click)="focusField('password')">Contraseña:</label>
       <app-input-field
+        id="password"
         formControlName="Contraseña"
         type="password"
         [showPasswordToggle]="true"
@@ -30,8 +32,8 @@
         height="40px"
       >
       </app-input-field>
-      @if (getFieldError('password')) {
-      <span class="error-message">{{ getFieldError('password') }}</span>
+      @if (getFieldError('Contraseña')) {
+      <span class="error-message">{{ getFieldError('Contraseña') }}</span>
       }
     </div>
 
@@ -41,20 +43,8 @@
       }
     </div>
 
-    <button type="submit" [disabled]="isLoading() || loginForm.invalid" class="submit-button">
+    <button type="submit" [disabled]="isLoading()" class="submit-button">
       {{ isLoading() ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
     </button>
   </form>
-
-  <!-- <div class="form">
-        <label for="name">NOMBRE</label> <app-input-field id="name" placeholder="Nombre" textColor="#174376"
-            backgroundColor="#F3F6FA" width="100%" height="40px"></app-input-field>
-
-        <label for="password">CONTRASEÑA</label>
-        <app-input-field id="password" placeholder="Contraseña" textColor="#174376" backgroundColor="#F3F6FA"
-            width="100%" height="40px"></app-input-field>
-
-        <app-button text="Iniciar Sesión" textColor="white" backgroundColor="#174376" width="100%"
-            height="50px"></app-button>
-    </div> -->
 </div>

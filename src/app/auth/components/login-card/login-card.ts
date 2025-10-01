@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component,  inject, signal, QueryList, ViewChildren } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Auth } from '@/auth/services/auth';
 import { Router } from '@angular/router';
@@ -16,6 +16,8 @@ export class LoginCard {
   private authService = inject(Auth);
   private router = inject(Router);
 
+  @ViewChildren(InputField) inputFields!: QueryList<InputField>;
+
   loginForm: FormGroup;
   isLoading = signal(false);
   errorMessage = signal('');
@@ -25,6 +27,13 @@ export class LoginCard {
       Email: ['', [Validators.required, Validators.email]],
       Contraseña: ['', [Validators.required, Validators.minLength(6)]],
     });
+  }
+
+  focusField(fieldId: string): void {
+    const inputField = this.inputFields?.find(field => field.id === fieldId);
+    if (inputField) {
+      inputField.focusInput();
+    }
   }
 
   onSubmit(): void {
@@ -66,7 +75,8 @@ export class LoginCard {
         },
       });
     } else {
-      this.markFormGroupTouched();
+      // No marcar campos como touched para evitar mostrar errores automáticamente
+      // this.markFormGroupTouched();
     }
   }
 
@@ -81,8 +91,8 @@ export class LoginCard {
     const field = this.loginForm.get(fieldName);
     if (field?.errors && field.touched) {
       if (field.errors['required'])
-        return `${fieldName === 'email' ? 'Email' : 'Contraseña'} es requerido`;
-      if (field.errors['Email']) return 'Email inválido';
+        return `${fieldName === 'Email' ? 'Email' : 'Contraseña'} es requerido`;
+      if (field.errors['email']) return 'Email inválido';
       if (field.errors['minlength']) return 'La contraseña debe tener al menos 6 caracteres';
     }
     return '';

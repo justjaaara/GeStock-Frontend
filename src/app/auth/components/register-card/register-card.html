@@ -1,8 +1,9 @@
 <div class="register-card">
   <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
     <div class="form-group">
-      <label for="name">Nombre:</label>
+      <label for="name" (click)="focusField('name')">Nombre:</label>
       <app-input-field
+        id="name"
         formControlName="Nombre"
         placeholder="Ingresa tu nombre"
         textColor="#174376"
@@ -17,10 +18,11 @@
     </div>
 
     <div class="form-group">
-      <label for="email">Email:</label>
+      <label for="email" (click)="focusField('email')">Email:</label>
       <app-input-field
+        id="email"
         formControlName="Email"
-        type="Email"
+        type="email"
         placeholder="Ingresa tu Email"
         textColor="#174376"
         backgroundColor="#F3F6FA"
@@ -34,8 +36,9 @@
     </div>
 
     <div class="form-group">
-      <label for="Contraseña">Contraseña:</label>
+      <label for="password" (click)="focusField('password')">Contraseña:</label>
       <app-input-field
+        id="password"
         formControlName="Contraseña"
         type="password"
         [showPasswordToggle]="true"
@@ -52,8 +55,9 @@
     </div>
 
     <div class="form-group">
-      <label for="Confirmar contraseña">Confirmar Contraseña:</label>
+      <label for="confirm-password" (click)="focusField('confirm-password')">Confirmar Contraseña:</label>
       <app-input-field
+        id="confirm-password"
         formControlName="Confirmar contraseña"
         type="password"
         [showPasswordToggle]="true"
@@ -77,7 +81,7 @@
       }
     </div>
 
-    <button type="submit" [disabled]="isLoading || !this.registerForm.valid" class="submit-button">
+    <button type="submit" [disabled]="isLoading" class="submit-button">
       {{ isLoading ? 'Registrando...' : 'Registrarse' }}
     </button>
   </form>

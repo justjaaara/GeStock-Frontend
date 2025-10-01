@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, ViewChildren, QueryList } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { passwordMatchValidator } from '@/auth/validators/password-match';
@@ -13,6 +13,8 @@ import { RegisterRequestBackend } from '@/auth/interfaces/auth';
   styleUrl: './register-card.css',
 })
 export class RegisterCard {
+  @ViewChildren(InputField) inputFields!: QueryList<InputField>;
+
   registerForm: FormGroup;
   isLoading = false;
   errorMessage = '';
@@ -45,11 +47,19 @@ export class RegisterCard {
     );
   }
 
+  focusField(fieldId: string): void {
+    const inputField = this.inputFields?.find(field => field.id === fieldId);
+    if (inputField) {
+      inputField.focusInput();
+    }
+  }
+
   onSubmit(): void {
     this.clearMessages();
 
     if (!this.registerForm.valid) {
-      this.markFormGroupTouched();
+      // No marcar campos como touched para evitar mostrar errores automáticamente
+      // this.markFormGroupTouched();
       this.errorMessage = 'Por favor completa todos los campos correctamente';
       return;
     }
