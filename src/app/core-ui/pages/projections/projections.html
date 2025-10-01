@@ -1,0 +1,196 @@
+<div class="grid">
+    <app-stat-card title="Precision Promedio" [value]="'87.3%'" badge="↑ 2.1% vs mes anterior" tone="good" />
+    <app-stat-card title="Productos Analizados" [value]="245" badge="↑ Todos activos" tone="good" />
+    <app-stat-card title="Alertas preventivas" [value]="12" badge="⚠️ Revisar" />
+    <app-stat-card title="Ultima actualizacion" [value]="'Hoy'" badge="✅ 6:00 AM" tone="good" />
+</div>
+
+<div class="grid-side">
+    <!-- Izquierda -->
+    <section class="panel soft">
+        <h5>Demanda Proyectada (30 días)</h5>
+
+        <div class="controls tight">
+            <div class="field">
+                <label>Modelo</label>
+                <select>
+                    <option>Promedio Móvil</option>
+                    <option>Suavizado Exponencial</option>
+                    <option>ARIMA</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Periodo base</label>
+                <select>
+                    <option>Últimos 30 días</option>
+                    <option>Últimos 60 días</option>
+                    <option selected>Últimos 90 días</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <button class="btn primary">Recalcular</button>
+            </div>
+        </div>
+
+        <div class="mini-spark">
+            <small class="muted spark-caption">Gráfico de Proyección de Demanda</small>
+        </div>
+    </section>
+
+    <!-- Derecha -->
+    <section class="panel">
+        <h5>Productos Críticos</h5>
+        <p class="muted sm">Productos que requerirían reabastecimiento según proyecciones</p>
+
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Stock Actual</th>
+                        <th>Demanda 30d</th>
+                        <th>Días Rest.</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (c of critical; track c.sku) {
+                    <tr>
+                        <td class="bold">{{ c.name }}</td>
+                        <td>{{ c.stock }}</td>
+                        <td class="muted">{{ c.forecast }}</td>
+                        <td [class.low]="c.days<=10" class="bold">{{ c.days }}</td>
+                        <td>
+                            <span class="badge info" *ngIf="c.action==='Ordenar'">Ordenar</span>
+                            <span class="badge warn" *ngIf="c.action==='Urgente'">Urgente</span>
+                            <span class="badge ok" *ngIf="c.action==='Planificar'">Planificar</span>
+                            <span class="muted" *ngIf="c.action==='OK'">OK</span>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+
+<div class="triple-grid">
+    <!-- 1) Análisis de Tendencias -->
+    <section class="panel">
+        <h5>Análisis de Tendencias</h5>
+
+        <ul class="kpi-list">
+            <li class="kpi-item">
+                <div class="kpi-head">
+                    <div>
+                        <div class="kpi-title">Tendencia General</div>
+                        <small class="kpi-sub muted">Consumo mensual</small>
+                    </div>
+                    <span class="chip ok">↑ 12%</span>
+                </div>
+            </li>
+
+            <li class="kpi-item">
+                <div class="kpi-head">
+                    <div>
+                        <div class="kpi-title">Estacionalidad</div>
+                        <small class="kpi-sub muted">Patrón detectado</small>
+                    </div>
+                    <span class="chip info">📈 Alta</span>
+                </div>
+            </li>
+
+            <li class="kpi-item">
+                <div class="kpi-head">
+                    <div>
+                        <div class="kpi-title">Volatilidad</div>
+                        <small class="kpi-sub muted">Variabilidad demanda</small>
+                    </div>
+                    <span class="chip warn">⚠️ Media</span>
+                </div>
+            </li>
+        </ul>
+
+        <!-- Pie en DOS FILAS -->
+        <div class="kpi-foot rows">
+            <div class="row">
+                <span class="muted">Confiabilidad del modelo:</span>
+                <strong>87.3%</strong>
+            </div>
+            <div class="row">
+                <span class="muted">Próxima actualización:</span>
+                <strong>{{ nextUpdate | date:'dd/MM/yyyy' }}&nbsp;{{ nextUpdate | date:'HH:mm' }}</strong>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2) Recomendaciones de Compra -->
+    <section class="panel">
+        <h5>Recomendaciones de Compra</h5>
+
+        <ul class="recs">
+            <li class="rec-item rec-danger">
+                <div>
+                    <span class="badge danger">Crítico - {{ recs.criticos }} productos</span>
+                    <div class="muted">Requieren orden inmediata para evitar desabastecimiento</div>
+                </div>
+                <button class="btn ghost sm">Ver</button>
+            </li>
+
+            <li class="rec-item rec-warn">
+                <div>
+                    <span class="badge warn">Planificar - {{ recs.planificar }} productos</span>
+                    <div class="muted">Programar compras en las próximas 2 semanas</div>
+                </div>
+                <button class="btn ghost sm">Ver</button>
+            </li>
+
+            <li class="rec-item rec-ok">
+                <div>
+                    <span class="badge ok">Óptimo - {{ recs.optimos }} productos</span>
+                    <div class="muted">Stock suficiente según proyecciones</div>
+                </div>
+                <span class="muted sm">95.5%</span>
+            </li>
+        </ul>
+    </section>
+
+    <!-- 3) Optimización de Inventario -->
+    <section class="panel">
+        <h5>Optimización de Inventario</h5>
+
+        <div class="opt-grid">
+            <div class="opt-val">
+                <span class="muted">Valor actual inventario:</span>
+                <strong class="value">{{ currInv | currency:'USD':'symbol':'1.0-0' }}</strong>
+            </div>
+
+            <div class="opt-val">
+                <span class="muted">Valor óptimo sugerido:</span>
+                <strong class="value" [ngClass]="optInv >= 0 ? 'pos' : 'neg'">
+                    {{ optInv | currency:'USD':'symbol':'1.0-0' }}
+                </strong>
+            </div>
+
+            <div class="opt-val">
+                <span class="muted">Ahorro potencial:</span>
+                <strong class="value" [ngClass]="savings >= 0 ? 'pos' : 'neg'">
+                    {{ savings | currency:'USD':'symbol':'1.0-0' }}
+                </strong>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="bold" style="margin-bottom:6px;">Acciones recomendadas:</div>
+        <ul class="bullets">
+            <li>Reducir 15% stock papel bond</li>
+            <li>Aumentar 20% stock consumibles</li>
+            <li>Ajustar frecuencia pedidos</li>
+        </ul>
+
+        <button class="btn primary full">Aplicar Optimización</button>
+    </section>
+</div>

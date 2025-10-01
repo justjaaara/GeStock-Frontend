@@ -1,0 +1,483 @@
+/* =========================
+   LAYOUT PRINCIPAL
+   ========================= */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(220px, 1fr));
+    gap: 14px;
+}
+
+.grid-side {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 16px;
+    align-items: stretch;
+}
+
+.triple-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+    align-items: stretch;
+}
+
+.grid-side>.panel,
+.triple-grid>.panel {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* =========================
+   PANEL / TARJETAS
+   ========================= */
+.panel {
+    margin-top: 16px;
+    background: #fff;
+    border: 1px solid #e5eaf2;
+    border-radius: 14px;
+    padding: 16px;
+}
+
+.panel.soft .controls {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    /* filtros uno bajo otro */
+    row-gap: 12px;
+    justify-content: initial;
+}
+
+.panel.soft .field {
+    width: 100%;
+}
+
+.panel.soft .field select,
+.panel.soft .field input,
+.panel.soft .field .btn {
+    width: 100%;
+}
+
+/* =========================
+   TIPOGRAFÍA / UTILIDADES
+   ========================= */
+h5 {
+    margin: 0 0 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1b2b3c;
+}
+
+.bold {
+    font-weight: 700;
+}
+
+.muted {
+    color: #8aa0b5;
+}
+
+.sm {
+    font-size: 12px;
+}
+
+.low {
+    color: #e37a20;
+}
+
+/* =========================
+   CONTROLES (form)
+   ========================= */
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-bottom: 12px;
+}
+
+.controls.tight {
+    gap: 10px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 0 0 auto;
+}
+
+.controls .field label {
+    margin: 0 0 6px 2px;
+    font-size: 12px;
+    line-height: 1;
+    color: #6b7a90;
+    font-weight: 500;
+}
+
+.field input {
+    height: 36px;
+    padding: 0 12px;
+    border: 1px solid #e3e9f2;
+    border-radius: 10px;
+    background: #fff;
+    outline: none;
+}
+
+.controls select {
+    height: 36px;
+    padding: 0 36px 0 12px;
+    border: 1px solid #e3e9f2;
+    border-radius: 12px;
+    background: #fff;
+    outline: 0;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 2 L6 7 L11 2' fill='none' stroke='%23354a61' stroke-width='2' stroke-linecap='round'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 12px 8px;
+}
+
+.btn {
+    height: 36px;
+    padding: 0 14px;
+    border: 1px solid #e3e9f2;
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.btn.primary {
+    border-radius: 12px;
+    border: 1px solid #d6e3ff;
+    background: #eef4ff;
+    color: #2e547f;
+    font-weight: 600;
+    transition: background .15s, box-shadow .15s, border-color .15s;
+}
+
+.btn.primary:hover {
+    background: #e6efff;
+}
+
+.btn.primary:focus {
+    box-shadow: 0 0 0 3px rgba(46, 84, 127, .15);
+    outline: 0;
+}
+
+.btn.ghost {
+    background: #fff;
+    border: 1px solid #e3e9f2;
+}
+
+.btn.sm {
+    height: 30px;
+    padding: 0 10px;
+    border-radius: 8px;
+}
+
+.btn.full {
+    width: 100%;
+}
+
+/* =========================
+   TABLAS
+   ========================= */
+.table-wrap {
+    overflow: auto;
+    border: 1px solid #e3e9f2;
+    border-radius: 10px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table thead th {
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+    color: #5b6b80;
+    background: #f7fafc;
+    padding: 10px 12px;
+    border-bottom: 1px solid #e3e9f2;
+}
+
+.table tbody td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #eef2f6;
+    font-size: 14px;
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.table tbody tr:hover td {
+    background: #fbfdff;
+}
+
+/* =========================
+   BADGES / CHIPS
+   ========================= */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    border: 1px solid transparent;
+}
+
+.badge.info {
+    background: #eef4ff;
+    color: #2e547f;
+    border-color: #d6e3ff;
+}
+
+.badge.warn {
+    background: #fff4e5;
+    color: #b8791b;
+    border-color: #f4d3a1;
+}
+
+.badge.ok {
+    background: #e7f9ee;
+    color: #065f46;
+    border-color: #bbf7d0;
+}
+
+.badge.danger {
+    background: #fde8ef;
+    color: #9f1239;
+    border-color: #fecdd3;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 12px;
+    border: 1px solid #bbf7d0;
+    background: #e7f9ee;
+    color: #065f46;
+}
+
+.chip.info {
+    border-color: #d6e3ff;
+    background: #eef4ff;
+    color: #2e547f;
+}
+
+.chip.warn {
+    border-color: #f4d3a1;
+    background: #fff4e5;
+    color: #b8791b;
+}
+
+.chip.ok {
+    border-color: #bbf7d0;
+    background: #f4fbf7;
+    color: #065f46;
+}
+
+/* =========================
+   MINI SPARK PLACEHOLDER
+   ========================= */
+.mini-spark {
+    position: relative;
+    height: 190px;
+    border: 1px dashed #dfe7f2;
+    border-radius: 12px;
+    background: repeating-linear-gradient(to right, #eef4ff 0 10px, #ffffff 10px 20px);
+}
+
+.spark-caption {
+    position: absolute;
+    bottom: 8px;
+    left: 10px;
+    font-size: 12px;
+    color: #6b7a90;
+}
+
+/* =========================
+   KPI LIST (panel izq. inferior)
+   ========================= */
+.kpi-list {
+    display: grid;
+    gap: 12px;
+    list-style: none;
+    padding: 0;
+}
+
+.kpi-item {
+    border: 1px solid #eef2f6;
+    background: #fff;
+    border-radius: 10px;
+    padding: 12px;
+}
+
+.kpi-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.kpi-title {
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.2;
+}
+
+.kpi-sub {
+    font-size: 12px;
+}
+
+.kpi-foot {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.kpi-foot.rows {
+    display: grid;
+    gap: 8px;
+    border-top: 1px solid #e9eef5;
+    margin-top: 12px;
+    padding-top: 10px;
+}
+
+.kpi-foot.rows .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.kpi-foot.rows .row .muted {
+    font-size: 13px;
+}
+
+.kpi-foot.rows .row strong {
+    font-size: 14px;
+}
+
+/* =========================
+   RECOMENDACIONES DE COMPRA
+   ========================= */
+.recs {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 0;
+    display: grid;
+    gap: 12px;
+}
+
+.rec-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+    border-radius: 12px;
+    padding: 12px;
+    border: 1px solid #e5eaf2;
+    background: #fff;
+}
+
+.rec-danger {
+    border-color: #fecaca;
+    background: #fff5f6;
+}
+
+.rec-warn {
+    border-color: #f4d3a1;
+    background: #fffaf0;
+}
+
+.rec-ok {
+    border-color: #bbf7d0;
+    background: #f4fbf7;
+}
+
+.recs .rec-item {
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+.recs .rec-item .badge {
+    font-size: 14px;
+    line-height: 1;
+    padding: 4px 10px;
+}
+
+.recs .rec-item .muted {
+    font-size: 12px;
+    line-height: 1.35;
+    margin-top: 6px;
+}
+
+.recs .btn.sm {
+    font-size: 12px;
+    padding: 0 12px;
+    border-radius: 10px;
+}
+
+.recs .rec-ok .muted.sm {
+    font-size: 12px;
+}
+
+/* =========================
+   OPTIMIZACIÓN DE INVENTARIO
+   ========================= */
+.opt-grid {
+    display: grid;
+    row-gap: 10px;
+    margin: 6px 0 10px;
+}
+
+.opt-val {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.opt-grid .muted {
+    font-size: 14px;
+    color: #6b7a90;
+}
+
+.opt-val .value {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.opt-val .value.pos {
+    color: #10b981;
+}
+
+.opt-val .value.neg {
+    color: #ef4444;
+}
+
+.bullets {
+    margin: 0 0 0 -18px;
+}
+
+.bullets li {
+    font-size: 14px;
+    color: #334155;
+    margin-bottom: 6px;
+}
+
+.triple-grid>.panel .recs,
+.triple-grid>.panel .opt-grid {
+    flex: 1 1 auto;
+}
