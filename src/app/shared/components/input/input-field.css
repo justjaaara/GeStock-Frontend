@@ -15,6 +15,14 @@ input {
   box-sizing: border-box;
 }
 
+@media (max-width: 480px) {
+  input {
+    padding: 14px 16px;
+    font-size: 16px; /* Previene zoom en iOS */
+    border-radius: 8px;
+  }
+}
+
 input:focus {
   border-color: #174376;
   box-shadow: 0 0 0 3px rgba(23, 67, 118, 0.1);
