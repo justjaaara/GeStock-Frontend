@@ -26,7 +26,7 @@ export class Auth {
 
   register(registerData: RegisterRequestBackend): Observable<AuthResponse> {
     return this.http
-      .post<AuthResponse>(`${environment.backendBaseUrl}/auth/register`, registerData, {
+      .post<AuthResponse>(`${environment.BACKENDBASEURL}/auth/register`, registerData, {
         headers: this.headers,
       })
       .pipe(
@@ -43,7 +43,7 @@ export class Auth {
 
   login(loginData: LoginRequest): Observable<AuthResponse> {
     return this.http
-      .post<AuthResponse>(`${environment.backendBaseUrl}/auth/login`, loginData, {
+      .post<AuthResponse>(`${environment.BACKENDBASEURL}/auth/login`, loginData, {
         headers: this.headers,
       })
       .pipe(
