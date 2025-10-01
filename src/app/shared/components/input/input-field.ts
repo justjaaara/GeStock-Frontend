@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, forwardRef } from '@angular/core';
+import { Component, Input, forwardRef, ElementRef } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
@@ -16,6 +16,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
   ]
 })
 export class InputField implements ControlValueAccessor {
+  @Input() id: string = '';
   @Input() placeholder: string = '';
   @Input() textColor: string = '';
   @Input() backgroundColor: string = '';
@@ -30,6 +31,8 @@ export class InputField implements ControlValueAccessor {
 
   private onChange = (value: string) => {};
   private onTouched = () => {};
+
+  constructor(private elementRef: ElementRef) {}
 
   get inputType(): string {
     if (this.type === 'password' && this.isPasswordVisible) {
@@ -46,6 +49,13 @@ export class InputField implements ControlValueAccessor {
 
   onBlur(): void {
     this.onTouched();
+  }
+
+  focusInput(): void {
+    const inputElement = this.elementRef.nativeElement.querySelector('input');
+    if (inputElement) {
+      inputElement.focus();
+    }
   }
 
   togglePasswordVisibility(): void {
