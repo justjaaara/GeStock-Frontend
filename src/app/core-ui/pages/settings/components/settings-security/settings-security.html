@@ -1,0 +1,96 @@
+<div class="settings-section">
+    <div class="section-header">
+        <h2>Seguridad y Privacidad</h2>
+        <p>Administra la seguridad de tu cuenta y configuraciones de privacidad</p>
+    </div>
+
+    <div class="security-options">
+        <div class="security-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <span class="icon">🔒</span>
+                </div>
+                <div class="card-info">
+                    <h3>Contraseña</h3>
+                    <p>Cambia tu contraseña regularmente para mantener tu cuenta segura</p>
+                </div>
+            </div>
+            <div class="card-actions">
+                <button class="btn btn-primary" (click)="openPasswordModal()">
+                    <span class="btn-icon">🔑</span>
+                    <span>Cambiar Contraseña</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Cambio de Contraseña -->
+@if (showPasswordModal()) {
+<div class="modal-overlay" (click)="closePasswordModal()">
+    <div class="password-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Cambiar Contraseña</h3>
+            <p>Ingresa tu contraseña actual y la nueva contraseña</p>
+        </div>
+
+        @if (isPasswordChanged()) {
+        <div class="alert alert-success">
+            <span class="alert-icon">✅</span>
+            <span>Contraseña cambiada exitosamente</span>
+        </div>
+        }
+
+        <form [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()" class="password-form">
+            <div class="form-group">
+                <label for="currentPassword">Contraseña Actual *</label>
+                <input id="currentPassword" type="password" class="input-field"
+                    placeholder="Ingresa tu contraseña actual" formControlName="currentPassword" />
+                @if (getFieldError('currentPassword')) {
+                <span class="error-message">{{ getFieldError('currentPassword') }}</span>
+                }
+            </div>
+
+            <div class="form-group">
+                <label for="newPassword">Nueva Contraseña *</label>
+                <input id="newPassword" type="password" class="input-field" placeholder="Ingresa tu nueva contraseña"
+                    formControlName="newPassword" />
+                @if (getFieldError('newPassword')) {
+                <span class="error-message">{{ getFieldError('newPassword') }}</span>
+                }
+                <small class="form-hint">Mínimo 6 caracteres, incluir al menos un número y un carácter especial</small>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirmar Contraseña *</label>
+                <input id="confirmPassword" type="password" class="input-field"
+                    placeholder="Confirma tu nueva contraseña" formControlName="confirmPassword" />
+                @if (getFieldError('confirmPassword')) {
+                <span class="error-message">{{ getFieldError('confirmPassword') }}</span>
+                }
+            </div>
+
+            @if (errorMessage()) {
+            <div class="error-message" style="margin-bottom: 1rem; padding: 0.75rem; background-color: #fee; border: 1px solid #fcc; border-radius: 4px; color: #c33;">
+                {{ errorMessage() }}
+            </div>
+            }
+
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" (click)="closePasswordModal()" [disabled]="isLoading()">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn btn-primary" [disabled]="!passwordForm.valid || isLoading()">
+                    @if (isLoading()) {
+                    <span class="btn-icon spinner">⏳</span>
+                    <span>Cambiando...</span>
+                    } @else {
+                    <span class="btn-icon">💾</span>
+                    <span>Cambiar Contraseña</span>
+                    }
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+}
