@@ -1,0 +1,105 @@
+<div class="settings-section">
+    <div class="section-header">
+        <h2>Notificaciones</h2>
+        <p>Configura cómo y cuándo quieres recibir notificaciones</p>
+    </div>
+
+    <div class="notification-groups">
+        <div class="notification-group">
+            <h3>Canales de Notificación</h3>
+            <div class="notification-items">
+                <div class="notification-item">
+                    <div class="item-info">
+                        <i class="lucide-mail"></i>
+                        <div>
+                            <h4>Correo Electrónico</h4>
+                            <p>Recibe notificaciones por email</p>
+                        </div>
+                    </div>
+                    <label class="toggle">
+                        <input type="checkbox" [checked]="notificationSettings.email" (change)="toggleSetting('email')">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="notification-item">
+                    <div class="item-info">
+                        <i class="lucide-smartphone"></i>
+                        <div>
+                            <h4>Notificaciones Push</h4>
+                            <p>Notificaciones en tiempo real en tu dispositivo</p>
+                        </div>
+                    </div>
+                    <label class="toggle">
+                        <input type="checkbox" [checked]="notificationSettings.push" (change)="toggleSetting('push')">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="notification-item">
+                    <div class="item-info">
+                        <i class="lucide-message-square"></i>
+                        <div>
+                            <h4>SMS</h4>
+                            <p>Mensajes de texto para alertas críticas</p>
+                        </div>
+                    </div>
+                    <label class="toggle">
+                        <input type="checkbox" [checked]="notificationSettings.sms" (change)="toggleSetting('sms')">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="notification-group">
+            <h3>Tipos de Notificaciones</h3>
+            <div class="notification-items">
+                <div class="notification-item">
+                    <div class="item-info">
+                        <i class="lucide-package"></i>
+                        <div>
+                            <h4>Alertas de Stock</h4>
+                            <p>Cuando el inventario esté bajo o agotado</p>
+                        </div>
+                    </div>
+                    <label class="toggle">
+                        <input type="checkbox" [checked]="notificationSettings.stockAlerts"
+                            (change)="toggleSetting('stockAlerts')">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="notification-item">
+                    <div class="item-info">
+                        <i class="lucide-shopping-cart"></i>
+                        <div>
+                            <h4>Actualizaciones de Órdenes</h4>
+                            <p>Estado de órdenes de compra y venta</p>
+                        </div>
+                    </div>
+                    <label class="toggle">
+                        <input type="checkbox" [checked]="notificationSettings.orderUpdates"
+                            (change)="toggleSetting('orderUpdates')">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="notification-item">
+                    <div class="item-info">
+                        <i class="lucide-settings"></i>
+                        <div>
+                            <h4>Notificaciones del Sistema</h4>
+                            <p>Actualizaciones y mantenimiento del sistema</p>
+                        </div>
+                    </div>
+                    <label class="toggle">
+                        <input type="checkbox" [checked]="notificationSettings.systemNotifications"
+                            (change)="toggleSetting('systemNotifications')">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
