@@ -21,3 +21,12 @@ export interface AuthResponse {
     role: string;
   };
 }
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
+export interface ChangePasswordResponse {
+  message: string;
+}
