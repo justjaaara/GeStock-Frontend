@@ -1,0 +1,31 @@
+<div class="settings-sidebar">
+    <div class="sidebar-content">
+        @for (item of menuItems; track item.id) {
+        <div class="menu-section">
+            <button class="menu-item" [class.active]="activeSection === item.id" [class.has-children]="item.children"
+                (click)="handleMenuClick(item)">
+                <div class="menu-item-content">
+                    <div class="menu-item-info">
+                        <i class="icon" [class]="'lucide-' + item.icon"></i>
+                        <span class="menu-label">{{ item.label }}</span>
+                    </div>
+                    @if (item.children) {
+                    <i class="expand-icon lucide-chevron-down" [class.rotated]="isExpanded(item.id)"></i>
+                    }
+                </div>
+            </button>
+
+            @if (item.children && isExpanded(item.id)) {
+            <div class="submenu">
+                @for (subItem of item.children; track subItem.id) {
+                <button class="submenu-item" (click)="selectSubSection(item.id, subItem.id)">
+                    <i class="icon" [class]="'lucide-' + subItem.icon"></i>
+                    <span class="submenu-label">{{ subItem.label }}</span>
+                </button>
+                }
+            </div>
+            }
+        </div>
+        }
+    </div>
+</div>
