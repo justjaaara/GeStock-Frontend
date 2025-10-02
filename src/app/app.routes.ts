@@ -12,6 +12,7 @@ import { Supplier } from './core-ui/pages/supplier/supplier';
 import { Client } from './core-ui/pages/client/client';
 import { Report } from './core-ui/pages/report/report';
 import { Projections } from './core-ui/pages/projections/projections';
+import { Alerts } from './core-ui/pages/alerts/alerts';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -72,6 +73,13 @@ export const routes: Routes = [
       {
         path: '',
         component: Projections
+      },
+    ], canActivate: [authGuard] },
+  { path: 'alertas', component: Layout,
+    children:[
+      {
+        path: '',
+        component: Alerts
       },
     ], canActivate: [authGuard] },
   { path: '**', redirectTo: '/login' },

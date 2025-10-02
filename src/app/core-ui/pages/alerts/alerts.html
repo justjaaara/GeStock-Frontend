@@ -1,0 +1,114 @@
+<div class="grid">
+    <app-stat-card title="Alertas Activas" [value]="5" badge="⚠️ Requieren atencion" />
+    <app-stat-card title="Stock critico" [value]="3" badge="🚨 Urgente" tone="bad" />
+    <app-stat-card title="Resueltas hoy" [value]="8" badge="↑ Buen ritmo" tone="good" />
+    <app-stat-card title="Tiempo promedio" [value]="'2.4 h'" badge="↑ Mejoro" tone="good" />
+</div>
+
+<div class="grid-panels">
+    <section class="panel">
+        <header class="panel-header">Movimientos Recientes</header>
+
+        <!-- Filtros -->
+        <div class="controls">
+            <div class="field">
+                <label>Prioridades</label>
+                <select>
+                    <option>Critica</option>
+                    <option>Alta</option>
+                    <option>Media</option>
+                    <option>Baja</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Tipo</label>
+                <select>
+                    <option>Stock critico</option>
+                    <option>Sin stock</option>
+                    <option>Stock bajo</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Estatus</label>
+                <select>
+                    <option>Vigente</option>
+                    <option>Anulado</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>&nbsp;</label>
+                <button class="btn primary">Filtrar</button>
+            </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="table-wrap alerts">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tipo</th>
+                        <th>Producto/Descripción</th>
+                        <th>Prioridad</th>
+                        <th>Detectada</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (a of alerts; track a.id) {
+                    <tr [class.row-danger]="a.type==='Stock Crítico'" [class.row-warn]="a.type==='Stock Bajo'"
+                        [class.row-empty]="a.type==='Sin Stock'">
+
+                        <td class="link-id">#{{ a.id }}</td>
+
+                        <td>
+                            <span class="tag" [class.tag-danger]="a.type==='Stock Crítico'"
+                                [class.tag-warn]="a.type==='Stock Bajo'" [class.tag-empty]="a.type==='Sin Stock'">
+                                {{ a.type }}
+                            </span>
+                        </td>
+
+                        <td class="prod">
+                            <div class="prod-name">{{ a.product }}</div>
+                            <div class="prod-sub muted">Stock: {{ a.stock }} | Mínimo: {{ a.min }}</div>
+                        </td>
+
+                        <td>
+                            <span class="pill prio" [class.critica]="a.priority==='Crítica'"
+                                [class.alta]="a.priority==='Alta'">
+                                {{ a.priority }}
+                            </span>
+                        </td>
+
+                        <td class="det">
+                            <div class="det-date">{{ a.detected | date:'dd/MM/yyyy' }}</div>
+                            <div class="det-time muted sm">{{ a.detected | date:'hh:mm a' }}</div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="panel"> <!-- quitamos .soft -->
+        <header class="panel-header">Alertas por Categoría</header>
+
+        <ul class="cat-list">
+            @for (c of categories; track c.label) {
+            <li class="cat-item {{c.tone}}">
+                <span class="lead"><span class="i">{{c.icon}}</span> {{c.label}}</span>
+                <span class="count">{{c.count}}</span>
+            </li>
+            }
+        </ul>
+
+        <hr class="divider">
+        <header class="panel-header">Resumen semanal</header>
+
+        <ul class="weekly">
+            @for (w of weekly; track w.label) {
+            <li><span>{{w.label}}</span><strong>{{w.value}}</strong></li>
+            }
+        </ul>
+    </section>
+</div>
