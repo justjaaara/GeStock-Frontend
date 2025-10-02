@@ -53,22 +53,16 @@ export class LoginCard {
           this.router.navigate(['/dashboard']);
         },
         error: (error) => {
-          this.isLoading.set(false); // ← IMPORTANTE: Siempre habilitar el botón
-
+          this.isLoading.set(false);
           console.error('Error en login:', error);
 
-          if (error.status === 0) {
+          if (error.status === 401) {
             this.errorMessage.set(
-              'No se puede conectar al servidor. Verifica que el backend esté ejecutándose.'
+              'Credenciales inválidas. Verifica tu email y contraseña.'
             );
-          } else if (error.status === 401) {
-            this.errorMessage.set('Credenciales inválidas. Verifica tu email y contraseña.');
-          } else if (error.status === 404) {
-            this.errorMessage.set(
-              'Servidor no encontrado. Verifica que el backend esté ejecutándose en el puerto 3000.'
-            );
+    
           } else if (error.status >= 500) {
-            this.errorMessage.set('Error interno del servidor. Intenta más tarde.');
+            this.errorMessage.set('Error interno del servidor.');
           } else {
             this.errorMessage.set('Error al iniciar sesión. Intenta nuevamente.');
           }
