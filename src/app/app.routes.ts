@@ -13,6 +13,7 @@ import { Client } from './core-ui/pages/client/client';
 import { Report } from './core-ui/pages/report/report';
 import { Projections } from './core-ui/pages/projections/projections';
 import { Alerts } from './core-ui/pages/alerts/alerts';
+import { Settings } from './core-ui/pages/settings/settings';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -80,6 +81,13 @@ export const routes: Routes = [
       {
         path: '',
         component: Alerts
+      },
+    ], canActivate: [authGuard] },
+  { path: 'configuraciones', component: Layout,
+    children:[
+      {
+        path: '',
+        component: Settings
       },
     ], canActivate: [authGuard] },
   { path: '**', redirectTo: '/login' },
