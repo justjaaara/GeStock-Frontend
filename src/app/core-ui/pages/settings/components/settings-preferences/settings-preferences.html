@@ -1,0 +1,66 @@
+<div class="settings-section">
+    <div class="section-header">
+        <h2>Preferencias</h2>
+        <p>Personaliza la aplicación según tus necesidades</p>
+    </div>
+
+    <div class="preferences-grid">
+        <div class="preference-group">
+            <h3>Configuración Regional</h3>
+
+            <div class="preference-item">
+                <label for="language">Idioma</label>
+                <select id="language" class="select-field" [value]="preferences.language"
+                    (change)="onSelectChange($event, 'language')">
+                    @for (lang of languages; track lang.value) {
+                    <option [value]="lang.value">{{ lang.label }}</option>
+                    }
+                </select>
+            </div>
+
+            <div class="preference-item">
+                <label for="timezone">Zona Horaria</label>
+                <select id="timezone" class="select-field" [value]="preferences.timezone"
+                    (change)="onSelectChange($event, 'timezone')">
+                    @for (tz of timezones; track tz.value) {
+                    <option [value]="tz.value">{{ tz.label }}</option>
+                    }
+                </select>
+            </div>
+
+            <div class="preference-item">
+                <label for="currency">Moneda</label>
+                <select id="currency" class="select-field" [value]="preferences.currency"
+                    (change)="onSelectChange($event, 'currency')">
+                    @for (currency of currencies; track currency.value) {
+                    <option [value]="currency.value">{{ currency.label }}</option>
+                    }
+                </select>
+            </div>
+
+            <div class="preference-item">
+                <label for="dateFormat">Formato de Fecha</label>
+                <select id="dateFormat" class="select-field" [value]="preferences.dateFormat"
+                    (change)="onSelectChange($event, 'dateFormat')">
+                    @for (format of dateFormats; track format.value) {
+                    <option [value]="format.value">{{ format.label }}</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="preference-group">
+            <h3>Apariencia</h3>
+
+            <div class="preference-item">
+                <label for="theme">Tema</label>
+                <select id="theme" class="select-field" [value]="preferences.theme"
+                    (change)="onSelectChange($event, 'theme')">
+                    @for (theme of themes; track theme.value) {
+                    <option [value]="theme.value">{{ theme.label }}</option>
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
