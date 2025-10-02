@@ -5,6 +5,7 @@ import { passwordMatchValidator } from '@/auth/validators/password-match';
 import { Auth } from '@/auth/services/auth';
 import { InputField } from '@/shared/components/input/input-field';
 import { RegisterRequestBackend } from '@/auth/interfaces/auth';
+import { strongPasswordValidator } from '@/shared/validators/strong-password.validator';
 
 @Component({
   selector: 'app-register-card',
@@ -37,8 +38,7 @@ export class RegisterCard {
           '',
           [
             Validators.required,
-            Validators.minLength(6),
-            Validators.pattern(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{6,}$/),
+            strongPasswordValidator(),
           ],
         ],
         'Confirmar contraseña': ['', [Validators.required]],
@@ -152,6 +152,9 @@ export class RegisterCard {
       return `${fieldName} debe tener al menos ${errors['minlength'].requiredLength} caracteres`;
     }
     if (errors['passwordMismatch']) return 'Las contraseñas no coinciden';
+    if (errors['strongPassword']) {
+      return errors['strongPassword'].message;
+    }
     if (errors['pattern']) {
       return this.getPatternErrorMessage(fieldName);
     }
