@@ -39,7 +39,7 @@ export class Sidebar {
       title: 'SISTEMA',
       items: [
         { label: 'Usuarios', link: '/usuarios', icon: '👤' },
-        { label: 'Ajustes', link: '/ajustes', icon: '⚙️' },
+        { label: 'Configuraciones', link: '/configuraciones', icon: '⚙️' },
       ]
     }
   ]);
