@@ -1,0 +1,30 @@
+<div class="settings-container">
+  <div class="settings-header">
+    <h1>Configuraciones</h1>
+    <p>Administra las configuraciones de tu cuenta y preferencias</p>
+  </div>
+
+  <div class="settings-content">
+    <app-settings-sidebar 
+      [activeSection]="activeSection()"
+      (sectionChange)="onSectionChange($event)"
+    />
+
+    <div class="settings-main">
+      @switch (activeSection()) {
+        @case ('profile') {
+          <app-settings-profile />
+        }
+        @case ('notifications') {
+          <app-settings-notifications />
+        }
+        @case ('preferences') {
+          <app-settings-preferences />
+        }
+        @case ('security') {
+          <app-settings-security />
+        }
+      }
+    </div>
+  </div>
+</div>
