@@ -1,0 +1,23 @@
+@if (isOpen) {
+<div class="modal-overlay" (click)="onOverlayClick()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">{{ title }}</h3>
+      <button class="modal-close" (click)="onCancel()" aria-label="Cerrar">×</button>
+    </div>
+
+    <div class="modal-body">
+      <p>{{ message }}</p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn" (click)="onCancel()">
+        {{ cancelText }}
+      </button>
+      <button class="btn primary" (click)="onConfirm()" [class.danger]="variant === 'danger'">
+        {{ confirmText }}
+      </button>
+    </div>
+  </div>
+</div>
+}
