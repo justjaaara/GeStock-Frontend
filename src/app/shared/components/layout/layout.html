@@ -1,9 +1,15 @@
-<div class="shell">
-  <app-sidebar appName="GeStock"></app-sidebar>
+<div class="shell" [class.sidebar-closed]="!sidebarService.isOpen()">
+  <app-sidebar appName="GeStock" [isOpen]="sidebarService.isOpen()"></app-sidebar>
+
+  <!-- Overlay para móvil -->
+  @if (sidebarService.isMobile() && sidebarService.isOpen()) {
+  <div class="sidebar-overlay" (click)="sidebarService.close()"></div>
+  }
+
   <main class="content">
     <!-- Topbar -->
     <header class="topbar">
-      <button class="icon-btn" aria-label="toggle menu">≡</button>
+      <button class="icon-btn" aria-label="toggle menu" (click)="toggleSidebar()">☰</button>
       @if (header.showSearch()) {
       <input class="search" placeholder="Buscar productos, proveedores..." />
       }

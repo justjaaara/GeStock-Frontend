@@ -1,4 +1,4 @@
-<aside class="side">
+<aside class="side" [class.closed]="!isOpen">
   <div class="brand">
     <img class="brand-logo" [src]="logoUrl" alt="logo" />
     <span class="brand-name">{{ appName }}</span>
@@ -6,36 +6,34 @@
 
   <div class="menu">
     @for (group of groups(); track group.title; let last = $last) {
-      <ng-container>
-        @if (group.title) {
-          <div class="group-title">{{ group.title }}</div>
-        }
+    <ng-container>
+      @if (group.title) {
+      <div class="group-title">{{ group.title }}</div>
+      }
 
-        <nav>
-          @for (item of group.items; track item.label) {
-            <a [routerLink]="item.link"
-              routerLinkActive="active"
-              class="item">
-              <span class="left">
-                <span class="ico">{{ item.icon }}</span>
-                <span class="text">{{ item.label }}</span>
-              </span>
+      <nav>
+        @for (item of group.items; track item.label) {
+        <a [routerLink]="item.link" routerLinkActive="active" class="item">
+          <span class="left">
+            <span class="ico">{{ item.icon }}</span>
+            <span class="text">{{ item.label }}</span>
+          </span>
 
-              @if (item.notificationCount !== undefined && item.notificationCount > 0) {
-                <span class="count">
-                  {{ item.notificationCount }}
-                </span>
-              }
-            </a>
+          @if (item.notificationCount !== undefined && item.notificationCount > 0) {
+          <span class="count">
+            {{ item.notificationCount }}
+          </span>
           }
-        </nav>
-
-        @if (!last) {
-          <hr class="divider" />
+        </a>
         }
-      </ng-container>
+      </nav>
+
+      @if (!last) {
+      <hr class="divider" />
+      }
+    </ng-container>
     }
   </div>
 
-  <footer class="foot">© 2025 GeStock Mockup</footer>
+  <div class="foot">© 2025 GeStock</div>
 </aside>

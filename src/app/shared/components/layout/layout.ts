@@ -1,9 +1,10 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, HostListener } from '@angular/core';
 import { Header } from '@/shared/services/header';
 import { Auth } from '@/auth/services/auth';
 import { RouterOutlet, RouterLink } from '@angular/router';
 import { Sidebar } from '@/shared/components/sidebar/sidebar';
 import { Modal } from '@/shared/components/modal/modal';
+import { SidebarService } from '@/shared/services/sidebar/sidebar';
 
 @Component({
   selector: 'app-layout',
@@ -15,8 +16,13 @@ import { Modal } from '@/shared/components/modal/modal';
 export class Layout {
   header = inject(Header);
   private authService = inject(Auth);
+  sidebarService = inject(SidebarService);
 
   showLogoutModal = signal(false);
+
+  toggleSidebar(): void {
+    this.sidebarService.toggle();
+  }
 
   openLogoutModal(): void {
     this.showLogoutModal.set(true);
