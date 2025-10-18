@@ -1,91 +1,161 @@
-<div class="grid">
-    <app-stat-card title="Total Productos" [value]="245" badge="↑ 8 nuevos" tone="good" />
-    <app-stat-card title="Stock critico" [value]="12" badge="↓ urgente" tone="bad" />
-    <app-stat-card title="Valor total" [value]="'$145,580'" badge="↑ 3.2%" tone="good" />
-    <app-stat-card title="Sin movimiento" [value]="18" badge="⌛ 30+ días" />
-</div>
+<div class="inventory-container">
+  <!-- Estadísticas superiores -->
+  <div class="grid">
+    <app-stat-card title="Total Productos" [value]="stats().totalProducts" icon="📦">
+    </app-stat-card>
 
-<section class="panel">
-    <header class="panel-header">
-        <h4>Lista de productos</h4>
+    <app-stat-card
+      title="Stock Bajo"
+      [value]="stats().lowStockProducts"
+      icon="⚠️"
+      variant="warning"
+    >
+    </app-stat-card>
 
-        <!-- Filtros -->
-        <div class="controls">
-            <div class="field">
-                <select>
-                    <option>Todos los estados</option>
-                    <option>Entrada</option>
-                    <option>Salida</option>
-                </select>
-            </div>
-            <div class="field">
-                <select>
-                    <option>Todas las categorias</option>
-                    <option>Vigente</option>
-                    <option>Anulado</option>
-                </select>
-            </div>
-        </div>
-    </header>
+    <app-stat-card
+      title="Stock Crítico"
+      [value]="stats().criticalStockProducts"
+      icon="🚨"
+      variant="danger"
+    >
+    </app-stat-card>
 
-    <!-- Tabla -->
-    <div class="table-wrap">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Codigo</th>
-                    <th>Producto</th>
-                    <th>Categoria</th>
-                    <th>Stock Actual</th>
-                    <th>Stock Minimo</th>
-                    <th>Precio Unit.</th>
-                    <th>Proveedor</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @for (p of products; track p.code) {
-                <tr>
-                    <td class="link-id">{{ p.code }}</td>
-                    <td>
-                        <div class="cell-product">
-                            <a class="name" href="javascript:void(0)">{{ p.name }}</a>
-                            @if (p.subtitle) {
-                            <div class="sub">{{ p.subtitle }}</div>
-                            }
-                        </div>
-                    </td>
-                    <td>{{ p.category }}</td>
-                    <td [class.bold]="true" [class.neg]="p.stock < p.min">{{ p.stock }}</td>
-                    <td>{{ p.min }}</td>
-                    <td>{{ p.price | currency:'USD':'symbol':'1.2-2' }}</td>
-                    <td>{{ p.provider }}</td>
-                    <td>
-                        <span class="pill" [class.ok]="p.status==='Activo'" [class.warn]="p.status==='Stock Bajo'"
-                            [class.crit]="p.status==='Crítico'">
-                            {{ p.status }}
-                        </span>
-                    </td>
+    <app-stat-card title="Valor Total" [value]="stats().totalValue" icon="💰"> </app-stat-card>
+  </div>
 
-                    <!-- Acciones con icon buttons -->
-                    <td class="actions">
-                        <button class="icon-btn" title="Editar">✏️</button>
-                        <button class="icon-btn" title="Ver">👁️</button>
-                    </td>
-                </tr>
-                }
-            </tbody>
-        </table>
+  <!-- Panel principal -->
+  <div class="panel">
+    <div class="panel-header">
+      <h4>Inventario de Productos</h4>
     </div>
 
-    <footer class="panel-foot">
-        <button class="btn nav" [disabled]="page===1" (click)="prevPage()">← Anterior</button>
+    <!-- Estados de carga y error -->
+    @if (isLoading()) {
+    <div style="text-align: center; padding: 2rem">
+      <div class="loading-spinner" style="margin: 0 auto 1rem"></div>
+      <p>Cargando inventario...</p>
+    </div>
+    } @if (error()) {
+    <div style="text-align: center; padding: 2rem">
+      <p style="color: #e74c3c; margin-bottom: 1rem">{{ error() ?? 'Error desconocido' }}</p>
+      <button (click)="refreshInventory()" class="btn nav">🔄 Reintentar</button>
+    </div>
+    }
 
-        <div class="page-info">
-            Página {{ page }} de {{ totalPages }} ({{ totalProducts }} productos)
-        </div>
+    <!-- Controles y filtros -->
+    @if (!isLoading() && !error()) {
+    <div class="controls">
+      <div class="field">
+        <select>
+          <option>Todas las categorías</option>
+          <option>Bebidas</option>
+          <option>Alimentos</option>
+          <option>Limpieza</option>
+        </select>
+      </div>
 
-        <button class="btn nav primary" [disabled]="page===totalPages" (click)="nextPage()">Siguiente →</button>
-    </footer>
-</section>
+      <div class="field">
+        <select>
+          <option>Todos los estados</option>
+          <option>Activo</option>
+          <option>Stock Bajo</option>
+          <option>Crítico</option>
+        </select>
+      </div>
+
+      <button class="btn nav primary">Filtrar</button>
+    </div>
+
+    <!-- Tabla de productos -->
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Producto</th>
+            <th>Categoría</th>
+            <th>Stock Actual</th>
+            <th>Stock Mín.</th>
+            <th>Precio Unit.</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (product of products(); track product.code) {
+          <tr>
+            <td>
+              <span class="link-id">{{ product.code }}</span>
+            </td>
+            <td>
+              <div class="cell-product">
+                <div class="name">{{ product.name }}</div>
+                @if (product.subtitle) {
+                <div class="sub">{{ product.subtitle }}</div>
+                }
+              </div>
+            </td>
+            <td>{{ product.category }}</td>
+            <td class="bold">{{ product.stock }}</td>
+            <td>{{ product.min }}</td>
+            <td class="bold">{{ product.price | currency : 'COP' : 'symbol' : '1.2-2' }}</td>
+            <td>
+              <span
+                class="pill"
+                [ngClass]="{
+                  ok: product.status === 'Activo',
+                  warn: product.status === 'Stock Bajo',
+                  crit: product.status === 'Crítico' || product.status === 'Sin Stock'
+                }"
+              >
+                {{ product.status }}
+              </span>
+            </td>
+            <td class="actions">
+              <button class="icon-btn" title="Ver detalles">👁️</button>
+              <button class="icon-btn" title="Editar">✏️</button>
+              <button class="icon-btn" title="Más opciones">🔧</button>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+
+      <!-- Mensaje cuando no hay productos -->
+      @if (products().length === 0) {
+      <div style="text-align: center; padding: 2rem; color: #6b7a90">
+        <p>No se encontraron productos en el inventario.</p>
+      </div>
+      }
+    </div>
+
+    <!-- Paginación -->
+    @if (paginationInfo() && paginationInfo()!.totalPages > 1) {
+    <div class="panel-foot">
+      <div class="page-info">
+        Mostrando {{ paginationInfo()!.showingFrom }}-{{ paginationInfo()!.showingTo }} de
+        {{ paginationInfo()!.totalItems }} productos
+      </div>
+
+      <div style="display: flex; gap: 8px; align-items: center">
+        <button (click)="prevPage()" [disabled]="!paginationInfo()?.hasPrevious" class="btn nav">
+          ← Anterior
+        </button>
+
+        @for (page of getPaginationPages(); track page) {
+        <button
+          (click)="goToPage(page)"
+          [class]="page === paginationInfo()!.currentPage ? 'btn nav primary' : 'btn nav'"
+        >
+          {{ page }}
+        </button>
+        }
+
+        <button (click)="nextPage()" [disabled]="!paginationInfo()?.hasNext" class="btn nav">
+          Siguiente →
+        </button>
+      </div>
+    </div>
+    } }
+  </div>
+</div>
