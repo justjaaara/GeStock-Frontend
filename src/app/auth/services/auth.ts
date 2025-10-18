@@ -1,7 +1,13 @@
 import { environment } from '@environments/environment.development';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { RegisterRequestBackend, AuthResponse, LoginRequest, ChangePasswordRequest, ChangePasswordResponse } from '@/auth/interfaces/auth';
+import {
+  RegisterRequestBackend,
+  AuthResponse,
+  LoginRequest,
+  ChangePasswordRequest,
+  ChangePasswordResponse,
+} from '@/auth/interfaces/auth';
 import { catchError, Observable, throwError, tap } from 'rxjs';
 import { Router } from '@angular/router';
 
@@ -26,9 +32,13 @@ export class Auth {
 
   register(registerData: RegisterRequestBackend): Observable<AuthResponse> {
     return this.http
-      .post<AuthResponse>(`${environment.BACKENDBASEURL}/auth/register`, registerData, {
-        headers: this.headers,
-      })
+      .post<AuthResponse>(
+        `${environment.BACKENDBASEURL}/auth/register`,
+        { ...registerData, roleId: 1 },
+        {
+          headers: this.headers,
+        }
+      )
       .pipe(
         tap((response) => {
           // Establecer estado después del login exitoso
@@ -96,33 +106,32 @@ export class Auth {
     const token = this._token();
     if (!token) return false;
 
-    // Aquí puedes agregar lógica para verificar la expiración del JWT
     return true;
   }
 
   changePassword(changePasswordData: ChangePasswordRequest): Observable<ChangePasswordResponse> {
     const token = this._token();
-  
+
     if (!token) {
       return throwError(() => new Error('No hay token de autenticación'));
     }
 
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
     });
 
-    return this.http.patch<ChangePasswordResponse>(
-      `${environment.BACKENDBASEURL}/users/change-password`, 
-      changePasswordData, 
-      { headers }
-    ).pipe(
-      tap((response: ChangePasswordResponse) => {
-      }),
-      catchError((error) => {
-        
-        return throwError(() => error);
-      })
-    );
+    return this.http
+      .patch<ChangePasswordResponse>(
+        `${environment.BACKENDBASEURL}/users/change-password`,
+        changePasswordData,
+        { headers }
+      )
+      .pipe(
+        tap((response: ChangePasswordResponse) => {}),
+        catchError((error) => {
+          return throwError(() => error);
+        })
+      );
   }
 }
