@@ -1,13 +1,14 @@
-import { Component,  inject, signal, QueryList, ViewChildren } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Auth } from '@/auth/services/auth';
-import { Router } from '@angular/router';
 import { LoginRequest } from '@/auth/interfaces/auth';
+import { Auth } from '@/auth/services/auth';
+import { CommonModule } from '@angular/common';
+import { Component, inject, QueryList, signal, ViewChildren } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 import { InputField } from '../../../shared/components/input/input-field';
 
 @Component({
   selector: 'app-login-card',
-  imports: [ReactiveFormsModule, InputField],
+  imports: [ReactiveFormsModule, InputField, CommonModule, RouterLink],
   templateUrl: './login-card.html',
   styleUrl: './login-card.css',
 })
@@ -30,7 +31,7 @@ export class LoginCard {
   }
 
   focusField(fieldId: string): void {
-    const inputField = this.inputFields?.find(field => field.id === fieldId);
+    const inputField = this.inputFields?.find((field) => field.id === fieldId);
     if (inputField) {
       inputField.focusInput();
     }
@@ -57,10 +58,7 @@ export class LoginCard {
           console.error('Error en login:', error);
 
           if (error.status === 401) {
-            this.errorMessage.set(
-              'Credenciales inválidas. Verifica tu email y contraseña.'
-            );
-    
+            this.errorMessage.set('Credenciales inválidas. Verifica tu email y contraseña.');
           } else if (error.status >= 500) {
             this.errorMessage.set('Error interno del servidor.');
           } else {
