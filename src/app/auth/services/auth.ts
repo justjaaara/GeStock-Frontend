@@ -22,6 +22,14 @@ import { catchError, Observable, throwError, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '@environments/environment.development';
 import { catchError, Observable, tap, throwError } from 'rxjs';
+import { JwtUtil } from '@/core/utils/jwt.util';
+
+export interface UserProfile {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -35,12 +43,18 @@ export class Auth {
 
   private _isAuthenticated = signal<boolean>(this.checkInitialAuthState());
   private _token = signal<string | null>(this.getTokenFromStorage());
+  private _userProfile = signal<UserProfile | null>(this.getUserFromToken());
 
   readonly isAuthenticated = computed(() => this._isAuthenticated());
   readonly token = computed(() => this._token());
+  readonly userProfile = computed(() => this._userProfile());
+  readonly userName = computed(() => this._userProfile()?.name || 'Usuario');
+  readonly userEmail = computed(() => this._userProfile()?.email || '');
+  readonly userRole = computed(() => this._userProfile()?.role || 'Usuario');
 
-  // readonly isAuthenticated = this._isAuthenticated;
-  // readonly token = this._token;
+  constructor() {
+    this.initializeAuthState();
+  }
 
   register(registerData: RegisterRequestBackend): Observable<AuthResponse> {
     return this.http
@@ -53,7 +67,6 @@ export class Auth {
       )
       .pipe(
         tap((response) => {
-          // Establecer estado después del login exitoso
           this.setAuthenticatedUser(response.access_token);
         }),
         catchError((error) => {
@@ -70,7 +83,6 @@ export class Auth {
       })
       .pipe(
         tap((response) => {
-          // Establecer estado después del login exitoso
           this.setAuthenticatedUser(response.access_token);
         }),
         catchError((error) => {
@@ -82,27 +94,75 @@ export class Auth {
 
   private checkInitialAuthState(): boolean {
     const token = localStorage.getItem('access_token');
-    if (token) return true;
-    return false;
+
+    if (!token) {
+      return false;
+    }
+
+    if (JwtUtil.isExpired(token)) {
+      console.warn('Token expirado detectado al inicializar');
+      this.logout();
+      return false;
+    }
+
+    return true;
   }
 
   private getTokenFromStorage(): string | null {
     return localStorage.getItem('access_token');
   }
 
+  private getUserFromToken(): UserProfile | null {
+    const token = this.getTokenFromStorage();
+    if (!token) return null;
+
+    if (JwtUtil.isExpired(token)) {
+      return null;
+    }
+
+    const decoded = JwtUtil.decode(token);
+    if (!decoded) return null;
+
+    return {
+      id: decoded.sub,
+      name: decoded.name,
+      email: decoded.email,
+      role: decoded.role,
+    };
+  }
+
   private initializeAuthState(): void {
     const token = this.getTokenFromStorage();
 
-    // TODO: EXTRAER DEL TOKEN SI ESTÁ AUTENTICADO
-    this._isAuthenticated.set(!!token);
-    this._token.set(token);
+    if (!token) {
+      this._isAuthenticated.set(false);
+      this._token.set(null);
+      this._userProfile.set(null);
+      return;
+    }
+
+    if (JwtUtil.isValid(token)) {
+      this._isAuthenticated.set(true);
+      this._token.set(token);
+      this._userProfile.set(this.getUserFromToken());
+    } else {
+      console.warn('Token inválido o expirado detectado');
+      this.logout();
+    }
   }
 
   setAuthenticatedUser(token: string): void {
+    if (JwtUtil.isExpired(token)) {
+      console.error('Intento de guardar un token expirado');
+      this.logout();
+      return;
+    }
+
     localStorage.setItem('access_token', token);
 
     this._token.set(token);
     this._isAuthenticated.set(true);
+    this._userProfile.set(this.getUserFromToken());
   }
 
   logout(): void {
@@ -110,13 +170,25 @@ export class Auth {
 
     this._token.set(null);
     this._isAuthenticated.set(false);
+    this._userProfile.set(null);
 
     this.router.navigate(['/login']);
   }
 
   isTokenValid(): boolean {
     const token = this._token();
-    if (!token) return false;
+
+    if (!token) {
+      return false;
+    }
+
+    const isValid = JwtUtil.isValid(token);
+
+    if (!isValid) {
+      console.warn('Token inválido o expirado detectado, cerrando sesión');
+      this.logout();
+      return false;
+    }
 
     return true;
   }
@@ -157,7 +229,27 @@ export class Auth {
       );
   }
 
+  getTokenExpirationTime(): number {
+    const token = this._token();
+    if (!token) return 0;
+
+    return JwtUtil.getTimeUntilExpiration(token);
+  }
+
+  isTokenExpiringSoon(): boolean {
+    const timeLeft = this.getTokenExpirationTime();
+    const fiveMinutes = 5 * 60 * 1000; // 5 minutos en milisegundos
+
+    return timeLeft > 0 && timeLeft < fiveMinutes;
+  }
+
   changePassword(changePasswordData: ChangePasswordRequest): Observable<ChangePasswordResponse> {
+    if (!this.isTokenValid()) {
+      return throwError(
+        () => new Error('Token inválido o expirado. Por favor inicia sesión nuevamente.')
+      );
+    }
+
     const token = this._token();
 
     if (!token) {
@@ -190,8 +282,34 @@ export class Auth {
         { headers }
       )
       .pipe(
-        tap((response: ChangePasswordResponse) => {}),
+        tap((response: ChangePasswordResponse) => {
+          console.log('Contraseña cambiada exitosamente');
+        }),
         catchError((error) => {
+          // Si recibimos un error 401, el token probablemente expiró
+          if (error.status === 401) {
+            console.error('Error 401: Token inválido o expirado');
+            this.logout();
+          }
+          return throwError(() => error);
+        })
+      );
+    return this.http
+      .patch<ChangePasswordResponse>(
+        `${environment.BACKENDBASEURL}/users/change-password`,
+        changePasswordData,
+        { headers }
+      )
+      .pipe(
+        tap((response: ChangePasswordResponse) => {
+          console.log('Contraseña cambiada exitosamente');
+        }),
+        catchError((error) => {
+          // Si recibimos un error 401, el token probablemente expiró
+          if (error.status === 401) {
+            console.error('Error 401: Token inválido o expirado');
+            this.logout();
+          }
           return throwError(() => error);
         })
       );
