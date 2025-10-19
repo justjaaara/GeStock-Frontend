@@ -1,4 +1,14 @@
-import { environment } from '@environments/environment.development';
+import {
+  AuthResponse,
+  ChangePasswordRequest,
+  ChangePasswordResponse,
+  ForgotPasswordRequest,
+  ForgotPasswordResponse,
+  LoginRequest,
+  RegisterRequestBackend,
+  ResetPasswordRequest,
+  ResetPasswordResponse,
+} from '@/auth/interfaces/auth';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import {
@@ -10,6 +20,8 @@ import {
 } from '@/auth/interfaces/auth';
 import { catchError, Observable, throwError, tap } from 'rxjs';
 import { Router } from '@angular/router';
+import { environment } from '@environments/environment.development';
+import { catchError, Observable, tap, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -109,6 +121,42 @@ export class Auth {
     return true;
   }
 
+  forgotPassword(forgotPasswordData: ForgotPasswordRequest): Observable<ForgotPasswordResponse> {
+    return this.http
+      .post<ForgotPasswordResponse>(
+        `${environment.BACKENDBASEURL}/auth/forgot-password`,
+        forgotPasswordData,
+        { headers: this.headers }
+      )
+      .pipe(
+        tap((response) => {
+          console.log('Respuesta de forgot password:', response);
+        }),
+        catchError((error) => {
+          console.error('Error en forgot password:', error);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  resetPassword(resetPasswordData: ResetPasswordRequest): Observable<ResetPasswordResponse> {
+    return this.http
+      .post<ResetPasswordResponse>(
+        `${environment.BACKENDBASEURL}/auth/reset-password`,
+        resetPasswordData,
+        { headers: this.headers }
+      )
+      .pipe(
+        tap((response) => {
+          console.log('Respuesta de reset password:', response);
+        }),
+        catchError((error) => {
+          console.error('Error en reset password:', error);
+          return throwError(() => error);
+        })
+      );
+  }
+
   changePassword(changePasswordData: ChangePasswordRequest): Observable<ChangePasswordResponse> {
     const token = this._token();
 
@@ -119,8 +167,22 @@ export class Auth {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
     });
 
+    return this.http
+      .patch<ChangePasswordResponse>(
+        `${environment.BACKENDBASEURL}/users/change-password`,
+        changePasswordData,
+        { headers }
+      )
+      .pipe(
+        tap((response: ChangePasswordResponse) => {}),
+        catchError((error) => {
+          return throwError(() => error);
+        })
+      );
     return this.http
       .patch<ChangePasswordResponse>(
         `${environment.BACKENDBASEURL}/users/change-password`,
