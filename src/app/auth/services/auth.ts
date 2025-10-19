@@ -1,14 +1,3 @@
-import {
-  AuthResponse,
-  ChangePasswordRequest,
-  ChangePasswordResponse,
-  ForgotPasswordRequest,
-  ForgotPasswordResponse,
-  LoginRequest,
-  RegisterRequestBackend,
-  ResetPasswordRequest,
-  ResetPasswordResponse,
-} from '@/auth/interfaces/auth';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import {
@@ -17,8 +6,11 @@ import {
   LoginRequest,
   ChangePasswordRequest,
   ChangePasswordResponse,
+  ForgotPasswordResponse,
+  ForgotPasswordRequest,
+  ResetPasswordRequest,
+  ResetPasswordResponse,
 } from '@/auth/interfaces/auth';
-import { catchError, Observable, throwError, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '@environments/environment.development';
 import { catchError, Observable, tap, throwError } from 'rxjs';
@@ -87,6 +79,74 @@ export class Auth {
         }),
         catchError((error) => {
           console.error('Error en el login', error);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  forgotPassword(forgotPasswordData: ForgotPasswordRequest): Observable<ForgotPasswordResponse> {
+    return this.http
+      .post<ForgotPasswordResponse>(
+        `${environment.BACKENDBASEURL}/auth/forgot-password`,
+        forgotPasswordData,
+        { headers: this.headers }
+      )
+      .pipe(
+        tap((response) => {
+          console.log('Respuesta de forgot password:', response);
+        }),
+        catchError((error) => {
+          console.error('Error en forgot password:', error);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  resetPassword(resetPasswordData: ResetPasswordRequest): Observable<ResetPasswordResponse> {
+    return this.http
+      .post<ResetPasswordResponse>(
+        `${environment.BACKENDBASEURL}/auth/reset-password`,
+        resetPasswordData,
+        { headers: this.headers }
+      )
+      .pipe(
+        tap((response) => {
+          console.log('Respuesta de reset password:', response);
+        }),
+        catchError((error) => {
+          console.error('Error en reset password:', error);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  changePassword(changePasswordData: ChangePasswordRequest): Observable<ChangePasswordResponse> {
+    if (!this.isTokenValid()) {
+      return throwError(
+        () => new Error('Token inválido o expirado. Por favor inicia sesión nuevamente.')
+      );
+    }
+
+    const token = this._token();
+
+    if (!token) {
+      return throwError(() => new Error('No hay token de autenticación'));
+    }
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+
+    return this.http
+      .patch<ChangePasswordResponse>(
+        `${environment.BACKENDBASEURL}/users/change-password`,
+        changePasswordData,
+        { headers }
+      )
+      .pipe(
+        tap((response: ChangePasswordResponse) => {}),
+        catchError((error) => {
           return throwError(() => error);
         })
       );
@@ -193,42 +253,6 @@ export class Auth {
     return true;
   }
 
-  forgotPassword(forgotPasswordData: ForgotPasswordRequest): Observable<ForgotPasswordResponse> {
-    return this.http
-      .post<ForgotPasswordResponse>(
-        `${environment.BACKENDBASEURL}/auth/forgot-password`,
-        forgotPasswordData,
-        { headers: this.headers }
-      )
-      .pipe(
-        tap((response) => {
-          console.log('Respuesta de forgot password:', response);
-        }),
-        catchError((error) => {
-          console.error('Error en forgot password:', error);
-          return throwError(() => error);
-        })
-      );
-  }
-
-  resetPassword(resetPasswordData: ResetPasswordRequest): Observable<ResetPasswordResponse> {
-    return this.http
-      .post<ResetPasswordResponse>(
-        `${environment.BACKENDBASEURL}/auth/reset-password`,
-        resetPasswordData,
-        { headers: this.headers }
-      )
-      .pipe(
-        tap((response) => {
-          console.log('Respuesta de reset password:', response);
-        }),
-        catchError((error) => {
-          console.error('Error en reset password:', error);
-          return throwError(() => error);
-        })
-      );
-  }
-
   getTokenExpirationTime(): number {
     const token = this._token();
     if (!token) return 0;
@@ -241,77 +265,5 @@ export class Auth {
     const fiveMinutes = 5 * 60 * 1000; // 5 minutos en milisegundos
 
     return timeLeft > 0 && timeLeft < fiveMinutes;
-  }
-
-  changePassword(changePasswordData: ChangePasswordRequest): Observable<ChangePasswordResponse> {
-    if (!this.isTokenValid()) {
-      return throwError(
-        () => new Error('Token inválido o expirado. Por favor inicia sesión nuevamente.')
-      );
-    }
-
-    const token = this._token();
-
-    if (!token) {
-      return throwError(() => new Error('No hay token de autenticación'));
-    }
-
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    });
-
-    return this.http
-      .patch<ChangePasswordResponse>(
-        `${environment.BACKENDBASEURL}/users/change-password`,
-        changePasswordData,
-        { headers }
-      )
-      .pipe(
-        tap((response: ChangePasswordResponse) => {}),
-        catchError((error) => {
-          return throwError(() => error);
-        })
-      );
-    return this.http
-      .patch<ChangePasswordResponse>(
-        `${environment.BACKENDBASEURL}/users/change-password`,
-        changePasswordData,
-        { headers }
-      )
-      .pipe(
-        tap((response: ChangePasswordResponse) => {
-          console.log('Contraseña cambiada exitosamente');
-        }),
-        catchError((error) => {
-          // Si recibimos un error 401, el token probablemente expiró
-          if (error.status === 401) {
-            console.error('Error 401: Token inválido o expirado');
-            this.logout();
-          }
-          return throwError(() => error);
-        })
-      );
-    return this.http
-      .patch<ChangePasswordResponse>(
-        `${environment.BACKENDBASEURL}/users/change-password`,
-        changePasswordData,
-        { headers }
-      )
-      .pipe(
-        tap((response: ChangePasswordResponse) => {
-          console.log('Contraseña cambiada exitosamente');
-        }),
-        catchError((error) => {
-          // Si recibimos un error 401, el token probablemente expiró
-          if (error.status === 401) {
-            console.error('Error 401: Token inválido o expirado');
-            this.logout();
-          }
-          return throwError(() => error);
-        })
-      );
   }
 }
