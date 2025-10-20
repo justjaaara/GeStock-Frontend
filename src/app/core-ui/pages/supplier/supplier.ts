@@ -21,11 +21,10 @@ type Supplier_list = {
   standalone: true,
   imports: [StatCard, CommonModule],
   templateUrl: './supplier.html',
-  styleUrl: './supplier.css'
+  styleUrl: './supplier.css',
 })
 export class Supplier implements OnInit, OnDestroy {
-
-  constructor(private header: Header) { }
+  constructor(private header: Header) {}
 
   ngOnInit(): void {
     this.header.title.set('Gestión de Proveedores');
@@ -34,11 +33,10 @@ export class Supplier implements OnInit, OnDestroy {
     this.header.actionsTopbar.set([
       { label: '', icon: '🌙', onClick: () => console.log('Modo Oscuro') },
       { label: 'Nuevo proveedor', icon: '➕', onClick: () => console.log('Nuevo proveedor') },
-      { label: 'Admin v1', icon: '🟢', onClick: () => console.log('Admin') }
     ]);
     this.header.actionsTitle.set([
       { label: 'Exportar lista', onClick: () => console.log('Exportar lista') },
-      { label: 'Reporte compras', onClick: () => console.log('Reporte compras') }
+      { label: 'Reporte compras', onClick: () => console.log('Reporte compras') },
     ]);
   }
 
@@ -57,7 +55,7 @@ export class Supplier implements OnInit, OnDestroy {
       products: 48,
       lastPurchase: '2025-09-02',
       total: 12580,
-      status: 'Activo'
+      status: 'Activo',
     },
     {
       code: 'PR002',
@@ -69,7 +67,7 @@ export class Supplier implements OnInit, OnDestroy {
       products: 24,
       lastPurchase: '2025-08-30',
       total: 8940,
-      status: 'Activo'
+      status: 'Activo',
     },
     {
       code: 'PR003',
@@ -81,7 +79,7 @@ export class Supplier implements OnInit, OnDestroy {
       products: 32,
       lastPurchase: '2025-08-25',
       total: 6720,
-      status: 'Activo'
+      status: 'Activo',
     },
     {
       code: 'PR004',
@@ -93,7 +91,7 @@ export class Supplier implements OnInit, OnDestroy {
       products: 12,
       lastPurchase: '2025-08-15',
       total: 15200,
-      status: 'En evaluación'
+      status: 'En evaluación',
     },
     {
       code: 'PR005',
@@ -105,15 +103,18 @@ export class Supplier implements OnInit, OnDestroy {
       products: 8,
       lastPurchase: '2025-08-10',
       total: 2180,
-      status: 'Inactivo'
-    }
+      status: 'Inactivo',
+    },
   ];
 
   page = 1;
   totalPages = 1;
   totalProducts = 5;
 
-  prevPage() { if (this.page > 1) this.page--; }
-  nextPage() { if (this.page < this.totalPages) this.page++; }
-
+  prevPage() {
+    if (this.page > 1) this.page--;
+  }
+  nextPage() {
+    if (this.page < this.totalPages) this.page++;
+  }
 }

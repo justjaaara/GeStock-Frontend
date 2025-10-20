@@ -29,6 +29,12 @@
         </a>
         }
 
+        <!-- Botón de usuario con nombre -->
+        <button class="btn user-btn">
+          <span class="ico">🟢</span>
+          {{ getUserName() }}
+        </button>
+
         <!-- Botón de cerrar sesión -->
         <button (click)="openLogoutModal()" class="btn" title="Cerrar sesión">Cerrar Sesión</button>
       </nav>
@@ -86,7 +92,7 @@
   <app-modal
     [isOpen]="showLogoutModal()"
     title="Cerrar Sesión"
-    message="¿Estás seguro que deseas cerrar sesión? Perderás el acceso a tu cuenta hasta que vuelvas a iniciar sesión."
+    [message]="'¿Estás seguro que deseas cerrar sesión, ' + getUserName() + '?'"
     icon="🚪"
     confirmText="Sí, cerrar sesión"
     cancelText="Cancelar"

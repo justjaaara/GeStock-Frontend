@@ -86,7 +86,6 @@ export class Inventory implements OnInit, OnDestroy {
     this.header.actionsTopbar.set([
       { label: '', icon: '🌙', onClick: () => console.log('Modo Oscuro') },
       { label: 'Nuevo producto', icon: '➕', onClick: () => console.log('Nuevo producto') },
-      { label: 'Admin v1', icon: '🟢', onClick: () => console.log('Admin') },
     ]);
     this.header.actionsTitle.set([
       { label: 'Exportar Excel', onClick: () => console.log('Exportar excel') },
