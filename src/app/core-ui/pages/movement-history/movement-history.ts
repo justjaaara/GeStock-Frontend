@@ -35,7 +35,6 @@ export class MovementHistory implements OnInit, OnDestroy {
     ]);
     this.header.showSearch.set(true);
     this.header.actionsTopbar.set([
-      { label: '', icon: '🌙', onClick: () => console.log('Modo Oscuro') },
       { label: 'Nuevo movimiento', icon: '➕', onClick: () => console.log('Nuevo movimiento') },
     ]);
     this.header.actionsTitle.set([

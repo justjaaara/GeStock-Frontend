@@ -31,10 +31,7 @@ export class Dashboard implements OnInit, OnDestroy {
     this.header.title.set('Visión General');
     this.header.breadcrumbs.set([{ label: 'Inicio', link: '/' }, { label: 'Dashboard' }]);
     this.header.showSearch.set(true);
-    this.header.actionsTopbar.set([
-      { label: '', icon: '🌙', onClick: () => console.log('Nuevo') },
-      { label: 'Nuevo', icon: '➕', onClick: () => this.openNew() },
-    ]);
+    this.header.actionsTopbar.set([{ label: 'Nuevo', icon: '➕', onClick: () => this.openNew() }]);
     this.header.actionsTitle.set([
       { label: 'Exportar', onClick: () => console.log('Exportar') },
       { label: 'Reportes rapidos', onClick: () => console.log('Nuevo') },

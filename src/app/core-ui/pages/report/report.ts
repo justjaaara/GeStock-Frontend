@@ -35,7 +35,6 @@ export class Report implements OnInit, OnDestroy {
     ]);
     this.header.showSearch.set(true);
     this.header.actionsTopbar.set([
-      { label: '', icon: '🌙', onClick: () => console.log('Modo Oscuro') },
       { label: 'Nuevo Reporte', icon: '➕', onClick: () => console.log('Nuevo proveedor') },
     ]);
     this.header.actionsTitle.set([

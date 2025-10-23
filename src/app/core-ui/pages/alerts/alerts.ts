@@ -22,7 +22,6 @@ export class Alerts implements OnInit, OnDestroy {
     ]);
     this.header.showSearch.set(true);
     this.header.actionsTopbar.set([
-      { label: '', icon: '🌙', onClick: () => console.log('Modo Oscuro') },
       { label: 'Configurar', icon: '⚙️', onClick: () => console.log('Configurar Alertas') },
       { label: 'Marcar Todas Leídas', onClick: () => console.log('Filtrar Alertas') },
     ]);

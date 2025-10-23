@@ -31,7 +31,6 @@ export class Projections implements OnInit, OnDestroy {
     ]);
     this.header.showSearch.set(true);
     this.header.actionsTopbar.set([
-      { label: '', icon: '🌙', onClick: () => console.log('Modo Oscuro') },
       { label: 'Configurar Modelos', onClick: () => console.log('Configurar Modelos') },
       { label: 'Nueva proyección', icon: '➕', onClick: () => console.log('Nueva proyección') },
     ]);

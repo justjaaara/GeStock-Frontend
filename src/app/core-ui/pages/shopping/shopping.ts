@@ -31,7 +31,6 @@ export class Shopping implements OnInit, OnDestroy {
     this.header.breadcrumbs.set([{ label: 'Inicio', link: '/' }, { label: 'Compras' }]);
     this.header.showSearch.set(true);
     this.header.actionsTopbar.set([
-      { label: '', icon: '🌙', onClick: () => console.log('Modo Oscuro') },
       { label: 'Nueva orden', icon: '➕', onClick: () => console.log('Nueva compra') },
     ]);
     this.header.actionsTitle.set([

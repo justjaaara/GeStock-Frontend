@@ -38,7 +38,6 @@ export class Client implements OnInit, OnDestroy {
     this.header.breadcrumbs.set([{ label: 'Inicio', link: '/' }, { label: 'Clientes' }]);
     this.header.showSearch.set(true);
     this.header.actionsTopbar.set([
-      { label: '', icon: '🌙', onClick: () => console.log('Modo Oscuro') },
       { label: 'Nuevo cliente', icon: '➕', onClick: () => console.log('Nuevo cliente') },
     ]);
     this.header.actionsTitle.set([
