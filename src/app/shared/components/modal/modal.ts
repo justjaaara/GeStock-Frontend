@@ -15,6 +15,8 @@ export class Modal {
   @Input() confirmText = 'Confirmar';
   @Input() cancelText = 'Cancelar';
   @Input() variant: 'primary' | 'danger' = 'primary';
+  @Input() customContent = false; // Nueva propiedad
+  @Input() showFooter = true; // Nueva propiedad
 
   @Output() confirm = new EventEmitter<void>();
   @Output() cancel = new EventEmitter<void>();
@@ -31,7 +33,9 @@ export class Modal {
   }
 
   onOverlayClick(): void {
-    this.onCancel();
+    if (!this.customContent) {
+      this.onCancel();
+    }
   }
 
   private close(): void {

@@ -1,15 +1,20 @@
 @if (isOpen) {
 <div class="modal-overlay" (click)="onOverlayClick()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
+  <div class="modal-content" (click)="$event.stopPropagation()" [class.large]="customContent">
     <div class="modal-header">
       <h3 class="modal-title">{{ title }}</h3>
       <button class="modal-close" (click)="onCancel()" aria-label="Cerrar">×</button>
     </div>
 
-    <div class="modal-body">
+    <div class="modal-body" [class.custom]="customContent">
+      @if (!customContent) {
       <p>{{ message }}</p>
+      } @else {
+      <ng-content></ng-content>
+      }
     </div>
 
+    @if (!customContent && showFooter) {
     <div class="modal-footer">
       <button class="btn" (click)="onCancel()">
         {{ cancelText }}
@@ -18,6 +23,7 @@
         {{ confirmText }}
       </button>
     </div>
+    }
   </div>
 </div>
 }
