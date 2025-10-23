@@ -3,6 +3,9 @@ import { Header } from '@/shared/services/header';
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, signal, computed, inject } from '@angular/core';
 import { InventoryService, Product, PaginationInfo } from '@/core-ui/services/inventory';
+import { Category, CreateProductDto, MeasurementType } from '@/core-ui/interfaces/product';
+import { Modal } from '@/shared/components/modal/modal';
+import { ProductForm } from '@/core-ui/components/product-form/product-form';
 
 type ProductUI = {
   code: string;
@@ -19,7 +22,7 @@ type ProductUI = {
 @Component({
   selector: 'app-inventory',
   standalone: true,
-  imports: [StatCard, CommonModule],
+  imports: [StatCard, CommonModule, Modal, ProductForm],
   templateUrl: './inventory.html',
   styleUrl: './inventory.css',
 })
@@ -70,6 +73,25 @@ export class Inventory implements OnInit, OnDestroy {
     };
   });
 
+  showCreateProductModal = signal(false);
+
+  // Datos temporales (luego vendrán del backend)
+  categories: Category[] = [
+    { categoryId: 1, categoryName: 'Bebidas' },
+    { categoryId: 2, categoryName: 'Alimentos' },
+    { categoryId: 3, categoryName: 'Limpieza' },
+    { categoryId: 4, categoryName: 'Tecnología' },
+    { categoryId: 5, categoryName: 'Oficina' },
+  ];
+
+  measurementTypes: MeasurementType[] = [
+    { measurementId: 1, measurementName: 'Unidad' },
+    { measurementId: 2, measurementName: 'Kilogramo' },
+    { measurementId: 3, measurementName: 'Litro' },
+    { measurementId: 4, measurementName: 'Caja' },
+    { measurementId: 5, measurementName: 'Paquete' },
+  ];
+
   ngOnInit(): void {
     this.setupHeader();
     this.loadInventory();
@@ -84,15 +106,33 @@ export class Inventory implements OnInit, OnDestroy {
     this.header.breadcrumbs.set([{ label: 'Inicio', link: '/' }, { label: 'Inventario' }]);
     this.header.showSearch.set(true);
     this.header.actionsTopbar.set([
-      { label: '', icon: '🌙', onClick: () => console.log('Modo Oscuro') },
-      { label: 'Nuevo producto', icon: '➕', onClick: () => console.log('Nuevo producto') },
+      { label: 'Nuevo producto', icon: '➕', onClick: () => this.openCreateProductModal() },
     ]);
     this.header.actionsTitle.set([
       { label: 'Exportar Excel', onClick: () => console.log('Exportar excel') },
       { label: 'Importar', onClick: () => console.log('Importar') },
       { label: 'Reporte Stock', onClick: () => this.generateStockReport() },
-      { label: 'Actualizar', onClick: () => this.refreshInventory() },
+      { label: 'Actualizar', onClick: () => this.loadInventory() },
     ]);
+  }
+
+  openCreateProductModal(): void {
+    this.showCreateProductModal.set(true);
+  }
+
+  closeCreateProductModal(): void {
+    this.showCreateProductModal.set(false);
+  }
+
+  handleCreateProduct(productData: CreateProductDto): void {
+    console.log('Producto a crear:', productData);
+    // Aquí irá la lógica para enviar al backend
+    // Por ahora solo cerramos el modal
+    setTimeout(() => {
+      this.closeCreateProductModal();
+      // Recargar inventario después de crear
+      this.loadInventory();
+    }, 1000);
   }
 
   private loadInventory(page?: number): void {

@@ -1,0 +1,212 @@
+<div class="product-form-container">
+  <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+    <!-- Información básica -->
+    <div class="form-section">
+      <h3 class="section-title">Información Básica</h3>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label" for="productName">
+            Nombre del Producto
+            <span class="required">*</span>
+          </label>
+          <input
+            id="productName"
+            type="text"
+            class="form-input"
+            formControlName="productName"
+            placeholder="Ej: Coca Cola 500ml"
+            [class.error]="isFieldInvalid('productName')"
+          />
+          @if (isFieldInvalid('productName')) {
+          <span class="error-message">{{ getErrorMessage('productName') }}</span>
+          }
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label" for="productDescription"> Descripción </label>
+          <textarea
+            id="productDescription"
+            class="form-textarea"
+            formControlName="productDescription"
+            placeholder="Descripción opcional del producto"
+            rows="3"
+            [class.error]="isFieldInvalid('productDescription')"
+          ></textarea>
+          @if (isFieldInvalid('productDescription')) {
+          <span class="error-message">{{ getErrorMessage('productDescription') }}</span>
+          }
+          <span class="field-hint">
+            {{ productForm.get('productDescription')?.value?.length || 0 }}/200 caracteres
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Clasificación -->
+    <div class="form-section">
+      <h3 class="section-title">Clasificación</h3>
+
+      <div class="form-row two-cols">
+        <div class="form-field">
+          <label class="form-label" for="categoryId">
+            Categoría
+            <span class="required">*</span>
+          </label>
+          <div class="autocomplete-wrapper">
+            <input
+              id="categorySearch"
+              type="text"
+              class="form-input"
+              (input)="filterCategories()"
+              (focus)="showCategoryDropdown.set(true)"
+              placeholder="Buscar categoría..."
+              [class.error]="isFieldInvalid('categoryId')"
+            />
+            @if (showCategoryDropdown() && filteredCategories().length > 0) {
+            <ul class="autocomplete-dropdown">
+              @for (category of filteredCategories(); track category.categoryId) {
+              <li class="autocomplete-item" (click)="selectCategory(category)">
+                {{ category.categoryName }}
+              </li>
+              }
+            </ul>
+            }
+          </div>
+          <input type="hidden" formControlName="categoryId" />
+          @if (selectedCategory()) {
+          <div class="selected-badge">
+            {{ selectedCategory()?.categoryName }}
+            <button type="button" class="remove-badge" (click)="clearCategory()">×</button>
+          </div>
+          } @if (isFieldInvalid('categoryId')) {
+          <span class="error-message">{{ getErrorMessage('categoryId') }}</span>
+          }
+        </div>
+
+        <div class="form-field">
+          <label class="form-label" for="measurementId">
+            Unidad de Medida
+            <span class="required">*</span>
+          </label>
+          <select
+            id="measurementId"
+            class="form-select"
+            formControlName="measurementId"
+            [class.error]="isFieldInvalid('measurementId')"
+          >
+            <option value="" disabled selected>Seleccionar unidad</option>
+            @for (measurement of measurementTypes; track measurement.measurementId) {
+            <option [value]="measurement.measurementId">
+              {{ measurement.measurementName }}
+            </option>
+            }
+          </select>
+          @if (isFieldInvalid('measurementId')) {
+          <span class="error-message">{{ getErrorMessage('measurementId') }}</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Precio e Inventario -->
+    <div class="form-section">
+      <h3 class="section-title">Precio e Inventario</h3>
+
+      <div class="form-row three-cols">
+        <div class="form-field">
+          <label class="form-label" for="unitPrice">
+            Precio Unitario
+            <span class="required">*</span>
+          </label>
+          <div class="input-with-prefix">
+            <span class="input-prefix">$</span>
+            <input
+              id="unitPrice"
+              type="number"
+              class="form-input with-prefix"
+              formControlName="unitPrice"
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+              [class.error]="isFieldInvalid('unitPrice')"
+            />
+          </div>
+          @if (isFieldInvalid('unitPrice')) {
+          <span class="error-message">{{ getErrorMessage('unitPrice') }}</span>
+          }
+        </div>
+
+        <div class="form-field">
+          <label class="form-label" for="actualStock">
+            Stock Actual
+            <span class="required">*</span>
+          </label>
+          <input
+            id="actualStock"
+            type="number"
+            class="form-input"
+            formControlName="actualStock"
+            placeholder="0"
+            min="0"
+            [class.error]="isFieldInvalid('actualStock')"
+          />
+          @if (isFieldInvalid('actualStock')) {
+          <span class="error-message">{{ getErrorMessage('actualStock') }}</span>
+          }
+        </div>
+
+        <div class="form-field">
+          <label class="form-label" for="minimumStock"> Stock Mínimo </label>
+          <input
+            id="minimumStock"
+            type="number"
+            class="form-input"
+            formControlName="minimumStock"
+            placeholder="0"
+            min="0"
+            [class.error]="isFieldInvalid('minimumStock')"
+          />
+          @if (isFieldInvalid('minimumStock')) {
+          <span class="error-message">{{ getErrorMessage('minimumStock') }}</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Información Adicional -->
+    <div class="form-section">
+      <h3 class="section-title">Información Adicional (Opcional)</h3>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label" for="lotId"> ID de Lote </label>
+          <input
+            id="lotId"
+            type="number"
+            class="form-input"
+            formControlName="lotId"
+            placeholder="Número de lote"
+            min="1"
+            [class.error]="isFieldInvalid('lotId')"
+          />
+          @if (isFieldInvalid('lotId')) {
+          <span class="error-message">{{ getErrorMessage('lotId') }}</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="form-actions">
+      <button type="button" class="btn-secondary" (click)="onCancel()">Cancelar</button>
+      <button type="submit" class="btn-primary" [disabled]="productForm.invalid || isSubmitting()">
+        @if (isSubmitting()) {
+        <span class="btn-spinner"></span>
+        Guardando... } @else { Crear Producto }
+      </button>
+    </div>
+  </form>
+</div>

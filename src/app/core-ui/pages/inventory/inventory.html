@@ -158,4 +158,19 @@
     </div>
     } }
   </div>
+
+  <!-- Modal de crear producto -->
+  <app-modal
+    [isOpen]="showCreateProductModal()"
+    title="Crear Nuevo Producto"
+    [customContent]="true"
+    (cancel)="closeCreateProductModal()"
+  >
+    <app-product-form
+      [categories]="categories"
+      [measurementTypes]="measurementTypes"
+      (submitProduct)="handleCreateProduct($event)"
+      (cancel)="closeCreateProductModal()"
+    ></app-product-form>
+  </app-modal>
 </div>
