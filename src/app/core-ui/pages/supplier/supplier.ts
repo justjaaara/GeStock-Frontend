@@ -31,7 +31,6 @@ export class Supplier implements OnInit, OnDestroy {
     this.header.breadcrumbs.set([{ label: 'Inicio', link: '/' }, { label: 'Proveedores' }]);
     this.header.showSearch.set(true);
     this.header.actionsTopbar.set([
-      { label: '', icon: '🌙', onClick: () => console.log('Modo Oscuro') },
       { label: 'Nuevo proveedor', icon: '➕', onClick: () => console.log('Nuevo proveedor') },
     ]);
     this.header.actionsTitle.set([
