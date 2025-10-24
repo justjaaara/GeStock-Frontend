@@ -86,6 +86,8 @@
           }
         </div>
 
+        <!-- Solo mostrar unidad de medida en modo creación -->
+        @if (!isEditMode) {
         <div class="form-field">
           <label class="form-label" for="measurementId">
             Unidad de Medida
@@ -108,6 +110,7 @@
           <span class="error-message">{{ getErrorMessage('measurementId') }}</span>
           }
         </div>
+        }
       </div>
     </div>
 
@@ -139,6 +142,8 @@
           }
         </div>
 
+        <!-- Solo mostrar campos de stock en modo creación -->
+        @if (!isEditMode) {
         <div class="form-field">
           <label class="form-label" for="actualStock">
             Stock Actual
@@ -173,10 +178,12 @@
           <span class="error-message">{{ getErrorMessage('minimumStock') }}</span>
           }
         </div>
+        }
       </div>
     </div>
 
-    <!-- Información Adicional -->
+    <!-- Información Adicional - Solo en modo creación -->
+    @if (!isEditMode) {
     <div class="form-section">
       <h3 class="section-title">Información Adicional (Opcional)</h3>
 
@@ -198,6 +205,7 @@
         </div>
       </div>
     </div>
+    }
 
     <!-- Botones de acción -->
     <div class="form-actions">

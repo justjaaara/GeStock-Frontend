@@ -330,3 +330,16 @@ td.actions {
     cursor: not-allowed;
     transform: none !important;
 }
+
+/* ===== BOTÓN DE ELIMINAR ===== */
+.icon-btn-danger {
+    color: #dc3545 !important;
+    transition: all 0.2s ease;
+}
+
+.icon-btn-danger:hover {
+    background: #dc3545 !important;
+    color: white !important;
+    transform: scale(1.1);
+    border-radius: 4px;
+}

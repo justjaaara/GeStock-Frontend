@@ -9,6 +9,13 @@ export interface CreateProductDto {
   lotId?: number;
 }
 
+export interface UpdateProductDto {
+  productName: string;
+  productDescription?: string;
+  unitPrice: number;
+  categoryId: number;
+}
+
 export interface ResponseProductDto extends CreateProductDto {
   productCode: string;
   productId: number;

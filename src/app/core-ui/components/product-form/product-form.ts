@@ -1,7 +1,22 @@
-import { Component, EventEmitter, Input, Output, signal, computed, inject } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  signal,
+  computed,
+  inject,
+  OnChanges,
+  SimpleChanges,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CreateProductDto, Category, MeasurementType } from '@/core-ui/interfaces/product';
+import {
+  CreateProductDto,
+  Category,
+  MeasurementType,
+  ProductUI,
+} from '@/core-ui/interfaces/product';
 import { ProductService } from '@/core-ui/services/product-service/product-service';
 
 @Component({
@@ -11,13 +26,15 @@ import { ProductService } from '@/core-ui/services/product-service/product-servi
   templateUrl: './product-form.html',
   styleUrl: './product-form.css',
 })
-export class ProductForm {
+export class ProductForm implements OnChanges {
   @Input() categories: Category[] = [];
   @Input() measurementTypes: MeasurementType[] = [];
-  @Output() submitProduct = new EventEmitter<CreateProductDto>();
+  @Input() productToEdit: ProductUI | null = null; // Nuevo input para edición
+  @Input() isEditMode: boolean = false; // Nuevo input para determinar el modo
+  @Output() submitProduct = new EventEmitter<any>(); // Cambio para que pueda emitir CreateProductDto o UpdateProductDto
   @Output() cancel = new EventEmitter<void>();
 
-  productForm: FormGroup;
+  productForm!: FormGroup;
   isSubmitting = signal(false);
   private productService = inject(ProductService);
 
@@ -28,22 +45,64 @@ export class ProductForm {
   selectedCategory = signal<Category | null>(null);
 
   constructor(private fb: FormBuilder) {
-    this.productForm = this.fb.group({
-      productName: ['', [Validators.required, Validators.maxLength(40)]],
-      productDescription: ['', [Validators.maxLength(200)]],
-      unitPrice: ['', [Validators.required, Validators.min(0.01)]],
-      categoryId: ['', [Validators.required]],
-      measurementId: ['', [Validators.required]],
-      actualStock: ['', [Validators.required, Validators.min(0)]],
-      minimumStock: ['', [Validators.min(0)]],
-      lotId: ['', [Validators.min(1)]],
-    });
-
+    this.initializeForm();
     this.filteredCategories.set(this.categories);
   }
 
-  ngOnChanges(): void {
+  private initializeForm(): void {
+    if (this.isEditMode) {
+      // Formulario para edición - solo campos editables
+      this.productForm = this.fb.group({
+        productName: ['', [Validators.required, Validators.maxLength(40)]],
+        productDescription: ['', [Validators.maxLength(200)]],
+        unitPrice: ['', [Validators.required, Validators.min(0.01)]],
+        categoryId: ['', [Validators.required]],
+      });
+    } else {
+      // Formulario completo para creación
+      this.productForm = this.fb.group({
+        productName: ['', [Validators.required, Validators.maxLength(40)]],
+        productDescription: ['', [Validators.maxLength(200)]],
+        unitPrice: ['', [Validators.required, Validators.min(0.01)]],
+        categoryId: ['', [Validators.required]],
+        measurementId: ['', [Validators.required]],
+        actualStock: ['', [Validators.required, Validators.min(0)]],
+        minimumStock: ['', [Validators.min(0)]],
+        lotId: ['', [Validators.min(1)]],
+      });
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
     this.filteredCategories.set(this.categories);
+
+    // Si cambió el modo de edición o el producto a editar, reinicializar el formulario
+    if (changes['isEditMode'] || changes['productToEdit']) {
+      this.initializeForm();
+      this.populateFormForEdit();
+    }
+  }
+
+  private populateFormForEdit(): void {
+    if (this.isEditMode && this.productToEdit) {
+      // Encontrar la categoría por nombre para obtener el ID
+      const category = this.categories.find(
+        (cat) => cat.categoryName === this.productToEdit!.category
+      );
+
+      this.productForm.patchValue({
+        productName: this.productToEdit.name,
+        productDescription: this.productToEdit.subtitle || '',
+        unitPrice: this.productToEdit.price,
+        categoryId: category?.categoryId || '',
+      });
+
+      // Establecer la categoría seleccionada para el autocomplete
+      if (category) {
+        this.selectedCategory.set(category);
+        this.categorySearch = category.categoryName;
+      }
+    }
   }
 
   filterCategories(): void {

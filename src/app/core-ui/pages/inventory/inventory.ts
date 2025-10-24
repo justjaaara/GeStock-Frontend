@@ -2,22 +2,29 @@ import { StatCard } from '@/shared/components/stat-card/stat-card';
 import { Header } from '@/shared/services/header';
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, signal, computed, inject } from '@angular/core';
-import { InventoryService, Product, PaginationInfo } from '@/core-ui/services/inventory';
+import {
+  InventoryService,
+  Product,
+  PaginationInfo,
+  UpdateProductDto,
+} from '@/core-ui/services/inventory';
 import type {
   Category,
   CreateProductDto,
   MeasurementType,
   ProductDetailView,
   ProductUI,
+  UpdateProductDto as UpdateProductInterface,
 } from '@/core-ui/interfaces/product';
 import { Modal } from '@/shared/components/modal/modal';
 import { ProductForm } from '@/core-ui/components/product-form/product-form';
 import { ProductDetail } from '@/core-ui/components/product-detail/porduct-detail/product-detail';
+import { EditProductFormComponent } from '@/core-ui/components/edit-product-form/edit-product-form';
 
 @Component({
   selector: 'app-inventory',
   standalone: true,
-  imports: [StatCard, CommonModule, Modal, ProductForm, ProductDetail],
+  imports: [StatCard, CommonModule, Modal, ProductForm, ProductDetail, EditProductFormComponent],
   templateUrl: './inventory.html',
   styleUrl: './inventory.css',
 })
@@ -77,6 +84,11 @@ export class Inventory implements OnInit, OnDestroy {
   showCreateProductModal = signal(false);
   showProductDetailModal = signal(false);
   selectedProductForDetail = signal<ProductDetailView | null>(null);
+  showEditProductModal = signal(false);
+  selectedProductForEdit = signal<ProductUI | null>(null);
+  showDeleteConfirmModal = signal(false);
+  selectedProductForDelete = signal<ProductUI | null>(null);
+  isDeleting = signal(false);
 
   ngOnInit(): void {
     this.setupHeader();
@@ -145,13 +157,91 @@ export class Inventory implements OnInit, OnDestroy {
   handleEditProduct(product: ProductDetailView): void {
     console.log('Editar producto:', product);
     this.closeProductDetailModal();
-    // Aquí abrirías el modal de edición
+    // Convertir ProductDetailView a ProductUI para edición
+    const productForEdit: ProductUI = {
+      code: product.productCode,
+      name: product.productName,
+      subtitle: product.productDescription,
+      category: product.categoryName,
+      stock: product.currentStock,
+      min: product.minimumStock || 0,
+      price: product.unitPrice,
+      status: product.status,
+      measurementType: product.measurementName,
+      lotId: product.lotId,
+    };
+    this.openEditProductModal(productForEdit);
   }
 
   handleUpdateStock(product: ProductDetailView): void {
     console.log('Actualizar stock:', product);
     this.closeProductDetailModal();
     // Aquí abrirías el modal de actualización de stock
+  }
+
+  // Nuevos métodos para edición
+  openEditProductModal(product: ProductUI): void {
+    this.selectedProductForEdit.set(product);
+    this.showEditProductModal.set(true);
+  }
+
+  closeEditProductModal(): void {
+    this.showEditProductModal.set(false);
+    this.selectedProductForEdit.set(null);
+  }
+
+  // Nuevos métodos para eliminación
+  openDeleteConfirmModal(product: ProductUI): void {
+    this.selectedProductForDelete.set(product);
+    this.showDeleteConfirmModal.set(true);
+  }
+
+  closeDeleteConfirmModal(): void {
+    this.showDeleteConfirmModal.set(false);
+    this.selectedProductForDelete.set(null);
+  }
+
+  handleUpdateProduct(productData: UpdateProductInterface): void {
+    const productToEdit = this.selectedProductForEdit();
+    if (!productToEdit) return;
+
+    console.log('Actualizando producto:', productToEdit.code, productData);
+
+    // El nuevo componente ya envía los datos en el formato correcto
+    this.inventoryService.updateProduct(productToEdit.code, productData).subscribe({
+      next: (response) => {
+        console.log('Producto actualizado:', response);
+        this.closeEditProductModal();
+        // Recargar inventario
+        this.loadInventory(this.currentPage());
+      },
+      error: (error) => {
+        console.error('Error actualizando producto:', error);
+        // Aquí puedes manejar el error, mostrar un mensaje, etc.
+      },
+    });
+  }
+
+  confirmDeleteProduct(): void {
+    const productToDelete = this.selectedProductForDelete();
+    if (!productToDelete) return;
+
+    this.isDeleting.set(true);
+
+    this.inventoryService.deleteProduct(productToDelete.code).subscribe({
+      next: (response) => {
+        console.log('Producto eliminado:', response);
+        this.isDeleting.set(false);
+        this.closeDeleteConfirmModal();
+        // Recargar inventario
+        this.loadInventory(this.currentPage());
+      },
+      error: (error) => {
+        console.error('Error eliminando producto:', error);
+        this.isDeleting.set(false);
+        // Aquí puedes manejar el error, mostrar un mensaje, etc.
+      },
+    });
   }
 
   handleCreateProduct(productData: CreateProductDto): void {
@@ -234,7 +324,7 @@ export class Inventory implements OnInit, OnDestroy {
       subtitle: product.productDescription,
       category: product.productCategory,
       stock: product.currentStock,
-      min: product.minimunStock,
+      min: product.minimumStock,
       price: product.unitPrice,
       status: product.productState,
       measurementType: product.measurementType,

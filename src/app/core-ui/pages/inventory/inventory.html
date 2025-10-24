@@ -153,8 +153,20 @@
               >
                 👁️
               </button>
-              <button class="icon-btn" title="Editar">✏️</button>
-              <button class="icon-btn" title="Más opciones">🔧</button>
+              <button
+                class="icon-btn"
+                title="Editar producto"
+                (click)="openEditProductModal(product)"
+              >
+                ✏️
+              </button>
+              <button
+                class="icon-btn icon-btn-danger"
+                title="Eliminar producto"
+                (click)="openDeleteConfirmModal(product)"
+              >
+                ❌
+              </button>
             </td>
           </tr>
           }
@@ -199,5 +211,76 @@
       (edit)="handleEditProduct($event)"
       (updateStock)="handleUpdateStock($event)"
     ></app-product-detail>
+  </app-modal>
+
+  <!-- Modal de editar producto -->
+  <app-modal
+    [isOpen]="showEditProductModal()"
+    title="Editar Producto"
+    [customContent]="true"
+    (cancel)="closeEditProductModal()"
+  >
+    @if (selectedProductForEdit()) {
+    <app-edit-product-form
+      [categories]="categories()"
+      [product]="selectedProductForEdit()!"
+      (updateProduct)="handleUpdateProduct($event)"
+      (cancel)="closeEditProductModal()"
+    ></app-edit-product-form>
+    }
+  </app-modal>
+
+  <!-- Modal de confirmación de eliminación -->
+  <app-modal
+    [isOpen]="showDeleteConfirmModal()"
+    title="Confirmar Eliminación"
+    [customContent]="true"
+    (cancel)="closeDeleteConfirmModal()"
+  >
+    <div style="padding: 1.5rem">
+      @if (selectedProductForDelete()) {
+      <div style="text-align: center">
+        <div style="font-size: 3rem; margin-bottom: 1rem">⚠️</div>
+        <h3 style="margin-bottom: 1rem; color: #dc3545">¿Estás seguro?</h3>
+        <p style="margin-bottom: 1.5rem; color: #6c757d">
+          Esta acción eliminará permanentemente el producto:
+        </p>
+        <div
+          style="
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #dc3545;
+          "
+        >
+          <strong>{{ selectedProductForDelete()!.name }}</strong
+          ><br />
+          <small style="color: #6c757d">Código: {{ selectedProductForDelete()!.code }}</small>
+        </div>
+        <p style="margin-bottom: 2rem; font-weight: 500; color: #dc3545">
+          Esta acción no se puede deshacer.
+        </p>
+
+        <div style="display: flex; gap: 1rem; justify-content: center">
+          <button class="btn nav" (click)="closeDeleteConfirmModal()" [disabled]="isDeleting()">
+            Cancelar
+          </button>
+          <button
+            class="btn danger"
+            (click)="confirmDeleteProduct()"
+            [disabled]="isDeleting()"
+            style="background: #dc3545; color: white; border-color: #dc3545"
+          >
+            @if (isDeleting()) {
+            <span>Eliminando...</span>
+            } @else {
+            <span>Sí, eliminar producto</span>
+            }
+          </button>
+        </div>
+      </div>
+      }
+    </div>
   </app-modal>
 </div>
