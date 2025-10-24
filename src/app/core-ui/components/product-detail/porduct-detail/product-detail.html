@@ -11,6 +11,7 @@
       [ngClass]="{
         'status-active': product.status === 'Activo',
         'status-warning': product.status === 'Stock Bajo',
+        'status-inactive': product.status === 'Inactivo',
         'status-critical': product.status === 'Crítico' || product.status === 'Sin Stock'
       }"
     >

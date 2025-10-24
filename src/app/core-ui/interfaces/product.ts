@@ -49,6 +49,7 @@ export type ProductUI = {
   stock: number;
   min: number;
   price: number;
-  provider: string;
   status: string;
+  measurementType?: string;
+  lotId?: number;
 };

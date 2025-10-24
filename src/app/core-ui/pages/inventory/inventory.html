@@ -13,8 +13,8 @@
     </app-stat-card>
 
     <app-stat-card
-      title="Stock Crítico"
-      [value]="stats().criticalStockProducts"
+      title="Productos Inactivos"
+      [value]="stats().inactiveProducts"
       icon="🚨"
       variant="danger"
     >
@@ -48,9 +48,11 @@
       <div class="field">
         <select>
           <option>Todas las categorías</option>
-          <option>Bebidas</option>
-          <option>Alimentos</option>
-          <option>Limpieza</option>
+          @if (categoriesLoading()) {
+          <option disabled>Cargando categorías...</option>
+          } @else { @for (category of categories(); track category.categoryId) {
+          <option [value]="category.categoryId">{{ category.categoryName }}</option>
+          } }
         </select>
       </div>
 
@@ -173,8 +175,8 @@
     (cancel)="closeCreateProductModal()"
   >
     <app-product-form
-      [categories]="categories"
-      [measurementTypes]="measurementTypes"
+      [categories]="categories()"
+      [measurementTypes]="measurementTypes()"
       (submitProduct)="handleCreateProduct($event)"
       (cancel)="closeCreateProductModal()"
     ></app-product-form>

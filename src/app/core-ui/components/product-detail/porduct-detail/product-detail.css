@@ -44,6 +44,11 @@
         color: #065f46;
       }
 
+      .status-inactive {
+        background: #d1fae5;
+        color: #322e47;
+      }
+
       .status-warning {
         background: #fef3c7;
         color: #92400e;

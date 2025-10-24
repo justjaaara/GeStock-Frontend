@@ -16,6 +16,7 @@ export class ProductDetail {
   @Output() updateStock = new EventEmitter<ProductDetailView>();
 
   getStockPercentage(): number {
+    console.log('🚀 ~ ProductDetail ~ product:', this.product);
     if (!this.product || !this.product.minimumStock) return 100;
     return Math.round((this.product.currentStock / this.product.minimumStock) * 100);
   }

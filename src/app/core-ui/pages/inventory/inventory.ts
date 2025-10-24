@@ -30,6 +30,10 @@ export class Inventory implements OnInit, OnDestroy {
   pagination = signal<PaginationInfo | null>(null);
   isLoading = signal(false);
   error = signal<string | null>(null);
+  categories = signal<Category[]>([]);
+  categoriesLoading = signal(false);
+  measurementTypes = signal<MeasurementType[]>([]);
+  measurementTypesLoading = signal(false);
 
   // Señal para la página actual
   currentPage = signal(1);
@@ -41,12 +45,14 @@ export class Inventory implements OnInit, OnDestroy {
     const totalProducts = this.pagination()?.totalItems || 0;
     const lowStockProducts = products.filter((p) => p.stock <= p.min).length;
     const criticalStockProducts = products.filter((p) => p.stock < p.min * 0.5).length;
+    const inactiveProducts = products.filter((p) => p.status !== 'Activo').length;
     const totalValue = products.reduce((sum, p) => sum + p.stock * p.price, 0);
 
     return {
       totalProducts,
       lowStockProducts,
       criticalStockProducts,
+      inactiveProducts,
       totalValue,
     };
   });
@@ -72,26 +78,11 @@ export class Inventory implements OnInit, OnDestroy {
   showProductDetailModal = signal(false);
   selectedProductForDetail = signal<ProductDetailView | null>(null);
 
-  // Datos temporales (luego vendrán del backend)
-  categories: Category[] = [
-    { categoryId: 1, categoryName: 'Bebidas' },
-    { categoryId: 2, categoryName: 'Alimentos' },
-    { categoryId: 3, categoryName: 'Limpieza' },
-    { categoryId: 4, categoryName: 'Tecnología' },
-    { categoryId: 5, categoryName: 'Oficina' },
-  ];
-
-  measurementTypes: MeasurementType[] = [
-    { measurementId: 1, measurementName: 'Unidad' },
-    { measurementId: 2, measurementName: 'Kilogramo' },
-    { measurementId: 3, measurementName: 'Litro' },
-    { measurementId: 4, measurementName: 'Caja' },
-    { measurementId: 5, measurementName: 'Paquete' },
-  ];
-
   ngOnInit(): void {
     this.setupHeader();
     this.loadInventory();
+    this.loadCategories();
+    this.loadMeasurementTypes();
   }
 
   ngOnDestroy(): void {
@@ -122,18 +113,21 @@ export class Inventory implements OnInit, OnDestroy {
   }
 
   openProductDetailModal(product: ProductUI): void {
-    // Convertir ProductUI a ProductDetail
+    // Encontrar el producto completo del backend para obtener todos los campos
+    const backendProduct = this.products().find((p) => p.code === product.code);
+
+    // Convertir ProductUI a ProductDetail usando los datos del backend
     const productDetail: ProductDetailView = {
-      productId: 0, // Este vendría del backend
+      productId: 0, // Este vendría del backend si se agrega
       productCode: product.code,
       productName: product.name,
       productDescription: product.subtitle,
       unitPrice: product.price,
       categoryName: product.category,
-      measurementName: 'Unidad', // Este vendría del backend
+      measurementName: product.measurementType || 'N/A', // Usar el tipo de medida del backend
       currentStock: product.stock,
       minimumStock: product.min,
-      lotId: undefined,
+      lotId: product.lotId || undefined,
       createdAt: new Date().toISOString(), // Este vendría del backend
       updatedAt: undefined,
       status: product.status,
@@ -171,6 +165,38 @@ export class Inventory implements OnInit, OnDestroy {
     }, 1000);
   }
 
+  private loadCategories(): void {
+    this.categoriesLoading.set(true);
+    this.inventoryService.getCategories().subscribe({
+      next: (categories) => {
+        this.categories.set(categories);
+        this.categoriesLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Error loading categories:', error);
+        this.categoriesLoading.set(false);
+        // En caso de error, mantener las categorías vacías
+        this.categories.set([]);
+      },
+    });
+  }
+
+  private loadMeasurementTypes(): void {
+    this.measurementTypesLoading.set(true);
+    this.inventoryService.getMeasurementTypes().subscribe({
+      next: (measurementTypes) => {
+        this.measurementTypes.set(measurementTypes);
+        this.measurementTypesLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Error loading measurement types:', error);
+        this.measurementTypesLoading.set(false);
+        // En caso de error, mantener los tipos de medida vacíos
+        this.measurementTypes.set([]);
+      },
+    });
+  }
+
   private loadInventory(page?: number): void {
     const pageToLoad = page || this.currentPage();
     this.isLoading.set(true);
@@ -179,6 +205,7 @@ export class Inventory implements OnInit, OnDestroy {
     this.inventoryService.getInventory(pageToLoad, this.itemsPerPage()).subscribe({
       next: (response) => {
         const mappedProducts = this.mapProductsToUI(response.data);
+        console.log('🚀 ~ Inventory ~ loadInventory ~ mappedProducts:', mappedProducts);
         this.products.set(mappedProducts);
         this.pagination.set(response.pagination);
         this.currentPage.set(response.pagination.currentPage);
@@ -201,16 +228,10 @@ export class Inventory implements OnInit, OnDestroy {
       stock: product.currentStock,
       min: product.minimunStock,
       price: product.unitPrice,
-      provider: 'N/A', // Este campo no viene del backend
-      status: this.getStockStatus(product.currentStock, product.minimunStock),
+      status: product.productState,
+      measurementType: product.measurementType,
+      lotId: product.lotId,
     }));
-  }
-
-  private getStockStatus(currentStock: number, minimumStock: number): string {
-    if (currentStock <= 0) return 'Sin Stock';
-    if (currentStock < minimumStock * 0.5) return 'Crítico';
-    if (currentStock <= minimumStock) return 'Stock Bajo';
-    return 'Activo';
   }
 
   private getErrorMessage(error: any): string {
@@ -258,9 +279,9 @@ export class Inventory implements OnInit, OnDestroy {
 
   private generateStockReport(): void {
     const lowStockItems = this.products().filter(
-      (p) => p.status === 'Stock Bajo' || p.status === 'Crítico' || p.status === 'Sin Stock'
+      (p) => p.status !== 'Activo' // Filtrar productos que no estén activos
     );
-    console.log('Productos con stock bajo:', lowStockItems);
+    console.log('Productos con problemas de stock:', lowStockItems);
     // Aquí puedes implementar la lógica para generar/descargar el reporte
   }
 
