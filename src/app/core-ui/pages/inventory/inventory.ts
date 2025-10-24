@@ -199,16 +199,24 @@ export class Inventory implements OnInit, OnDestroy {
 
   private loadInventory(page?: number): void {
     const pageToLoad = page || this.currentPage();
+    console.log(
+      '🔄 Loading inventory - Page to load:',
+      pageToLoad,
+      'Current page signal:',
+      this.currentPage()
+    );
     this.isLoading.set(true);
     this.error.set(null);
 
     this.inventoryService.getInventory(pageToLoad, this.itemsPerPage()).subscribe({
       next: (response) => {
+        console.log('📦 Inventory response:', response.pagination);
         const mappedProducts = this.mapProductsToUI(response.data);
         console.log('🚀 ~ Inventory ~ loadInventory ~ mappedProducts:', mappedProducts);
         this.products.set(mappedProducts);
         this.pagination.set(response.pagination);
         this.currentPage.set(response.pagination.currentPage);
+        console.log('✅ Updated currentPage signal to:', response.pagination.currentPage);
         this.isLoading.set(false);
       },
       error: (error) => {
@@ -253,22 +261,55 @@ export class Inventory implements OnInit, OnDestroy {
   // Métodos de paginación
   goToPage(page: number): void {
     const pag = this.pagination();
-    if (pag && page >= 1 && page <= pag.totalPages && page !== this.currentPage()) {
+    console.log(
+      '🎯 goToPage called - Target page:',
+      page,
+      'Backend current page:',
+      pag?.currentPage
+    );
+    console.log('📊 Pagination info:', pag);
+
+    if (pag && page >= 1 && page <= pag.totalPages && page !== pag.currentPage) {
+      console.log('✅ Conditions met, loading page:', page);
+      this.pagination.set({ ...pag, currentPage: page });
       this.loadInventory(page);
+    } else {
+      console.log('❌ Conditions not met:', {
+        hasValidPagination: !!pag,
+        pageInRange: page >= 1 && page <= (pag?.totalPages || 0),
+        isDifferentPage: page !== pag?.currentPage,
+      });
     }
   }
 
   prevPage(): void {
     const pag = this.pagination();
+    console.log(
+      '⬅️ prevPage called - Pagination current:',
+      pag?.currentPage,
+      'Has previous:',
+      pag?.hasPreviousPage
+    );
     if (pag && pag.hasPreviousPage) {
-      this.goToPage(this.currentPage() - 1);
+      const targetPage = pag.currentPage - 1;
+      console.log('🎯 prevPage - Going to page:', targetPage);
+      this.goToPage(targetPage);
     }
   }
 
   nextPage(): void {
     const pag = this.pagination();
+    console.log(
+      '➡️ nextPage called - Pagination current:',
+      pag?.currentPage,
+      'Has next:',
+      pag?.hasNextPage
+    );
     if (pag && pag.hasNextPage) {
-      this.goToPage(this.currentPage() + 1);
+      const targetPage = Number(pag.currentPage) + 1;
+      console.log('🚀 ~ Inventory ~ nextPage ~ currentPage:', pag.currentPage);
+      console.log('🎯 nextPage - Going to page:', targetPage);
+      this.goToPage(targetPage);
     }
   }
 
@@ -288,6 +329,7 @@ export class Inventory implements OnInit, OnDestroy {
   // Método para cambiar items por página
   changeItemsPerPage(newLimit: number): void {
     this.itemsPerPage.set(newLimit);
+    this.currentPage.set(1); // Asegurarse de que la señal esté en 1
     this.loadInventory(1); // Volver a la primera página
   }
 
@@ -302,15 +344,30 @@ export class Inventory implements OnInit, OnDestroy {
     return this.pagination()?.totalItems || 0;
   }
 
-  // Agregar este método
+  // Método mejorado para la paginación
   getPaginationPages(): number[] {
     const pag = this.pagination();
     if (!pag) return [];
 
     const totalPages = pag.totalPages;
+    const currentPage = pag.currentPage;
     const maxPagesToShow = 5;
-    const pagesToShow = Math.min(totalPages, maxPagesToShow);
 
-    return Array.from({ length: pagesToShow }, (_, i) => i + 1);
+    // Si hay pocas páginas, mostrar todas
+    if (totalPages <= maxPagesToShow) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
+    // Calcular el rango centrado alrededor de la página actual
+    const halfRange = Math.floor(maxPagesToShow / 2);
+    let startPage = Math.max(1, currentPage - halfRange);
+    let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+    // Ajustar si estamos cerca del final
+    if (endPage - startPage + 1 < maxPagesToShow) {
+      startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+
+    return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
   }
 }

@@ -68,6 +68,38 @@
       <button class="btn nav primary">Filtrar</button>
     </div>
 
+    <!-- Paginación superior -->
+    @if (paginationInfo() && paginationInfo()!.totalPages > 1) {
+    <div class="pagination-container">
+      <div class="page-info">
+        Mostrando {{ paginationInfo()!.showingFrom }}-{{ paginationInfo()!.showingTo }} de
+        {{ paginationInfo()!.totalItems }} productos
+      </div>
+
+      <div class="pagination-buttons">
+        <button (click)="prevPage()" [disabled]="!paginationInfo()?.hasPrevious" class="btn nav">
+          ← Anterior
+        </button>
+
+        @for (page of getPaginationPages(); track page) {
+        <button
+          (click)="goToPage(page)"
+          [ngClass]="{
+            'btn-pagination-active': page === paginationInfo()!.currentPage,
+            'btn nav': page !== paginationInfo()!.currentPage
+          }"
+        >
+          {{ page }}
+        </button>
+        }
+
+        <button (click)="nextPage()" [disabled]="!paginationInfo()?.hasNext" class="btn nav">
+          Siguiente →
+        </button>
+      </div>
+    </div>
+    }
+
     <!-- Tabla de productos -->
     <div class="table-wrap">
       <table class="table">
@@ -136,35 +168,7 @@
       </div>
       }
     </div>
-
-    <!-- Paginación -->
-    @if (paginationInfo() && paginationInfo()!.totalPages > 1) {
-    <div class="panel-foot">
-      <div class="page-info">
-        Mostrando {{ paginationInfo()!.showingFrom }}-{{ paginationInfo()!.showingTo }} de
-        {{ paginationInfo()!.totalItems }} productos
-      </div>
-
-      <div style="display: flex; gap: 8px; align-items: center">
-        <button (click)="prevPage()" [disabled]="!paginationInfo()?.hasPrevious" class="btn nav">
-          ← Anterior
-        </button>
-
-        @for (page of getPaginationPages(); track page) {
-        <button
-          (click)="goToPage(page)"
-          [class]="page === paginationInfo()!.currentPage ? 'btn nav primary' : 'btn nav'"
-        >
-          {{ page }}
-        </button>
-        }
-
-        <button (click)="nextPage()" [disabled]="!paginationInfo()?.hasNext" class="btn nav">
-          Siguiente →
-        </button>
-      </div>
-    </div>
-    } }
+    }
   </div>
 
   <!-- Modal de crear producto -->
