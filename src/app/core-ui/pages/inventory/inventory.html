@@ -112,7 +112,13 @@
               </span>
             </td>
             <td class="actions">
-              <button class="icon-btn" title="Ver detalles">👁️</button>
+              <button
+                class="icon-btn"
+                title="Ver detalles"
+                (click)="openProductDetailModal(product)"
+              >
+                👁️
+              </button>
               <button class="icon-btn" title="Editar">✏️</button>
               <button class="icon-btn" title="Más opciones">🔧</button>
             </td>
@@ -172,5 +178,20 @@
       (submitProduct)="handleCreateProduct($event)"
       (cancel)="closeCreateProductModal()"
     ></app-product-form>
+  </app-modal>
+
+  <!-- Modal de detalles del producto -->
+  <app-modal
+    [isOpen]="showProductDetailModal()"
+    [title]="'Detalles del Producto'"
+    [customContent]="true"
+    (cancel)="closeProductDetailModal()"
+  >
+    <app-product-detail
+      [product]="selectedProductForDetail()"
+      (close)="closeProductDetailModal()"
+      (edit)="handleEditProduct($event)"
+      (updateStock)="handleUpdateStock($event)"
+    ></app-product-detail>
   </app-modal>
 </div>

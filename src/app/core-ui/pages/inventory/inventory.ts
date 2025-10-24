@@ -3,26 +3,21 @@ import { Header } from '@/shared/services/header';
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, signal, computed, inject } from '@angular/core';
 import { InventoryService, Product, PaginationInfo } from '@/core-ui/services/inventory';
-import { Category, CreateProductDto, MeasurementType } from '@/core-ui/interfaces/product';
+import type {
+  Category,
+  CreateProductDto,
+  MeasurementType,
+  ProductDetailView,
+  ProductUI,
+} from '@/core-ui/interfaces/product';
 import { Modal } from '@/shared/components/modal/modal';
 import { ProductForm } from '@/core-ui/components/product-form/product-form';
-
-type ProductUI = {
-  code: string;
-  name: string;
-  subtitle?: string;
-  category: string;
-  stock: number;
-  min: number;
-  price: number;
-  provider: string;
-  status: string;
-};
+import { ProductDetail } from '@/core-ui/components/product-detail/porduct-detail/product-detail';
 
 @Component({
   selector: 'app-inventory',
   standalone: true,
-  imports: [StatCard, CommonModule, Modal, ProductForm],
+  imports: [StatCard, CommonModule, Modal, ProductForm, ProductDetail],
   templateUrl: './inventory.html',
   styleUrl: './inventory.css',
 })
@@ -74,6 +69,8 @@ export class Inventory implements OnInit, OnDestroy {
   });
 
   showCreateProductModal = signal(false);
+  showProductDetailModal = signal(false);
+  selectedProductForDetail = signal<ProductDetailView | null>(null);
 
   // Datos temporales (luego vendrán del backend)
   categories: Category[] = [
@@ -122,6 +119,45 @@ export class Inventory implements OnInit, OnDestroy {
 
   closeCreateProductModal(): void {
     this.showCreateProductModal.set(false);
+  }
+
+  openProductDetailModal(product: ProductUI): void {
+    // Convertir ProductUI a ProductDetail
+    const productDetail: ProductDetailView = {
+      productId: 0, // Este vendría del backend
+      productCode: product.code,
+      productName: product.name,
+      productDescription: product.subtitle,
+      unitPrice: product.price,
+      categoryName: product.category,
+      measurementName: 'Unidad', // Este vendría del backend
+      currentStock: product.stock,
+      minimumStock: product.min,
+      lotId: undefined,
+      createdAt: new Date().toISOString(), // Este vendría del backend
+      updatedAt: undefined,
+      status: product.status,
+    };
+
+    this.selectedProductForDetail.set(productDetail);
+    this.showProductDetailModal.set(true);
+  }
+
+  closeProductDetailModal(): void {
+    this.showProductDetailModal.set(false);
+    this.selectedProductForDetail.set(null);
+  }
+
+  handleEditProduct(product: ProductDetailView): void {
+    console.log('Editar producto:', product);
+    this.closeProductDetailModal();
+    // Aquí abrirías el modal de edición
+  }
+
+  handleUpdateStock(product: ProductDetailView): void {
+    console.log('Actualizar stock:', product);
+    this.closeProductDetailModal();
+    // Aquí abrirías el modal de actualización de stock
   }
 
   handleCreateProduct(productData: CreateProductDto): void {

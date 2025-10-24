@@ -1,0 +1,128 @@
+<div class="product-detail-container">
+  @if (product) {
+  <!-- Header del producto -->
+  <div class="product-header">
+    <div class="product-title">
+      <h2>{{ product.productName }}</h2>
+      <span class="product-code">{{ product.productCode }}</span>
+    </div>
+    <span
+      class="status-badge"
+      [ngClass]="{
+        'status-active': product.status === 'Activo',
+        'status-warning': product.status === 'Stock Bajo',
+        'status-critical': product.status === 'Crítico' || product.status === 'Sin Stock'
+      }"
+    >
+      {{ product.status }}
+    </span>
+  </div>
+
+  @if (product.productDescription) {
+  <div class="product-description">
+    <p>{{ product.productDescription }}</p>
+  </div>
+  }
+
+  <!-- Información principal -->
+  <div class="detail-sections">
+    <!-- Información básica -->
+    <div class="detail-section">
+      <h3 class="section-title">Información Básica</h3>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="detail-label">Categoría</span>
+          <span class="detail-value">{{ product.categoryName }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Unidad de Medida</span>
+          <span class="detail-value">{{ product.measurementName }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Precio Unitario</span>
+          <span class="detail-value price">{{
+            product.unitPrice | currency : 'COP' : 'symbol' : '1.2-2'
+          }}</span>
+        </div>
+        @if (product.lotId) {
+        <div class="detail-item">
+          <span class="detail-label">ID de Lote</span>
+          <span class="detail-value">{{ product.lotId }}</span>
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Información de stock -->
+    <div class="detail-section">
+      <h3 class="section-title">Control de Stock</h3>
+      <div class="stock-info">
+        <div class="stock-item current">
+          <div class="stock-number">{{ product.currentStock }}</div>
+          <div class="stock-label">Stock Actual</div>
+        </div>
+        @if (product.minimumStock) {
+        <div class="stock-item minimum">
+          <div class="stock-number">{{ product.minimumStock }}</div>
+          <div class="stock-label">Stock Mínimo</div>
+        </div>
+        }
+        <div class="stock-item total">
+          <div class="stock-number">
+            {{ product.currentStock * product.unitPrice | currency : 'COP' : 'symbol' : '1.0-0' }}
+          </div>
+          <div class="stock-label">Valor Total</div>
+        </div>
+      </div>
+
+      <!-- Indicador visual de stock -->
+      <div class="stock-indicator">
+        <div class="stock-bar">
+          <div
+            class="stock-fill"
+            [style.width.%]="getStockPercentage()"
+            [ngClass]="{
+              'fill-good': getStockPercentage() > 100,
+              'fill-warning': getStockPercentage() <= 100 && getStockPercentage() > 50,
+              'fill-critical': getStockPercentage() <= 50
+            }"
+          ></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información de fechas -->
+    <div class="detail-section">
+      <h3 class="section-title">Historial</h3>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="detail-label">Fecha de Creación</span>
+          <span class="detail-value">{{ product.createdAt | date : 'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+        @if (product.updatedAt) {
+        <div class="detail-item">
+          <span class="detail-label">Última Actualización</span>
+          <span class="detail-value">{{ product.updatedAt | date : 'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Acciones -->
+  <div class="product-actions">
+    <button class="btn-secondary" (click)="onEdit()">
+      <span class="btn-icon">✏️</span>
+      Editar Producto
+    </button>
+    <button class="btn-secondary" (click)="onStockUpdate()">
+      <span class="btn-icon">📦</span>
+      Actualizar Stock
+    </button>
+    <button class="btn-secondary" (click)="onClose()">
+      <span class="btn-icon">👁️</span>
+      Ver Movimientos
+    </button>
+  </div>
+  }
+</div>
