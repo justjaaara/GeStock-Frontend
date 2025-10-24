@@ -1,3 +1,6 @@
+/* Importar estilos de ngx-toastr */
+@import 'ngx-toastr/toastr';
+
 * {
   box-sizing: border-box;
 }

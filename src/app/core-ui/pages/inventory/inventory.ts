@@ -20,6 +20,7 @@ import { Modal } from '@/shared/components/modal/modal';
 import { ProductForm } from '@/core-ui/components/product-form/product-form';
 import { ProductDetail } from '@/core-ui/components/product-detail/porduct-detail/product-detail';
 import { EditProductFormComponent } from '@/core-ui/components/edit-product-form/edit-product-form';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-inventory',
@@ -31,6 +32,7 @@ import { EditProductFormComponent } from '@/core-ui/components/edit-product-form
 export class Inventory implements OnInit, OnDestroy {
   private inventoryService = inject(InventoryService);
   private header = inject(Header);
+  private toastr = inject(ToastrService);
 
   // Señales para el estado
   products = signal<ProductUI[]>([]);
@@ -207,17 +209,16 @@ export class Inventory implements OnInit, OnDestroy {
 
     console.log('Actualizando producto:', productToEdit.code, productData);
 
-    // El nuevo componente ya envía los datos en el formato correcto
     this.inventoryService.updateProduct(productToEdit.code, productData).subscribe({
       next: (response) => {
         console.log('Producto actualizado:', response);
+        this.toastr.success('Producto actualizado con éxito', 'Actualización Exitosa');
         this.closeEditProductModal();
-        // Recargar inventario
         this.loadInventory(this.currentPage());
       },
       error: (error) => {
         console.error('Error actualizando producto:', error);
-        // Aquí puedes manejar el error, mostrar un mensaje, etc.
+        this.toastr.error('Error al actualizar el producto', 'Error');
       },
     });
   }
@@ -231,26 +232,24 @@ export class Inventory implements OnInit, OnDestroy {
     this.inventoryService.deleteProduct(productToDelete.code).subscribe({
       next: (response) => {
         console.log('Producto eliminado:', response);
+        this.toastr.success('Producto eliminado con éxito', 'Eliminación Exitosa');
         this.isDeleting.set(false);
         this.closeDeleteConfirmModal();
-        // Recargar inventario
         this.loadInventory(this.currentPage());
       },
       error: (error) => {
         console.error('Error eliminando producto:', error);
+        this.toastr.error('Error al eliminar el producto', 'Error');
         this.isDeleting.set(false);
-        // Aquí puedes manejar el error, mostrar un mensaje, etc.
       },
     });
   }
 
   handleCreateProduct(productData: CreateProductDto): void {
     console.log('Producto a crear:', productData);
-    // Aquí irá la lógica para enviar al backend
-    // Por ahora solo cerramos el modal
     setTimeout(() => {
+      this.toastr.success('Producto creado con éxito', 'Creación Exitosa');
       this.closeCreateProductModal();
-      // Recargar inventario después de crear
       this.loadInventory();
     }, 1000);
   }

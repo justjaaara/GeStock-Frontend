@@ -5,6 +5,7 @@ import { Component, inject, QueryList, signal, ViewChildren } from '@angular/cor
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { InputField } from '../../../shared/components/input/input-field';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-login-card',
@@ -16,6 +17,7 @@ export class LoginCard {
   private formBuilder = inject(FormBuilder);
   private authService = inject(Auth);
   private router = inject(Router);
+  private toastr = inject(ToastrService);
 
   @ViewChildren(InputField) inputFields!: QueryList<InputField>;
 
@@ -50,7 +52,7 @@ export class LoginCard {
       this.authService.login(loginData).subscribe({
         next: (response) => {
           this.isLoading.set(false);
-          // Redirige al dashboard
+          this.toastr.success('Inicio de sesión exitoso', 'Bienvenido');
           this.router.navigate(['/dashboard']);
         },
         error: (error) => {
@@ -59,10 +61,13 @@ export class LoginCard {
 
           if (error.status === 401) {
             this.errorMessage.set('Credenciales inválidas. Verifica tu email y contraseña.');
+            this.toastr.error('Credenciales inválidas', 'Error de autenticación');
           } else if (error.status >= 500) {
             this.errorMessage.set('Error interno del servidor.');
+            this.toastr.error('Error interno del servidor', 'Error');
           } else {
             this.errorMessage.set('Error al iniciar sesión. Intenta nuevamente.');
+            this.toastr.error('Error al iniciar sesión', 'Error');
           }
         },
       });
