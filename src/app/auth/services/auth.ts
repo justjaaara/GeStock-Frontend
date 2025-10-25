@@ -11,17 +11,9 @@ import {
 } from '@/auth/interfaces/auth';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
-import {
-  RegisterRequestBackend,
-  AuthResponse,
-  LoginRequest,
-  ChangePasswordRequest,
-  ChangePasswordResponse,
-} from '@/auth/interfaces/auth';
 import { catchError, Observable, throwError, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '@environments/environment.development';
-import { catchError, Observable, tap, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -165,8 +157,6 @@ export class Auth {
     }
 
     const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     });
