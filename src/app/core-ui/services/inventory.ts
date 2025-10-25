@@ -115,4 +115,22 @@ export class InventoryService {
 
     return this.http.get<InventoryResponse>(url);
   }
+
+  getProductByCode(productCode: string): Observable<any> {
+    return this.http.get<any>(`${environment.BACKENDBASEURL}/products/${productCode}`);
+  }
+
+  updateStock(data: {
+    productId: number;
+    lotId: number | null;
+    quantity: number;
+    productCode: string;
+    userId: number;
+    type: string;
+  }): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(
+      `${environment.BACKENDBASEURL}/inventory/update-stock`,
+      data
+    );
+  }
 }

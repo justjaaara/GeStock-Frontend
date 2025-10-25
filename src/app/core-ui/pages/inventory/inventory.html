@@ -87,6 +87,14 @@
       @if (hasAppliedFilters()) {
       <button class="btn nav" (click)="resetFilters()">Limpiar filtros</button>
       }
+
+      <button
+        class="btn nav"
+        (click)="openStockUpdateModal()"
+        title="Actualizar stock de inventario"
+      >
+        📦 Actualizar Stock
+      </button>
     </div>
     <!-- Paginación superior -->
     @if (paginationInfo() && paginationInfo()!.totalPages > 1) {
@@ -302,5 +310,20 @@
       </div>
       }
     </div>
+  </app-modal>
+
+  <!-- Modal de actualización de stock -->
+  <app-modal
+    [isOpen]="showStockUpdateModal()"
+    title="Actualizar Stock"
+    [customContent]="true"
+    (cancel)="closeStockUpdateModal()"
+  >
+    <app-stock-update-form
+      [isLoading]="isUpdatingStock()"
+      [userId]="userId()"
+      (submitStockUpdate)="handleStockUpdate($event)"
+      (cancel)="closeStockUpdateModal()"
+    ></app-stock-update-form>
   </app-modal>
 </div>
