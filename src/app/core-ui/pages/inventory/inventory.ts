@@ -2,36 +2,47 @@ import { StatCard } from '@/shared/components/stat-card/stat-card';
 import { Header } from '@/shared/services/header';
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, signal, computed, inject } from '@angular/core';
-import { InventoryService, Product, PaginationInfo } from '@/core-ui/services/inventory';
-
-type ProductUI = {
-  code: string;
-  name: string;
-  subtitle?: string;
-  category: string;
-  stock: number;
-  min: number;
-  price: number;
-  provider: string;
-  status: string;
-};
+import {
+  InventoryService,
+  Product,
+  PaginationInfo,
+  UpdateProductDto,
+} from '@/core-ui/services/inventory';
+import type {
+  Category,
+  CreateProductDto,
+  MeasurementType,
+  ProductDetailView,
+  ProductUI,
+  UpdateProductDto as UpdateProductInterface,
+} from '@/core-ui/interfaces/product';
+import { Modal } from '@/shared/components/modal/modal';
+import { ProductForm } from '@/core-ui/components/product-form/product-form';
+import { ProductDetail } from '@/core-ui/components/product-detail/porduct-detail/product-detail';
+import { EditProductFormComponent } from '@/core-ui/components/edit-product-form/edit-product-form';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-inventory',
   standalone: true,
-  imports: [StatCard, CommonModule],
+  imports: [StatCard, CommonModule, Modal, ProductForm, ProductDetail, EditProductFormComponent],
   templateUrl: './inventory.html',
   styleUrl: './inventory.css',
 })
 export class Inventory implements OnInit, OnDestroy {
   private inventoryService = inject(InventoryService);
   private header = inject(Header);
+  private toastr = inject(ToastrService);
 
   // Señales para el estado
   products = signal<ProductUI[]>([]);
   pagination = signal<PaginationInfo | null>(null);
   isLoading = signal(false);
   error = signal<string | null>(null);
+  categories = signal<Category[]>([]);
+  categoriesLoading = signal(false);
+  measurementTypes = signal<MeasurementType[]>([]);
+  measurementTypesLoading = signal(false);
 
   // Señal para la página actual
   currentPage = signal(1);
@@ -43,12 +54,14 @@ export class Inventory implements OnInit, OnDestroy {
     const totalProducts = this.pagination()?.totalItems || 0;
     const lowStockProducts = products.filter((p) => p.stock <= p.min).length;
     const criticalStockProducts = products.filter((p) => p.stock < p.min * 0.5).length;
+    const inactiveProducts = products.filter((p) => p.status !== 'Activo').length;
     const totalValue = products.reduce((sum, p) => sum + p.stock * p.price, 0);
 
     return {
       totalProducts,
       lowStockProducts,
       criticalStockProducts,
+      inactiveProducts,
       totalValue,
     };
   });
@@ -70,9 +83,20 @@ export class Inventory implements OnInit, OnDestroy {
     };
   });
 
+  showCreateProductModal = signal(false);
+  showProductDetailModal = signal(false);
+  selectedProductForDetail = signal<ProductDetailView | null>(null);
+  showEditProductModal = signal(false);
+  selectedProductForEdit = signal<ProductUI | null>(null);
+  showDeleteConfirmModal = signal(false);
+  selectedProductForDelete = signal<ProductUI | null>(null);
+  isDeleting = signal(false);
+
   ngOnInit(): void {
     this.setupHeader();
     this.loadInventory();
+    this.loadCategories();
+    this.loadMeasurementTypes();
   }
 
   ngOnDestroy(): void {
@@ -84,29 +108,204 @@ export class Inventory implements OnInit, OnDestroy {
     this.header.breadcrumbs.set([{ label: 'Inicio', link: '/' }, { label: 'Inventario' }]);
     this.header.showSearch.set(true);
     this.header.actionsTopbar.set([
-      { label: '', icon: '🌙', onClick: () => console.log('Modo Oscuro') },
-      { label: 'Nuevo producto', icon: '➕', onClick: () => console.log('Nuevo producto') },
-      { label: 'Admin v1', icon: '🟢', onClick: () => console.log('Admin') },
+      { label: 'Nuevo producto', icon: '➕', onClick: () => this.openCreateProductModal() },
     ]);
     this.header.actionsTitle.set([
       { label: 'Exportar Excel', onClick: () => console.log('Exportar excel') },
       { label: 'Importar', onClick: () => console.log('Importar') },
       { label: 'Reporte Stock', onClick: () => this.generateStockReport() },
-      { label: 'Actualizar', onClick: () => this.refreshInventory() },
+      { label: 'Actualizar', onClick: () => this.loadInventory() },
     ]);
+  }
+
+  openCreateProductModal(): void {
+    this.showCreateProductModal.set(true);
+  }
+
+  closeCreateProductModal(): void {
+    this.showCreateProductModal.set(false);
+  }
+
+  openProductDetailModal(product: ProductUI): void {
+    // Encontrar el producto completo del backend para obtener todos los campos
+    const backendProduct = this.products().find((p) => p.code === product.code);
+
+    // Convertir ProductUI a ProductDetail usando los datos del backend
+    const productDetail: ProductDetailView = {
+      productId: 0, // Este vendría del backend si se agrega
+      productCode: product.code,
+      productName: product.name,
+      productDescription: product.subtitle,
+      unitPrice: product.price,
+      categoryName: product.category,
+      measurementName: product.measurementType || 'N/A', // Usar el tipo de medida del backend
+      currentStock: product.stock,
+      minimumStock: product.min,
+      lotId: product.lotId || undefined,
+      createdAt: new Date().toISOString(), // Este vendría del backend
+      updatedAt: undefined,
+      status: product.status,
+    };
+
+    this.selectedProductForDetail.set(productDetail);
+    this.showProductDetailModal.set(true);
+  }
+
+  closeProductDetailModal(): void {
+    this.showProductDetailModal.set(false);
+    this.selectedProductForDetail.set(null);
+  }
+
+  handleEditProduct(product: ProductDetailView): void {
+    console.log('Editar producto:', product);
+    this.closeProductDetailModal();
+    // Convertir ProductDetailView a ProductUI para edición
+    const productForEdit: ProductUI = {
+      code: product.productCode,
+      name: product.productName,
+      subtitle: product.productDescription,
+      category: product.categoryName,
+      stock: product.currentStock,
+      min: product.minimumStock || 0,
+      price: product.unitPrice,
+      status: product.status,
+      measurementType: product.measurementName,
+      lotId: product.lotId,
+    };
+    this.openEditProductModal(productForEdit);
+  }
+
+  handleUpdateStock(product: ProductDetailView): void {
+    console.log('Actualizar stock:', product);
+    this.closeProductDetailModal();
+    // Aquí abrirías el modal de actualización de stock
+  }
+
+  // Nuevos métodos para edición
+  openEditProductModal(product: ProductUI): void {
+    this.selectedProductForEdit.set(product);
+    this.showEditProductModal.set(true);
+  }
+
+  closeEditProductModal(): void {
+    this.showEditProductModal.set(false);
+    this.selectedProductForEdit.set(null);
+  }
+
+  // Nuevos métodos para eliminación
+  openDeleteConfirmModal(product: ProductUI): void {
+    this.selectedProductForDelete.set(product);
+    this.showDeleteConfirmModal.set(true);
+  }
+
+  closeDeleteConfirmModal(): void {
+    this.showDeleteConfirmModal.set(false);
+    this.selectedProductForDelete.set(null);
+  }
+
+  handleUpdateProduct(productData: UpdateProductInterface): void {
+    const productToEdit = this.selectedProductForEdit();
+    if (!productToEdit) return;
+
+    console.log('Actualizando producto:', productToEdit.code, productData);
+
+    this.inventoryService.updateProduct(productToEdit.code, productData).subscribe({
+      next: (response) => {
+        console.log('Producto actualizado:', response);
+        this.toastr.success('Producto actualizado con éxito', 'Actualización Exitosa');
+        this.closeEditProductModal();
+        this.loadInventory(this.currentPage());
+      },
+      error: (error) => {
+        console.error('Error actualizando producto:', error);
+        this.toastr.error('Error al actualizar el producto', 'Error');
+      },
+    });
+  }
+
+  confirmDeleteProduct(): void {
+    const productToDelete = this.selectedProductForDelete();
+    if (!productToDelete) return;
+
+    this.isDeleting.set(true);
+
+    this.inventoryService.deleteProduct(productToDelete.code).subscribe({
+      next: (response) => {
+        console.log('Producto eliminado:', response);
+        this.toastr.success('Producto eliminado con éxito', 'Eliminación Exitosa');
+        this.isDeleting.set(false);
+        this.closeDeleteConfirmModal();
+        this.loadInventory(this.currentPage());
+      },
+      error: (error) => {
+        console.error('Error eliminando producto:', error);
+        this.toastr.error('Error al eliminar el producto', 'Error');
+        this.isDeleting.set(false);
+      },
+    });
+  }
+
+  handleCreateProduct(productData: CreateProductDto): void {
+    console.log('Producto a crear:', productData);
+    setTimeout(() => {
+      this.toastr.success('Producto creado con éxito', 'Creación Exitosa');
+      this.closeCreateProductModal();
+      this.loadInventory();
+    }, 1000);
+  }
+
+  private loadCategories(): void {
+    this.categoriesLoading.set(true);
+    this.inventoryService.getCategories().subscribe({
+      next: (categories) => {
+        this.categories.set(categories);
+        this.categoriesLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Error loading categories:', error);
+        this.categoriesLoading.set(false);
+        // En caso de error, mantener las categorías vacías
+        this.categories.set([]);
+      },
+    });
+  }
+
+  private loadMeasurementTypes(): void {
+    this.measurementTypesLoading.set(true);
+    this.inventoryService.getMeasurementTypes().subscribe({
+      next: (measurementTypes) => {
+        this.measurementTypes.set(measurementTypes);
+        this.measurementTypesLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Error loading measurement types:', error);
+        this.measurementTypesLoading.set(false);
+        // En caso de error, mantener los tipos de medida vacíos
+        this.measurementTypes.set([]);
+      },
+    });
   }
 
   private loadInventory(page?: number): void {
     const pageToLoad = page || this.currentPage();
+    console.log(
+      '🔄 Loading inventory - Page to load:',
+      pageToLoad,
+      'Current page signal:',
+      this.currentPage()
+    );
     this.isLoading.set(true);
     this.error.set(null);
 
     this.inventoryService.getInventory(pageToLoad, this.itemsPerPage()).subscribe({
       next: (response) => {
+        console.log('📦 Inventory response:', response.pagination);
         const mappedProducts = this.mapProductsToUI(response.data);
+        console.log('🚀 ~ Inventory ~ loadInventory ~ mappedProducts:', mappedProducts);
         this.products.set(mappedProducts);
         this.pagination.set(response.pagination);
         this.currentPage.set(response.pagination.currentPage);
+        console.log('✅ Updated currentPage signal to:', response.pagination.currentPage);
         this.isLoading.set(false);
       },
       error: (error) => {
@@ -124,18 +323,12 @@ export class Inventory implements OnInit, OnDestroy {
       subtitle: product.productDescription,
       category: product.productCategory,
       stock: product.currentStock,
-      min: product.minimunStock,
+      min: product.minimumStock,
       price: product.unitPrice,
-      provider: 'N/A', // Este campo no viene del backend
-      status: this.getStockStatus(product.currentStock, product.minimunStock),
+      status: product.productState,
+      measurementType: product.measurementType,
+      lotId: product.lotId,
     }));
-  }
-
-  private getStockStatus(currentStock: number, minimumStock: number): string {
-    if (currentStock <= 0) return 'Sin Stock';
-    if (currentStock < minimumStock * 0.5) return 'Crítico';
-    if (currentStock <= minimumStock) return 'Stock Bajo';
-    return 'Activo';
   }
 
   private getErrorMessage(error: any): string {
@@ -157,22 +350,55 @@ export class Inventory implements OnInit, OnDestroy {
   // Métodos de paginación
   goToPage(page: number): void {
     const pag = this.pagination();
-    if (pag && page >= 1 && page <= pag.totalPages && page !== this.currentPage()) {
+    console.log(
+      '🎯 goToPage called - Target page:',
+      page,
+      'Backend current page:',
+      pag?.currentPage
+    );
+    console.log('📊 Pagination info:', pag);
+
+    if (pag && page >= 1 && page <= pag.totalPages && page !== pag.currentPage) {
+      console.log('✅ Conditions met, loading page:', page);
+      this.pagination.set({ ...pag, currentPage: page });
       this.loadInventory(page);
+    } else {
+      console.log('❌ Conditions not met:', {
+        hasValidPagination: !!pag,
+        pageInRange: page >= 1 && page <= (pag?.totalPages || 0),
+        isDifferentPage: page !== pag?.currentPage,
+      });
     }
   }
 
   prevPage(): void {
     const pag = this.pagination();
+    console.log(
+      '⬅️ prevPage called - Pagination current:',
+      pag?.currentPage,
+      'Has previous:',
+      pag?.hasPreviousPage
+    );
     if (pag && pag.hasPreviousPage) {
-      this.goToPage(this.currentPage() - 1);
+      const targetPage = pag.currentPage - 1;
+      console.log('🎯 prevPage - Going to page:', targetPage);
+      this.goToPage(targetPage);
     }
   }
 
   nextPage(): void {
     const pag = this.pagination();
+    console.log(
+      '➡️ nextPage called - Pagination current:',
+      pag?.currentPage,
+      'Has next:',
+      pag?.hasNextPage
+    );
     if (pag && pag.hasNextPage) {
-      this.goToPage(this.currentPage() + 1);
+      const targetPage = Number(pag.currentPage) + 1;
+      console.log('🚀 ~ Inventory ~ nextPage ~ currentPage:', pag.currentPage);
+      console.log('🎯 nextPage - Going to page:', targetPage);
+      this.goToPage(targetPage);
     }
   }
 
@@ -183,15 +409,16 @@ export class Inventory implements OnInit, OnDestroy {
 
   private generateStockReport(): void {
     const lowStockItems = this.products().filter(
-      (p) => p.status === 'Stock Bajo' || p.status === 'Crítico' || p.status === 'Sin Stock'
+      (p) => p.status !== 'Activo' // Filtrar productos que no estén activos
     );
-    console.log('Productos con stock bajo:', lowStockItems);
+    console.log('Productos con problemas de stock:', lowStockItems);
     // Aquí puedes implementar la lógica para generar/descargar el reporte
   }
 
   // Método para cambiar items por página
   changeItemsPerPage(newLimit: number): void {
     this.itemsPerPage.set(newLimit);
+    this.currentPage.set(1); // Asegurarse de que la señal esté en 1
     this.loadInventory(1); // Volver a la primera página
   }
 
@@ -206,15 +433,30 @@ export class Inventory implements OnInit, OnDestroy {
     return this.pagination()?.totalItems || 0;
   }
 
-  // Agregar este método
+  // Método mejorado para la paginación
   getPaginationPages(): number[] {
     const pag = this.pagination();
     if (!pag) return [];
 
     const totalPages = pag.totalPages;
+    const currentPage = pag.currentPage;
     const maxPagesToShow = 5;
-    const pagesToShow = Math.min(totalPages, maxPagesToShow);
 
-    return Array.from({ length: pagesToShow }, (_, i) => i + 1);
+    // Si hay pocas páginas, mostrar todas
+    if (totalPages <= maxPagesToShow) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
+    // Calcular el rango centrado alrededor de la página actual
+    const halfRange = Math.floor(maxPagesToShow / 2);
+    let startPage = Math.max(1, currentPage - halfRange);
+    let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+    // Ajustar si estamos cerca del final
+    if (endPage - startPage + 1 < maxPagesToShow) {
+      startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+
+    return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
   }
 }

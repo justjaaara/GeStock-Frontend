@@ -20,6 +20,9 @@ export class Layout {
 
   showLogoutModal = signal(false);
 
+  getUserName(): string {
+    return this.authService.userName();
+  }
   toggleSidebar(): void {
     this.sidebarService.toggle();
   }
