@@ -46,26 +46,38 @@
     @if (!isLoading() && !error()) {
     <div class="controls">
       <div class="field">
-        <select>
-          <option>Todas las categorías</option>
+        <select #categorySelect (change)="categoryFilter.set(categorySelect.value)">
+          <option value="">Todas las categorías</option>
           @if (categoriesLoading()) {
           <option disabled>Cargando categorías...</option>
           } @else { @for (category of categories(); track category.categoryId) {
-          <option [value]="category.categoryId">{{ category.categoryName }}</option>
+          <option [value]="category.categoryName">{{ category.categoryName }}</option>
           } }
         </select>
       </div>
 
       <div class="field">
-        <select>
-          <option>Todos los estados</option>
-          <option>Activo</option>
-          <option>Stock Bajo</option>
-          <option>Crítico</option>
+        <select #stockLevelSelect (change)="stockLevelFilter.set(stockLevelSelect.value)">
+          <option value="">Todos los niveles de stock</option>
+          <option value="Crítico">Crítico</option>
+          <option value="Stock Bajo">Stock Bajo</option>
+          <option value="Sin Stock">Sin Stock</option>
         </select>
       </div>
 
-      <button class="btn nav primary">Filtrar</button>
+      <div class="field">
+        <select #stateSelect (change)="stateFilter.set(stateSelect.value)">
+          <option value="">Todos los estados</option>
+          <option value="Activo">Activo</option>
+          <option value="Inactivo">Inactivo</option>
+        </select>
+      </div>
+
+      <button class="btn nav primary" (click)="applyFilters()">Filtrar</button>
+
+      @if (hasAppliedFilters()) {
+      <button class="btn nav" (click)="resetFilters()">Limpiar filtros</button>
+      }
     </div>
 
     <!-- Paginación superior -->
