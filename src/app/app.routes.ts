@@ -14,7 +14,6 @@ import { Projections } from './core-ui/pages/projections/projections';
 import { Report } from './core-ui/pages/report/report';
 import { Settings } from './core-ui/pages/settings/settings';
 import { Shopping } from './core-ui/pages/shopping/shopping';
-import { Supplier } from './core-ui/pages/supplier/supplier';
 import { Layout } from './shared/components/layout/layout';
 
 export const routes: Routes = [
@@ -68,17 +67,7 @@ export const routes: Routes = [
     ],
     canActivate: [authGuard],
   },
-  {
-    path: 'proveedores',
-    component: Layout,
-    children: [
-      {
-        path: '',
-        component: Supplier,
-      },
-    ],
-    canActivate: [authGuard],
-  },
+
   {
     path: 'clientes',
     component: Layout,
