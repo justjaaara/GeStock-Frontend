@@ -20,12 +20,22 @@ import { Modal } from '@/shared/components/modal/modal';
 import { ProductForm } from '@/core-ui/components/product-form/product-form';
 import { ProductDetail } from '@/core-ui/components/product-detail/porduct-detail/product-detail';
 import { EditProductFormComponent } from '@/core-ui/components/edit-product-form/edit-product-form';
+import { StockUpdateFormComponent } from '@/core-ui/components/stock-update-form/stock-update-form';
+import { JwtUtil } from '@/core/utils/jwt.util';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-inventory',
   standalone: true,
-  imports: [StatCard, CommonModule, Modal, ProductForm, ProductDetail, EditProductFormComponent],
+  imports: [
+    StatCard,
+    CommonModule,
+    Modal,
+    ProductForm,
+    ProductDetail,
+    EditProductFormComponent,
+    StockUpdateFormComponent,
+  ],
   templateUrl: './inventory.html',
   styleUrl: './inventory.css',
 })
@@ -97,12 +107,16 @@ export class Inventory implements OnInit, OnDestroy {
   showDeleteConfirmModal = signal(false);
   selectedProductForDelete = signal<ProductUI | null>(null);
   isDeleting = signal(false);
+  showStockUpdateModal = signal(false);
+  isUpdatingStock = signal(false);
+  userId = signal<number | null>(null);
 
   ngOnInit(): void {
     this.setupHeader();
     this.loadInventory();
     this.loadCategories();
     this.loadMeasurementTypes();
+    this.extractUserIdFromToken();
   }
 
   ngOnDestroy(): void {
@@ -122,6 +136,25 @@ export class Inventory implements OnInit, OnDestroy {
       { label: 'Reporte Stock', onClick: () => this.generateStockReport() },
       { label: 'Actualizar', onClick: () => this.loadInventory() },
     ]);
+  }
+
+  private extractUserIdFromToken(): void {
+    try {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        const decoded = JwtUtil.decode(token);
+        if (decoded && decoded.sub) {
+          this.userId.set(decoded.sub);
+          console.log('User ID extracted from token:', decoded.sub);
+        } else {
+          console.warn('Could not extract user ID from token');
+        }
+      } else {
+        console.warn('No access token found in localStorage');
+      }
+    } catch (error) {
+      console.error('Error extracting user ID from token:', error);
+    }
   }
 
   openCreateProductModal(): void {
@@ -207,6 +240,39 @@ export class Inventory implements OnInit, OnDestroy {
   closeDeleteConfirmModal(): void {
     this.showDeleteConfirmModal.set(false);
     this.selectedProductForDelete.set(null);
+  }
+
+  openStockUpdateModal(): void {
+    this.showStockUpdateModal.set(true);
+  }
+
+  closeStockUpdateModal(): void {
+    this.showStockUpdateModal.set(false);
+  }
+
+  handleStockUpdate(updateData: {
+    productId: number;
+    lotId: number | null;
+    quantity: number;
+    productCode: string;
+    userId: number;
+    type: string;
+  }): void {
+    this.isUpdatingStock.set(true);
+    this.inventoryService.updateStock(updateData).subscribe({
+      next: (response) => {
+        this.toastr.success(response.message, 'Stock Actualizado');
+        this.isUpdatingStock.set(false);
+        this.closeStockUpdateModal();
+        this.refreshInventory();
+      },
+      error: (error) => {
+        console.error('Error updating stock:', error);
+        const errorMessage = error?.error?.message || 'Error al actualizar el stock';
+        this.toastr.error(errorMessage, 'Error');
+        this.isUpdatingStock.set(false);
+      },
+    });
   }
 
   handleUpdateProduct(productData: UpdateProductInterface): void {
