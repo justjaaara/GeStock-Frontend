@@ -48,6 +48,12 @@ export class Inventory implements OnInit, OnDestroy {
   currentPage = signal(1);
   itemsPerPage = signal(20);
 
+  // Señales para los filtros
+  categoryFilter = signal<string>('');
+  stockLevelFilter = signal<string>('');
+  stateFilter = signal<string>('');
+  hasAppliedFilters = signal(false);
+
   // Señales computadas para estadísticas
   stats = computed(() => {
     const products = this.products();
@@ -316,6 +322,75 @@ export class Inventory implements OnInit, OnDestroy {
     });
   }
 
+  private loadFilteredInventory(page?: number): void {
+    const pageToLoad = page || this.currentPage();
+    console.log('🔄 Loading filtered inventory - Page:', pageToLoad);
+    this.isLoading.set(true);
+    this.error.set(null);
+
+    // Mapear los valores del UI a los valores del backend
+    const categoryName = this.categoryFilter() || undefined;
+    const stockLevel = this.mapStockLevelToBackend(this.stockLevelFilter());
+    const state = this.mapStateToBackend(this.stateFilter());
+
+    this.inventoryService
+      .getFilteredInventory(pageToLoad, this.itemsPerPage(), categoryName, stockLevel, state)
+      .subscribe({
+        next: (response) => {
+          console.log('📦 Filtered inventory response:', response.pagination);
+          const mappedProducts = this.mapProductsToUI(response.data);
+          this.products.set(mappedProducts);
+          this.pagination.set(response.pagination);
+          this.currentPage.set(response.pagination.currentPage);
+          this.isLoading.set(false);
+        },
+        error: (error) => {
+          console.error('Error loading filtered inventory:', error);
+          this.error.set(this.getErrorMessage(error));
+          this.isLoading.set(false);
+        },
+      });
+  }
+
+  private mapStockLevelToBackend(uiValue: string): string | undefined {
+    if (!uiValue) return undefined;
+    const mapping: { [key: string]: string } = {
+      Crítico: 'critical',
+      'Stock Bajo': 'low',
+      'Sin Stock': 'out',
+    };
+    return mapping[uiValue] || undefined;
+  }
+
+  private mapStateToBackend(uiValue: string): string | undefined {
+    if (!uiValue) return undefined;
+    const mapping: { [key: string]: string } = {
+      Activo: 'active',
+      Inactivo: 'inactive',
+    };
+    return mapping[uiValue] || undefined;
+  }
+
+  applyFilters(): void {
+    console.log('🔍 Applying filters:', {
+      category: this.categoryFilter(),
+      stockLevel: this.stockLevelFilter(),
+      state: this.stateFilter(),
+    });
+    this.hasAppliedFilters.set(true);
+    this.currentPage.set(1);
+    this.loadFilteredInventory(1);
+  }
+
+  resetFilters(): void {
+    this.categoryFilter.set('');
+    this.stockLevelFilter.set('');
+    this.stateFilter.set('');
+    this.hasAppliedFilters.set(false);
+    this.currentPage.set(1);
+    this.loadInventory(1);
+  }
+
   private mapProductsToUI(products: Product[]): ProductUI[] {
     return products.map((product) => ({
       code: product.productCode,
@@ -361,7 +436,13 @@ export class Inventory implements OnInit, OnDestroy {
     if (pag && page >= 1 && page <= pag.totalPages && page !== pag.currentPage) {
       console.log('✅ Conditions met, loading page:', page);
       this.pagination.set({ ...pag, currentPage: page });
-      this.loadInventory(page);
+
+      // Usar el endpoint correcto según si hay filtros aplicados
+      if (this.hasAppliedFilters()) {
+        this.loadFilteredInventory(page);
+      } else {
+        this.loadInventory(page);
+      }
     } else {
       console.log('❌ Conditions not met:', {
         hasValidPagination: !!pag,

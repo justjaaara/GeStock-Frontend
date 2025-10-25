@@ -93,4 +93,26 @@ export class InventoryService {
       `${environment.BACKENDBASEURL}/products/${productCode}`
     );
   }
+
+  getFilteredInventory(
+    page: number = 1,
+    limit: number = 20,
+    categoryName?: string,
+    stockLevel?: string,
+    state?: string
+  ): Observable<InventoryResponse> {
+    let url = `${environment.BACKENDBASEURL}/inventory/filtered?page=${page}&limit=${limit}`;
+
+    if (categoryName) {
+      url += `&categoryName=${encodeURIComponent(categoryName)}`;
+    }
+    if (stockLevel) {
+      url += `&stockLevel=${stockLevel}`;
+    }
+    if (state) {
+      url += `&state=${state}`;
+    }
+
+    return this.http.get<InventoryResponse>(url);
+  }
 }
