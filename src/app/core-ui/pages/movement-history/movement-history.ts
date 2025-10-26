@@ -14,6 +14,7 @@ export interface Movement {
   quantity: number;
   userName: string;
   reference: string;
+  movementReason: string;
 }
 
 export interface PaginationInfo {

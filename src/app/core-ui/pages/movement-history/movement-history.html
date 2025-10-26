@@ -85,23 +85,24 @@
           <th>Cantidad</th>
           <th>Usuario</th>
           <th>Referencia</th>
+          <th>Razón</th>
         </tr>
       </thead>
 
       <tbody>
         @if (isLoading()) {
         <tr>
-          <td colspan="7" class="ta-center">Cargando movimientos...</td>
+          <td colspan="8" class="ta-center">Cargando movimientos...</td>
         </tr>
         } @else if (error()) {
         <tr>
-          <td colspan="7" class="ta-center error">
+          <td colspan="8" class="ta-center error">
             {{ error() }}
           </td>
         </tr>
         } @else if (movements().length === 0) {
         <tr>
-          <td colspan="7" class="ta-center">No hay movimientos registrados</td>
+          <td colspan="8" class="ta-center">No hay movimientos registrados</td>
         </tr>
         } @else { @for (m of movements(); track m.movementId) {
         <tr>
@@ -142,6 +143,7 @@
 
           <td>{{ m.userName }}</td>
           <td>{{ m.reference }}</td>
+          <td>{{ m.movementReason }}</td>
         </tr>
         } }
       </tbody>
