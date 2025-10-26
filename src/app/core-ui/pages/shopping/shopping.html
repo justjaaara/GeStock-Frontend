@@ -6,30 +6,19 @@
     <div class="controls">
       <div class="field">
         <label>Desde</label>
-        <input type="text" placeholder="mm/dd/yyyy" />
+        <input type="date" [(ngModel)]="startDate" placeholder="yyyy-mm-dd" />
       </div>
       <div class="field">
         <label>Hasta</label>
-        <input type="text" placeholder="mm/dd/yyyy" />
-      </div>
-      <div class="field">
-        <label>Tipo</label>
-        <select>
-          <option>Todos</option>
-          <option>Entrada</option>
-          <option>Salida</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Estatus</label>
-        <select>
-          <option>Vigente</option>
-          <option>Anulado</option>
-        </select>
+        <input type="date" [(ngModel)]="endDate" placeholder="yyyy-mm-dd" />
       </div>
       <div class="field">
         <label>&nbsp;</label>
-        <button class="btn primary">Filtrar</button>
+        <button class="btn primary" (click)="applyFilters()">Filtrar</button>
+      </div>
+      <div class="field" *ngIf="startDate() || endDate()">
+        <label>&nbsp;</label>
+        <button class="btn" (click)="clearFilters()">Limpiar</button>
       </div>
     </div>
   </header>

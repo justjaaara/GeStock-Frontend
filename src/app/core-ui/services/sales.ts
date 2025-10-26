@@ -70,4 +70,31 @@ export class SalesService {
       })
     );
   }
+
+  getFilteredSales(
+    startDate?: string,
+    endDate?: string,
+    page: number = 1,
+    limit: number = 20
+  ): Observable<SalesHistoryResponse> {
+    let url = `${environment.BACKENDBASEURL}/sales/filtered/date-range?page=${page}&limit=${limit}`;
+
+    if (startDate) {
+      url += `&startDate=${startDate}`;
+    }
+    if (endDate) {
+      url += `&endDate=${endDate}`;
+    }
+
+    console.log('Fetching filtered sales from URL:', url);
+    return this.http.get<any>(url).pipe(
+      tap((response: any) => {
+        console.log('Filtered sales response:', response);
+      }),
+      catchError((error: any) => {
+        console.error('Error in getFilteredSales:', error);
+        throw error;
+      })
+    );
+  }
 }

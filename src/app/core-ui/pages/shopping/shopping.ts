@@ -1,6 +1,7 @@
 import { Header } from '@/shared/services/header';
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { SalesFormComponent } from '@/core-ui/components/sales-form/sales-form';
 import { SalesService, SaleMovement, PaginationInfo } from '@/core-ui/services/sales';
 import { ToastrService } from 'ngx-toastr';
@@ -8,7 +9,7 @@ import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-shopping',
   standalone: true,
-  imports: [CommonModule, SalesFormComponent],
+  imports: [CommonModule, SalesFormComponent, FormsModule],
   templateUrl: './shopping.html',
   styleUrl: './shopping.css',
 })
@@ -23,6 +24,10 @@ export class Shopping implements OnInit, OnDestroy {
   isLoading = signal(false);
   currentPage = signal(1);
   itemsPerPage = 20;
+
+  // Filtros
+  startDate = signal<string>('');
+  endDate = signal<string>('');
 
   ngOnInit(): void {
     this.header.title.set('Gestión de Compras');
@@ -47,7 +52,20 @@ export class Shopping implements OnInit, OnDestroy {
   loadSalesHistory(): void {
     this.isLoading.set(true);
     console.log('Iniciando carga de historial de ventas, página:', this.currentPage());
-    this.salesService.getSalesHistory(this.currentPage(), this.itemsPerPage).subscribe({
+
+    // Determinar si hay filtros activos
+    const hasFilters = this.startDate() || this.endDate();
+
+    const request$ = hasFilters
+      ? this.salesService.getFilteredSales(
+          this.startDate() || undefined,
+          this.endDate() || undefined,
+          this.currentPage(),
+          this.itemsPerPage
+        )
+      : this.salesService.getSalesHistory(this.currentPage(), this.itemsPerPage);
+
+    request$.subscribe({
       next: (response: any) => {
         console.log('Respuesta completa recibida:', response);
 
@@ -98,6 +116,19 @@ export class Shopping implements OnInit, OnDestroy {
       this.currentPage.update((page) => page + 1);
       this.loadSalesHistory();
     }
+  }
+
+  applyFilters(): void {
+    // Resetear a la primera página cuando se aplican filtros
+    this.currentPage.set(1);
+    this.loadSalesHistory();
+  }
+
+  clearFilters(): void {
+    this.startDate.set('');
+    this.endDate.set('');
+    this.currentPage.set(1);
+    this.loadSalesHistory();
   }
 
   openSalesModal(): void {
