@@ -73,14 +73,17 @@
             </div>
             <div
               class="info-item stock-info"
-              [class.low-stock]="selectedProduct.currentStock < selectedProduct.minimumStock"
+              [class.low-stock]="
+                selectedProduct.currentStock <
+                (selectedProduct.minimunStock || selectedProduct.minimumStock || 0)
+              "
             >
               <label>Stock Disponible:</label>
               <span>{{ selectedProduct.currentStock }}</span>
             </div>
             <div class="info-item">
               <label>Stock Mínimo:</label>
-              <span>{{ selectedProduct.minimumStock }}</span>
+              <span>{{ selectedProduct.minimunStock || selectedProduct.minimumStock || 0 }}</span>
             </div>
           </div>
         </div>

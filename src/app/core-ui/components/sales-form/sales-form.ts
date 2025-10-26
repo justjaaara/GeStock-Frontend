@@ -68,6 +68,13 @@ export class SalesFormComponent implements OnInit {
 
     this.inventoryService.getProductByCode(productCode).subscribe({
       next: (product: Product) => {
+        console.log('✅ Product mapped correctly for sales form:', product);
+        console.log('🔍 Debugging specific fields:');
+        console.log('  - currentStock:', product.currentStock);
+        console.log('  - productCategory:', product.productCategory);
+        console.log('  - minimumStock:', product.minimumStock);
+        console.log('  - minimunStock:', product.minimunStock);
+
         this.selectedProduct = product;
         this.loading = false;
         this.step1Form.enable();

@@ -1,11 +1,12 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
+import { tap, catchError, map } from 'rxjs/operators';
 import { environment } from '@environments/environment.development';
 import type { Category, MeasurementType } from '@/core-ui/interfaces/product';
 
 export interface Product {
+  productId?: number; // Agregado para el endpoint /products/${code}
   productCode: string;
   productName: string;
   productDescription: string;
@@ -14,9 +15,13 @@ export interface Product {
   minimumStock?: number; // Ortografía correcta
   minimunStock?: number; // Ortografía del backend (typo)
   unitPrice: number;
-  productState: string;
+  productState?: string;
   lotId: number | null;
-  measurementType: string;
+  measurementType?: string;
+  measurementName?: string; // Agregado para el endpoint /products/${code}
+  stateName?: string; // Agregado para el endpoint /products/${code}
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface UpdateProductDto {
@@ -135,8 +140,33 @@ export class InventoryService {
     return this.http.get<InventoryResponse>(url);
   }
 
-  getProductByCode(productCode: string): Observable<any> {
-    return this.http.get<any>(`${environment.BACKENDBASEURL}/products/${productCode}`);
+  getProductByCode(productCode: string): Observable<Product> {
+    return this.http.get<any>(`${environment.BACKENDBASEURL}/products/${productCode}`).pipe(
+      tap((response) => {
+        console.log('Raw backend response from /products/${productCode}:', response);
+      }),
+      map((response) => {
+        // Map backend field names to frontend Product interface
+        const mappedProduct: Product = {
+          productId: response.productId,
+          productName: response.productName,
+          productDescription: response.productDescription,
+          productCode: response.productCode,
+          unitPrice: response.unitPrice,
+          productCategory: response.categoryName, // Map categoryName to productCategory
+          currentStock: response.actualStock, // Map actualStock to currentStock
+          minimumStock: response.minimumStock,
+          minimunStock: response.minimunStock, // In case backend has typo
+          lotId: response.lotId || null,
+          measurementName: response.measurementName,
+          stateName: response.stateName,
+          createdAt: response.createdAt,
+          updatedAt: response.updatedAt,
+        };
+        console.log('Mapped product for frontend:', mappedProduct);
+        return mappedProduct;
+      })
+    );
   }
 
   updateStock(data: {

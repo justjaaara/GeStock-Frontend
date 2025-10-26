@@ -467,8 +467,8 @@ export class Inventory implements OnInit, OnDestroy {
       stock: product.currentStock,
       min: product.minimunStock || product.minimumStock || 0, // Soporta ambas ortografías
       price: product.unitPrice,
-      status: product.productState,
-      measurementType: product.measurementType,
+      status: product.productState || product.stateName || 'Desconocido',
+      measurementType: product.measurementType || product.measurementName,
       lotId: product.lotId,
     }));
   }
