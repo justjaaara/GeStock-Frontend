@@ -1,33 +1,28 @@
-import { StatCard } from '@/shared/components/stat-card/stat-card';
 import { Header } from '@/shared/services/header';
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { SalesFormComponent } from '@/core-ui/components/sales-form/sales-form';
-
-type OrdenCompra = {
-  id: number;
-  code: string; // OC-2025-048
-  fecha: Date;
-  proveedor: string;
-  items: number;
-  subtotal: number;
-  igv: number;
-  total: number;
-  estado: string;
-  entrega: Date;
-};
+import { SalesService, SaleMovement, PaginationInfo } from '@/core-ui/services/sales';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-shopping',
   standalone: true,
-  imports: [StatCard, CommonModule, SalesFormComponent],
+  imports: [CommonModule, SalesFormComponent],
   templateUrl: './shopping.html',
   styleUrl: './shopping.css',
 })
 export class Shopping implements OnInit, OnDestroy {
-  showSalesModal = false;
+  private header = inject(Header);
+  private salesService = inject(SalesService);
+  private toastr = inject(ToastrService);
 
-  constructor(private header: Header) {}
+  showSalesModal = signal(false);
+  sales = signal<SaleMovement[]>([]);
+  pagination = signal<PaginationInfo | null>(null);
+  isLoading = signal(false);
+  currentPage = signal(1);
+  itemsPerPage = 20;
 
   ngOnInit(): void {
     this.header.title.set('Gestión de Compras');
@@ -41,152 +36,82 @@ export class Shopping implements OnInit, OnDestroy {
       { label: 'Plantilla Compra', onClick: () => console.log('Importar') },
       { label: 'Reporte Mensual', onClick: () => console.log('Reportes') },
     ]);
+
+    this.loadSalesHistory();
   }
 
   ngOnDestroy(): void {
     this.header.reset();
   }
 
-  orders: OrdenCompra[] = [
-    {
-      id: 48,
-      code: 'OC-2025-048',
-      fecha: new Date(2025, 8, 3),
-      proveedor: 'Papelería Central',
-      items: 8,
-      subtotal: 1240,
-      igv: 223.2,
-      total: 1463.2,
-      estado: 'Pendiente',
-      entrega: new Date(2025, 8, 5),
-    },
-    {
-      id: 47,
-      code: 'OC-2025-047',
-      fecha: new Date(2025, 8, 2),
-      proveedor: 'TechSupply',
-      items: 12,
-      subtotal: 2890,
-      igv: 520.2,
-      total: 3410.2,
-      estado: 'Enviada',
-      entrega: new Date(2025, 8, 8),
-    },
-    {
-      id: 46,
-      code: 'OC-2025-046',
-      fecha: new Date(2025, 8, 1),
-      proveedor: 'Oficina Total',
-      items: 5,
-      subtotal: 680,
-      igv: 122.4,
-      total: 802.4,
-      estado: 'Recibida',
-      entrega: new Date(2025, 8, 1),
-    },
-    {
-      id: 45,
-      code: 'OC-2025-045',
-      fecha: new Date(2025, 7, 30),
-      proveedor: 'TechSupply',
-      items: 3,
-      subtotal: 1450,
-      igv: 261,
-      total: 1711,
-      estado: 'Cerrada',
-      entrega: new Date(2025, 7, 30),
-    },
-    {
-      id: 44,
-      code: 'OC-2025-044',
-      fecha: new Date(2025, 7, 28),
-      proveedor: 'Papelería Central',
-      items: 15,
-      subtotal: 2120,
-      igv: 381.6,
-      total: 2501.6,
-      estado: 'Cerrada',
-      entrega: new Date(2025, 7, 29),
-    },
-    {
-      id: 43,
-      code: 'OC-2025-043',
-      fecha: new Date(2025, 7, 25),
-      proveedor: 'Muebles Express',
-      items: 6,
-      subtotal: 4200,
-      igv: 756,
-      total: 4956,
-      estado: 'Retrasada',
-      entrega: new Date(2025, 7, 27),
-    },
-  ];
+  loadSalesHistory(): void {
+    this.isLoading.set(true);
+    console.log('Iniciando carga de historial de ventas, página:', this.currentPage());
+    this.salesService.getSalesHistory(this.currentPage(), this.itemsPerPage).subscribe({
+      next: (response: any) => {
+        console.log('Respuesta completa recibida:', response);
 
-  // Datos demo (ajusta a tu backend)
-  toReplenish = [
-    {
-      code: 'P-001',
-      name: 'Tóner HP 12A',
-      stock: 8,
-      min: 15,
-      suggested: 25,
-      supplier: 'TechSupply',
-    },
-    {
-      code: 'P-002',
-      name: 'Papel A4',
-      stock: 12,
-      min: 50,
-      suggested: 100,
-      supplier: 'Papelería Central',
-    },
-    {
-      code: 'P-003',
-      name: 'Cajas Archivo',
-      stock: 17,
-      min: 25,
-      suggested: 50,
-      supplier: 'Oficina Total',
-    },
-  ];
+        // Manejo flexible de la respuesta
+        if (response.data && Array.isArray(response.data)) {
+          this.sales.set(response.data);
+          console.log('Datos asignados (array directo):', this.sales());
+        } else if (response.data?.data && Array.isArray(response.data.data)) {
+          this.sales.set(response.data.data);
+          console.log('Datos asignados (data.data):', this.sales());
+        } else {
+          console.warn('Estructura de respuesta no esperada:', response);
+          this.sales.set([]);
+        }
 
-  // Barras de “Gastos por Mes” (max = 30,120 → 100%)
-  spendSeries = [
-    { label: '18,250', value: 18250, percent: 61, current: true },
-    { label: '22,140', value: 22140, percent: 74, current: false },
-    { label: '28,450', value: 28450, percent: 94, current: true }, // mes actual
-    { label: '19,320', value: 19320, percent: 64, current: true },
-    { label: '30,120', value: 30120, percent: 100, current: true },
-    { label: '7,890', value: 7890, percent: 26, current: false },
-  ];
+        // Asignar paginación
+        if (response.pagination) {
+          this.pagination.set(response.pagination);
+        } else if (response.data?.pagination) {
+          this.pagination.set(response.data.pagination);
+        } else {
+          console.warn('Paginación no encontrada en respuesta');
+          this.pagination.set(null);
+        }
 
-  // KPIs “visuales” (valores fijos, sin cálculos)
-  avgSpend = 22702; // Promedio mensual mostrado en la tarjeta
-  currentSpend = 28450; // Mes actual
-  variationPct = 0.253; // 25.3%
-
-  page = 1;
-  totalPages = 1;
-  totalProducts = 6;
-
-  prevPage() {
-    if (this.page > 1) this.page--;
+        console.log('Estado final - Sales:', this.sales().length, 'Pagination:', this.pagination());
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        this.isLoading.set(false);
+        console.error('Error al cargar historial de ventas:', error);
+        this.toastr.error('Error al cargar el historial de ventas');
+      },
+    });
   }
 
-  nextPage() {
-    if (this.page < this.totalPages) this.page++;
+  prevPage(): void {
+    const pag = this.pagination();
+    if (pag && pag.hasPreviousPage) {
+      this.currentPage.update((page) => page - 1);
+      this.loadSalesHistory();
+    }
+  }
+
+  nextPage(): void {
+    const pag = this.pagination();
+    if (pag && pag.hasNextPage) {
+      this.currentPage.update((page) => page + 1);
+      this.loadSalesHistory();
+    }
   }
 
   openSalesModal(): void {
-    this.showSalesModal = true;
+    this.showSalesModal.set(true);
   }
 
   closeSalesModal(): void {
-    this.showSalesModal = false;
+    this.showSalesModal.set(false);
   }
 
   onSaleCreated(sale: any): void {
     console.log('Venta creada:', sale);
-    // Aquí puedes agregar lógica adicional, como recargar la lista de órdenes
+    // Recargar la lista de ventas
+    this.currentPage.set(1);
+    this.loadSalesHistory();
   }
 }

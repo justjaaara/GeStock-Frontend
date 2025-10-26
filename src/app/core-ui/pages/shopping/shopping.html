@@ -1,10 +1,3 @@
-<div class="grid">
-  <app-stat-card title="Ordenes Activas" [value]="14" badge="↑ 3 meses" tone="good" />
-  <app-stat-card title="Pendientes Aprobacion" [value]="5" badge="⌛Revisar " />
-  <app-stat-card title="Valor total mes" [value]="'$28,450'" badge="↑ 18%" tone="good" />
-  <app-stat-card title="Recibidas mes" [value]="12" badge="↑ En tiempo" tone="good" />
-</div>
-
 <section class="panel">
   <header class="panel-header">
     <h4>Historial de Movimientos</h4>
@@ -43,53 +36,41 @@
 
   <!-- Tabla -->
   <div class="table-wrap">
-    <table class="table">
+    <div class="loading-message" *ngIf="isLoading()">
+      <p>Cargando...</p>
+    </div>
+
+    <div class="empty-message" *ngIf="!isLoading() && sales().length === 0">
+      <p>No hay movimientos registrados</p>
+    </div>
+
+    <table class="table" *ngIf="!isLoading() && sales().length > 0">
       <thead>
         <tr>
-          <th>N° Orden</th>
+          <th>N° Movimiento</th>
           <th>Fecha</th>
-          <th>Proveedor</th>
-          <th>Productos</th>
-          <th>Subtotal</th>
-          <th>IGV</th>
-          <th>Total</th>
-          <th>Estado</th>
-          <th>Entrega Est.</th>
-          <th class="ta-right">Acciones</th>
+          <th>Producto</th>
+          <th>Tipo Movimiento</th>
+          <th>Razón</th>
+          <th>Cantidad</th>
+          <th>Usuario</th>
+          <th>Referencia</th>
         </tr>
       </thead>
 
       <tbody>
-        @for (o of orders; track o.id) {
+        @for (sale of sales(); track sale.movementId) {
         <tr>
           <td>
-            <a class="link-id" href="javascript:void(0)">{{ o.code }}</a>
+            <a class="link-id" href="javascript:void(0)">{{ sale.movementId }}</a>
           </td>
-          <td>{{ o.fecha | date : 'dd/MM/yyyy' }}</td>
-          <td>{{ o.proveedor }}</td>
-          <td>{{ o.items }} items</td>
-          <td>{{ o.subtotal | currency : 'USD' : 'symbol' : '1.0-2' }}</td>
-          <td>{{ o.igv | currency : 'USD' : 'symbol' : '1.0-2' }}</td>
-          <td class="bold">{{ o.total | currency : 'USD' : 'symbol' : '1.0-2' }}</td>
-          <td>
-            <span
-              class="status"
-              [class.pendiente]="o.estado === 'Pendiente'"
-              [class.enviada]="o.estado === 'Enviada'"
-              [class.recibida]="o.estado === 'Recibida'"
-              [class.cerrada]="o.estado === 'Cerrada'"
-              [class.retrasada]="o.estado === 'Retrasada'"
-            >
-              {{ o.estado }}
-            </span>
-          </td>
-          <td>{{ o.entrega | date : 'dd/MM/yyyy' }}</td>
-          <td class="actions ta-right">
-            <button class="icon-btn" title="Ver">👁️</button>
-            <button class="icon-btn" title="Editar">✏️</button>
-            <button class="icon-btn" title="Notas">🗒️</button>
-            <button class="icon-btn" title="Auditar">🔎</button>
-          </td>
+          <td>{{ sale.movementDate | date : 'dd/MM/yyyy HH:mm' }}</td>
+          <td>{{ sale.productName }}</td>
+          <td>{{ sale.movementType }}</td>
+          <td>{{ sale.movementReason }}</td>
+          <td>{{ sale.quantity }}</td>
+          <td>{{ sale.userName }}</td>
+          <td>{{ sale.reference }}</td>
         </tr>
         }
       </tbody>
@@ -97,88 +78,19 @@
   </div>
 
   <footer class="panel-foot">
-    <button class="btn nav" [disabled]="page === 1" (click)="prevPage()">← Anterior</button>
+    <button class="btn nav" [disabled]="!pagination()?.hasPreviousPage" (click)="prevPage()">
+      ← Anterior
+    </button>
 
-    <div class="page-info">
-      Página {{ page }} de {{ totalPages }} ({{ totalProducts }} productos)
-    </div>
+    <div class="page-info">Página {{ currentPage() }} de {{ pagination()?.totalPages || 1 }}</div>
 
-    <button class="btn nav primary" [disabled]="page === totalPages" (click)="nextPage()">
+    <button class="btn nav primary" [disabled]="!pagination()?.hasNextPage" (click)="nextPage()">
       Siguiente →
     </button>
   </footer>
 </section>
 
-<div class="grid-side">
-  <section class="panel">
-    <!-- Columna izquierda: Reabastecer -->
-    <h4>Productos por Reabastecer</h4>
-
-    <div class="table-wrap">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Producto</th>
-            <th>Stock</th>
-            <th>Min.</th>
-            <th>Sugerido</th>
-            <th>Proveedor</th>
-            <th class="ta-right">Acción</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (p of toReplenish; track p.code) {
-          <tr>
-            <td>{{ p.name }}</td>
-            <td [class.low]="p.stock < p.min" class="bold">{{ p.stock }}</td>
-            <td class="muted">{{ p.min }}</td>
-            <td class="bold">{{ p.suggested }}</td>
-            <td class="muted">{{ ' ' + p.supplier }}</td>
-            <td class="actions ta-right">
-              <button class="btn pill">+ Orden</button>
-            </td>
-          </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="panel">
-    <!-- Columna derecha: Gastos por Mes -->
-    <aside class="mini-card">
-      <h5>Gastos por Mes</h5>
-
-      <div class="bars">
-        @for (m of spendSeries; track m.label) {
-        <div class="bar" [class.is-current]="m.current">
-          <div class="bar-col" [style.height.%]="m.percent"></div>
-          <small class="muted">{{ m.label }}</small>
-        </div>
-        }
-      </div>
-
-      <hr />
-
-      <div class="stats">
-        <div class="row">
-          <span class="muted">Promedio Mensual:</span>
-          <strong>{{ avgSpend | currency : 'USD' : 'symbol' : '1.0-0' }}</strong>
-        </div>
-        <div class="row">
-          <span class="muted">Mes Actual:</span>
-          <strong>{{ currentSpend | currency : 'USD' : 'symbol' : '1.0-0' }}</strong>
-        </div>
-        <div class="row">
-          <span class="muted">Variación:</span>
-          <span class="chip">↑ {{ variationPct | percent : '1.1-1' }}</span>
-        </div>
-      </div>
-    </aside>
-  </section>
-</div>
-
 <!-- Modal de Venta -->
-@if (showSalesModal) {
+@if (showSalesModal()) {
 <app-sales-form (close)="closeSalesModal()" (saleCreated)="onSaleCreated($event)"></app-sales-form>
 }

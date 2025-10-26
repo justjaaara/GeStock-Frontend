@@ -13,6 +13,19 @@
     padding: 16px;
 }
 
+.loading-message,
+.empty-message {
+    padding: 40px 20px;
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+}
+
+.loading-message p,
+.empty-message p {
+    margin: 0;
+}
+
 .panel-header {
     display: flex;
     align-items: center;
