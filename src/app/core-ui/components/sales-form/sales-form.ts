@@ -122,6 +122,7 @@ export class SalesFormComponent implements OnInit {
         this.loading = false;
         this.toastr.success('Venta registrada exitosamente', 'Éxito');
         this.saleCreated.emit(response);
+        this.close.emit();
       },
       error: (error) => {
         this.loading = false;

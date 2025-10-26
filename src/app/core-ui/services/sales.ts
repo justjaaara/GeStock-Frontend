@@ -45,6 +45,18 @@ export interface SalesHistoryResponse {
   pagination: PaginationInfo;
 }
 
+export interface SalesStats {
+  totalSales: number;
+  totalQuantitySold: number;
+  salesToday: number;
+  quantitySoldToday: number;
+  topSellingProduct: {
+    productCode: string;
+    productName: string;
+    totalQuantity: number;
+  } | null;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -93,6 +105,20 @@ export class SalesService {
       }),
       catchError((error: any) => {
         console.error('Error in getFilteredSales:', error);
+        throw error;
+      })
+    );
+  }
+
+  getSalesStats(): Observable<SalesStats> {
+    const url = `${environment.BACKENDBASEURL}/sales/stats`;
+    console.log('Fetching sales stats from URL:', url);
+    return this.http.get<SalesStats>(url).pipe(
+      tap((response: any) => {
+        console.log('Sales stats response:', response);
+      }),
+      catchError((error: any) => {
+        console.error('Error in getSalesStats:', error);
         throw error;
       })
     );

@@ -1,3 +1,33 @@
+<!-- Estadísticas -->
+<div class="grid" *ngIf="stats()">
+  <app-stat-card title="Total de Ventas" [value]="stats()!.totalSales" badge="Registradas" />
+  <app-stat-card
+    title="Cantidad Vendida Total"
+    [value]="stats()!.totalQuantitySold"
+    badge="Unidades"
+  />
+  <app-stat-card title="Ventas Hoy" [value]="stats()!.salesToday" badge="📅 Hoy" tone="good" />
+  <app-stat-card
+    title="Cantidad Vendida Hoy"
+    [value]="stats()!.quantitySoldToday"
+    badge="Unidades hoy"
+    tone="good"
+  />
+  <app-stat-card
+    *ngIf="stats()!.topSellingProduct"
+    [title]="'Producto Más Vendido'"
+    [value]="stats()!.topSellingProduct!.productName"
+    [badge]="
+      'Código: ' +
+      stats()!.topSellingProduct!.productCode +
+      ' | ' +
+      stats()!.topSellingProduct!.totalQuantity +
+      ' unidades'
+    "
+    tone="good"
+  />
+</div>
+
 <section class="panel">
   <header class="panel-header">
     <h4>Historial de Movimientos</h4>

@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SalesFormComponent } from '@/core-ui/components/sales-form/sales-form';
-import { SalesService, SaleMovement, PaginationInfo } from '@/core-ui/services/sales';
+import { SalesService, SaleMovement, PaginationInfo, SalesStats } from '@/core-ui/services/sales';
 import { ToastrService } from 'ngx-toastr';
+import { StatCard } from '@/shared/components/stat-card/stat-card';
 
 @Component({
   selector: 'app-shopping',
   standalone: true,
-  imports: [CommonModule, SalesFormComponent, FormsModule],
+  imports: [CommonModule, SalesFormComponent, FormsModule, StatCard],
   templateUrl: './shopping.html',
   styleUrl: './shopping.css',
 })
@@ -29,6 +30,10 @@ export class Shopping implements OnInit, OnDestroy {
   startDate = signal<string>('');
   endDate = signal<string>('');
 
+  // Estadísticas
+  stats = signal<SalesStats | null>(null);
+  isLoadingStats = signal(false);
+
   ngOnInit(): void {
     this.header.title.set('Gestión de Compras');
     this.header.breadcrumbs.set([{ label: 'Inicio', link: '/' }, { label: 'Compras' }]);
@@ -43,10 +48,27 @@ export class Shopping implements OnInit, OnDestroy {
     ]);
 
     this.loadSalesHistory();
+    this.loadSalesStats();
   }
 
   ngOnDestroy(): void {
     this.header.reset();
+  }
+
+  loadSalesStats(): void {
+    this.isLoadingStats.set(true);
+    this.salesService.getSalesStats().subscribe({
+      next: (stats) => {
+        this.stats.set(stats);
+        this.isLoadingStats.set(false);
+        console.log('Estadísticas cargadas:', stats);
+      },
+      error: (error) => {
+        this.isLoadingStats.set(false);
+        console.error('Error al cargar estadísticas:', error);
+        this.toastr.error('Error al cargar las estadísticas');
+      },
+    });
   }
 
   loadSalesHistory(): void {
@@ -141,8 +163,9 @@ export class Shopping implements OnInit, OnDestroy {
 
   onSaleCreated(sale: any): void {
     console.log('Venta creada:', sale);
-    // Recargar la lista de ventas
+    // Recargar la lista de ventas y estadísticas
     this.currentPage.set(1);
     this.loadSalesHistory();
+    this.loadSalesStats();
   }
 }
