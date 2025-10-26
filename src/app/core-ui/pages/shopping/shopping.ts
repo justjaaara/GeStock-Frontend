@@ -2,6 +2,7 @@ import { StatCard } from '@/shared/components/stat-card/stat-card';
 import { Header } from '@/shared/services/header';
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { SalesFormComponent } from '@/core-ui/components/sales-form/sales-form';
 
 type OrdenCompra = {
   id: number;
@@ -19,11 +20,13 @@ type OrdenCompra = {
 @Component({
   selector: 'app-shopping',
   standalone: true,
-  imports: [StatCard, CommonModule],
+  imports: [StatCard, CommonModule, SalesFormComponent],
   templateUrl: './shopping.html',
   styleUrl: './shopping.css',
 })
 export class Shopping implements OnInit, OnDestroy {
+  showSalesModal = false;
+
   constructor(private header: Header) {}
 
   ngOnInit(): void {
@@ -31,7 +34,7 @@ export class Shopping implements OnInit, OnDestroy {
     this.header.breadcrumbs.set([{ label: 'Inicio', link: '/' }, { label: 'Compras' }]);
     this.header.showSearch.set(true);
     this.header.actionsTopbar.set([
-      { label: 'Nueva orden', icon: '➕', onClick: () => console.log('Nueva compra') },
+      { label: 'Nueva orden', icon: '➕', onClick: () => this.openSalesModal() },
     ]);
     this.header.actionsTitle.set([
       { label: 'Exportar Ordenes', onClick: () => console.log('Exportar excel') },
@@ -169,7 +172,21 @@ export class Shopping implements OnInit, OnDestroy {
   prevPage() {
     if (this.page > 1) this.page--;
   }
+
   nextPage() {
     if (this.page < this.totalPages) this.page++;
+  }
+
+  openSalesModal(): void {
+    this.showSalesModal = true;
+  }
+
+  closeSalesModal(): void {
+    this.showSalesModal = false;
+  }
+
+  onSaleCreated(sale: any): void {
+    console.log('Venta creada:', sale);
+    // Aquí puedes agregar lógica adicional, como recargar la lista de órdenes
   }
 }
