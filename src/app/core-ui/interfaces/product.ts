@@ -58,5 +58,5 @@ export type ProductUI = {
   price: number;
   status: string;
   measurementType?: string;
-  lotId?: number;
+  lotId?: number | null;
 };

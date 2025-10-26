@@ -465,7 +465,7 @@ export class Inventory implements OnInit, OnDestroy {
       subtitle: product.productDescription,
       category: product.productCategory,
       stock: product.currentStock,
-      min: product.minimumStock,
+      min: product.minimunStock || product.minimumStock || 0, // Soporta ambas ortografías
       price: product.unitPrice,
       status: product.productState,
       measurementType: product.measurementType,

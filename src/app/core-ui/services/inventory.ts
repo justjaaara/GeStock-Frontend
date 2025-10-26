@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
 import { environment } from '@environments/environment.development';
 import type { Category, MeasurementType } from '@/core-ui/interfaces/product';
 
@@ -10,10 +11,11 @@ export interface Product {
   productDescription: string;
   productCategory: string;
   currentStock: number;
-  minimumStock: number;
+  minimumStock?: number; // Ortografía correcta
+  minimunStock?: number; // Ortografía del backend (typo)
   unitPrice: number;
   productState: string;
-  lotId: number;
+  lotId: number | null;
   measurementType: string;
 }
 
@@ -63,8 +65,25 @@ export class InventoryService {
   private http = inject(HttpClient);
 
   getInventory(page: number = 1, limit: number = 20): Observable<InventoryResponse> {
-    return this.http.get<InventoryResponse>(
-      `${environment.BACKENDBASEURL}/inventory?page=${page}&limit=${limit}`
+    const url = `${environment.BACKENDBASEURL}/inventory?page=${page}&limit=${limit}`;
+    console.log('🔍 Fetching inventory from:', url);
+    return this.http.get<InventoryResponse>(url).pipe(
+      tap((response: InventoryResponse) => {
+        console.log('📦 Raw inventory response:', response);
+        console.log('📦 First product sample:', response.data[0]);
+        if (response.data[0]) {
+          console.log('📊 minimumStock value:', response.data[0].minimumStock);
+          console.log('📊 minimunStock value (typo):', response.data[0].minimunStock);
+          console.log(
+            '📊 Using:',
+            response.data[0].minimunStock || response.data[0].minimumStock || 0
+          );
+        }
+      }),
+      catchError((error: any) => {
+        console.error('❌ Error fetching inventory:', error);
+        throw error;
+      })
     );
   }
 
