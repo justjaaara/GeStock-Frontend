@@ -257,6 +257,7 @@ export class Inventory implements OnInit, OnDestroy {
     productCode: string;
     userId: number;
     type: string;
+    movementReason: 'AJUSTE INVENTARIO' | 'DEVOLUCION CLIENTE' | 'DAÑO';
   }): void {
     this.isUpdatingStock.set(true);
     this.inventoryService.updateStock(updateData).subscribe({

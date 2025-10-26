@@ -127,6 +127,7 @@ export class InventoryService {
     productCode: string;
     userId: number;
     type: string;
+    movementReason: 'AJUSTE INVENTARIO' | 'DEVOLUCION CLIENTE' | 'DAÑO';
   }): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(
       `${environment.BACKENDBASEURL}/inventory/update-stock`,
