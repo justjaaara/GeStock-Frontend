@@ -46,39 +46,43 @@
           <th>Mes</th>
           <th>Año</th>
           <th>Usuario</th>
-          <th class="ta-right">Total Productos</th>
-          <th class="ta-right">Valor Total</th>
+          <th>Estado</th>
           <th class="ta-right">Acciones</th>
         </tr>
       </thead>
 
       <tbody>
-        @for (closure of closures; track closure.id) {
+        @if (closures().length === 0) {
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 2rem">No hay cierres disponibles</td>
+        </tr>
+        } @else { @for (closure of closures(); track closure.headerId) {
         <tr>
           <td>
-            <a class="link-id" href="javascript:void(0)">#{{ closure.id }}</a>
+            <a class="link-id" href="javascript:void(0)">#{{ closure.headerId }}</a>
           </td>
           <td>{{ closure.closureDate | date : 'dd/MM/yyyy' }}</td>
-          <td>{{ closure.month }}</td>
-          <td>{{ closure.year }}</td>
+          <td>{{ closure.closureMonth }}</td>
+          <td>{{ closure.closureYear }}</td>
           <td>{{ closure.userName }}</td>
-          <td class="ta-right">{{ closure.totalProducts }}</td>
-          <td class="ta-right">{{ closure.totalValue | currency : 'USD' : 'symbol' : '1.0-0' }}</td>
+          <td>{{ closure.status }}</td>
           <td class="actions ta-right">
             <button class="icon-btn" title="Ver Detalle">👁️</button>
-            <button class="icon-btn" title="Exportar PDF">�</button>
-            <button class="icon-btn" title="Exportar Excel">�</button>
+            <button class="icon-btn" title="Exportar PDF">📄</button>
+            <button class="icon-btn" title="Exportar Excel">📊</button>
           </td>
         </tr>
-        }
+        } }
       </tbody>
     </table>
   </div>
 
   <footer class="panel-foot">
-    <button class="btn nav" [disabled]="page === 1" (click)="prevPage()">← Anterior</button>
-    <div class="page-info">Página {{ page }} de {{ totalPages }} ({{ totalClosures }} cierres)</div>
-    <button class="btn nav primary" [disabled]="page === totalPages" (click)="nextPage()">
+    <button class="btn nav" [disabled]="page() === 1" (click)="prevPage()">← Anterior</button>
+    <div class="page-info">
+      Página {{ page() }} de {{ totalPages() }} ({{ totalClosures() }} cierres)
+    </div>
+    <button class="btn nav primary" [disabled]="page() === totalPages()" (click)="nextPage()">
       Siguiente →
     </button>
   </footer>

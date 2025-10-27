@@ -1,16 +1,16 @@
 import { StatCard } from '@/shared/components/stat-card/stat-card';
 import { Header } from '@/shared/services/header';
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { InventoryService, Closure } from '@/core-ui/services/inventory';
 
 type ClosureRow = {
-  id: number;
+  headerId: number;
   closureDate: string;
-  month: number;
-  year: number;
+  closureMonth: number;
+  closureYear: number;
   userName: string;
-  totalProducts: number;
-  totalValue: number;
+  status: string;
 };
 
 @Component({
@@ -21,9 +21,10 @@ type ClosureRow = {
   styleUrl: './closure.css',
 })
 export class Closures implements OnInit, OnDestroy {
-  constructor(private header: Header) {}
+  constructor(private header: Header, private inventoryService: InventoryService) {}
 
   ngOnInit(): void {
+    console.log('Closures component initialized');
     this.header.title.set('Cierres Históricos de Inventario');
     this.header.breadcrumbs.set([{ label: 'Inicio', link: '/' }, { label: 'Cierres' }]);
     this.header.showSearch.set(true);
@@ -35,77 +36,47 @@ export class Closures implements OnInit, OnDestroy {
       { label: 'Importar CSV', onClick: () => console.log('Importar CSV') },
       { label: 'Reporte General', onClick: () => console.log('Reporte General') },
     ]);
+    this.loadClosures();
   }
 
   ngOnDestroy(): void {
     this.header.reset();
   }
 
-  page = 1;
-  totalPages = 1;
-  totalClosures = 6;
+  page = signal(1);
+  totalPages = signal(1);
+  totalClosures = signal(0);
+  closures = signal<ClosureRow[]>([]);
+
+  loadClosures() {
+    console.log('Loading closures for page:', this.page());
+    this.inventoryService.getClosures(this.page(), 10).subscribe({
+      next: (response) => {
+        console.log('Full response:', response);
+        this.closures.set(response.data);
+        this.totalPages.set(Number(response.pagination.totalPages));
+        this.totalClosures.set(Number(response.pagination.totalItems));
+        console.log('Closures loaded:', this.closures());
+        console.log('Closures array length:', this.closures().length);
+        console.log('Pagination:', response.pagination);
+      },
+      error: (error) => {
+        console.error('Error loading closures:', error);
+      },
+    });
+  }
 
   prevPage() {
-    if (this.page > 1) this.page--;
-  }
-  nextPage() {
-    if (this.page < this.totalPages) this.page++;
+    if (this.page() > 1) {
+      this.page.update((p) => p - 1);
+      this.loadClosures();
+    }
   }
 
-  closures: ClosureRow[] = [
-    {
-      id: 1,
-      closureDate: '2025-10-01',
-      month: 10,
-      year: 2025,
-      userName: 'Juan Pérez',
-      totalProducts: 150,
-      totalValue: 45280,
-    },
-    {
-      id: 2,
-      closureDate: '2025-09-01',
-      month: 9,
-      year: 2025,
-      userName: 'María García',
-      totalProducts: 145,
-      totalValue: 42150,
-    },
-    {
-      id: 3,
-      closureDate: '2025-08-01',
-      month: 8,
-      year: 2025,
-      userName: 'Carlos López',
-      totalProducts: 152,
-      totalValue: 48920,
-    },
-    {
-      id: 4,
-      closureDate: '2025-07-01',
-      month: 7,
-      year: 2025,
-      userName: 'Ana Rodríguez',
-      totalProducts: 148,
-      totalValue: 39850,
-    },
-    {
-      id: 5,
-      closureDate: '2025-06-01',
-      month: 6,
-      year: 2025,
-      userName: 'Pedro Martínez',
-      totalProducts: 155,
-      totalValue: 51200,
-    },
-    {
-      id: 6,
-      closureDate: '2025-05-01',
-      month: 5,
-      year: 2025,
-      userName: 'Laura Sánchez',
-      totalProducts: 149,
-      totalValue: 46780,
-    },
-  ];
+  nextPage() {
+    if (this.page() < this.totalPages()) {
+      this.page.update((p) => p + 1);
+      this.loadClosures();
+    }
+  }
 }

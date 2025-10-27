@@ -63,6 +63,20 @@ export interface InventoryResponse {
   pagination: PaginationInfo;
 }
 
+export interface Closure {
+  headerId: number;
+  closureDate: string;
+  closureMonth: number;
+  closureYear: number;
+  userName: string;
+  status: string;
+}
+
+export interface ClosuresResponse {
+  data: Closure[];
+  pagination: PaginationInfo;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -181,6 +195,25 @@ export class InventoryService {
     return this.http.post<{ message: string }>(
       `${environment.BACKENDBASEURL}/inventory/update-stock`,
       data
+    );
+  }
+
+  getClosures(page: number = 1, limit: number = 20): Observable<ClosuresResponse> {
+    const url = `${environment.BACKENDBASEURL}/inventory/closures?page=${page}&limit=${limit}`;
+    console.log('🔍 Fetching closures from:', url);
+    return this.http.get<ClosuresResponse>(url).pipe(
+      tap((response: ClosuresResponse) => {
+        console.log('📦 Raw closures response:', response);
+        console.log('📦 First closure sample:', response.data[0]);
+        if (response.data[0]) {
+          console.log('📊 Closure status:', response.data[0].status);
+          console.log('📊 Closure date:', response.data[0].closureDate);
+        }
+      }),
+      catchError((error: any) => {
+        console.error('❌ Error fetching closures:', error);
+        throw error;
+      })
     );
   }
 }
