@@ -326,4 +326,42 @@
       (cancel)="closeStockUpdateModal()"
     ></app-stock-update-form>
   </app-modal>
+
+  <!-- Modal de confirmación de cierre mensual -->
+  <app-modal
+    [isOpen]="showClosureConfirmModal()"
+    title="Confirmar Cierre Mensual"
+    (confirm)="confirmGenerateClosure()"
+    (cancel)="cancelClosure()"
+    [confirmText]="'Generar Cierre'"
+    [cancelText]="'Cancelar'"
+  >
+    <div style="text-align: center; padding: 1rem 0">
+      <div style="font-size: 1.1rem; margin-bottom: 1rem">
+        <strong>¿Está seguro de que desea generar el cierre mensual?</strong>
+      </div>
+
+      <div
+        style="
+          background: #f8f9fa;
+          padding: 1rem;
+          border-radius: 8px;
+          margin: 1rem 0;
+          border-left: 4px solid #007bff;
+        "
+      >
+        <div style="margin-bottom: 0.5rem">
+          <strong>Fecha del cierre:</strong> {{ currentMonthInfo().formattedDate }}
+        </div>
+        <div style="color: #6c757d; font-size: 0.9rem">
+          Una vez generado el cierre, no se podrán realizar más modificaciones al inventario durante
+          este mes.
+        </div>
+      </div>
+
+      <div style="color: #dc3545; font-weight: 500; margin-top: 1rem">
+        ⚠️ Esta acción no se puede deshacer
+      </div>
+    </div>
+  </app-modal>
 </div>

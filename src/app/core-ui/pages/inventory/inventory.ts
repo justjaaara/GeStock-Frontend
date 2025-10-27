@@ -102,6 +102,34 @@ export class Inventory implements OnInit, OnDestroy {
     };
   });
 
+  // Fecha del mes actual para el cierre
+  currentMonthInfo = computed(() => {
+    const now = new Date();
+    const month = now.getMonth() + 1; // getMonth() devuelve 0-11
+    const year = now.getFullYear();
+    const monthNames = [
+      'Enero',
+      'Febrero',
+      'Marzo',
+      'Abril',
+      'Mayo',
+      'Junio',
+      'Julio',
+      'Agosto',
+      'Septiembre',
+      'Octubre',
+      'Noviembre',
+      'Diciembre',
+    ];
+
+    return {
+      month,
+      year,
+      monthName: monthNames[month - 1],
+      formattedDate: `${monthNames[month - 1]} ${year}`,
+    };
+  });
+
   showCreateProductModal = signal(false);
   showProductDetailModal = signal(false);
   selectedProductForDetail = signal<ProductDetailView | null>(null);
@@ -114,6 +142,8 @@ export class Inventory implements OnInit, OnDestroy {
   isUpdatingStock = signal(false);
   userId = signal<number | null>(null);
   roleId = signal<number | null>(null);
+  showClosureConfirmModal = signal(false);
+  isGeneratingClosure = signal(false);
 
   ngOnInit(): void {
     this.extractUserIdFromToken();
@@ -623,6 +653,14 @@ export class Inventory implements OnInit, OnDestroy {
   }
 
   generateMonthlyClosure(): void {
+    // Mostrar modal de confirmación
+    this.showClosureConfirmModal.set(true);
+  }
+
+  confirmGenerateClosure(): void {
+    this.showClosureConfirmModal.set(false);
+    this.isGeneratingClosure.set(true);
+
     this.http
       .post<{ message: string; headerId: number; month: number; year: number; createdAt: string }>(
         `${environment.BACKENDBASEURL}/inventory/generate-monthly-closure`,
@@ -632,18 +670,24 @@ export class Inventory implements OnInit, OnDestroy {
         next: (response) => {
           this.toastr.success(response.message, 'Cierre Generado');
           console.log('Cierre generado:', response);
+          this.isGeneratingClosure.set(false);
           // Opcional: recargar inventario o mostrar mensaje adicional
         },
         error: (error) => {
           if (error.status === 400) {
-            this.toastr.warning(error.error.message, 'Advertencia');
+            this.toastr.warning('Ya existe un cierre para este mes.', 'Advertencia');
           } else if (error.status === 401) {
             this.toastr.error('No autorizado. Verifica tu sesión.', 'Error');
           } else {
             this.toastr.error('Error al generar cierre mensual.', 'Error');
           }
           console.error('Error generando cierre:', error);
+          this.isGeneratingClosure.set(false);
         },
       });
+  }
+
+  cancelClosure(): void {
+    this.showClosureConfirmModal.set(false);
   }
 }
