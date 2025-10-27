@@ -1,7 +1,7 @@
 /* ===== KPIs Superiores ===== */
 .grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 14px;
 }
 
@@ -28,9 +28,14 @@
 /* ===== Grid de paneles ===== */
 .grid-panels {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 16px;
   padding: 0 16px;
+}
+
+/* Cuando hay movimientos (admin), el grid es 2fr 1fr */
+.grid-panels:has(.panel:first-child) {
+  grid-template-columns: 2fr 1fr;
 }
 
 .panel-header {
@@ -40,7 +45,7 @@
 
 .grid-3 {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 16px;
   padding: 16px;
 }
