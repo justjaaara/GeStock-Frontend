@@ -77,6 +77,21 @@ export interface ClosuresResponse {
   pagination: PaginationInfo;
 }
 
+export interface ClosureDetail {
+  closureId: number;
+  closureDate: string;
+  finalStock: number;
+  lotId: number | null;
+  productName: string;
+  userName: string;
+  headerId: number;
+}
+
+export interface ClosureDetailsResponse {
+  data: ClosureDetail[];
+  pagination: PaginationInfo;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -212,6 +227,25 @@ export class InventoryService {
       }),
       catchError((error: any) => {
         console.error('❌ Error fetching closures:', error);
+        throw error;
+      })
+    );
+  }
+
+  getClosureDetails(
+    headerId: number,
+    page: number = 1,
+    limit: number = 20
+  ): Observable<ClosureDetailsResponse> {
+    const url = `${environment.BACKENDBASEURL}/inventory/closures/${headerId}/details?page=${page}&limit=${limit}`;
+    console.log('🔍 Fetching closure details from:', url);
+    return this.http.get<ClosureDetailsResponse>(url).pipe(
+      tap((response: ClosureDetailsResponse) => {
+        console.log('📦 Raw closure details response:', response);
+        console.log('📦 First closure detail sample:', response.data[0]);
+      }),
+      catchError((error: any) => {
+        console.error('❌ Error fetching closure details:', error);
         throw error;
       })
     );

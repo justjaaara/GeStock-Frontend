@@ -401,3 +401,32 @@ td.actions {
     text-align: right;
     font-variant-numeric: tabular-nums;
 }
+
+/* ========== MODAL DETAILS ========== */
+.closure-details .table-wrap {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.closure-details .table {
+    font-size: 14px;
+}
+
+.closure-details .table th,
+.closure-details .table td {
+    padding: 8px 12px;
+}
+
+.modal-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e5eaf2;
+}
+
+.modal-pagination .page-info {
+    font-size: 14px;
+    color: #666;
+}

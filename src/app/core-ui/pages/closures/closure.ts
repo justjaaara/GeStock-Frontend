@@ -2,7 +2,8 @@ import { StatCard } from '@/shared/components/stat-card/stat-card';
 import { Header } from '@/shared/services/header';
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, signal } from '@angular/core';
-import { InventoryService, Closure } from '@/core-ui/services/inventory';
+import { InventoryService, Closure, ClosureDetail } from '@/core-ui/services/inventory';
+import { Modal } from '@/shared/components/modal/modal';
 
 type ClosureRow = {
   headerId: number;
@@ -16,7 +17,7 @@ type ClosureRow = {
 @Component({
   selector: 'app-closures',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, Modal],
   templateUrl: './closure.html',
   styleUrl: './closure.css',
 })
@@ -48,6 +49,15 @@ export class Closures implements OnInit, OnDestroy {
   totalClosures = signal(0);
   closures = signal<ClosureRow[]>([]);
 
+  // Modal signals
+  isModalOpen = signal(false);
+  modalTitle = signal('Detalle del Cierre');
+  selectedClosureId = signal<number | null>(null);
+  closureDetails = signal<ClosureDetail[]>([]);
+  detailsPage = signal(1);
+  detailsTotalPages = signal(1);
+  detailsTotalItems = signal(0);
+
   loadClosures() {
     console.log('Loading closures for page:', this.page());
     this.inventoryService.getClosures(this.page(), 10).subscribe({
@@ -77,6 +87,50 @@ export class Closures implements OnInit, OnDestroy {
     if (this.page() < this.totalPages()) {
       this.page.update((p) => p + 1);
       this.loadClosures();
+    }
+  }
+
+  viewDetails(closure: ClosureRow) {
+    this.selectedClosureId.set(closure.headerId);
+    this.modalTitle.set(`Detalle del Cierre #${closure.headerId}`);
+    this.detailsPage.set(1);
+    this.loadClosureDetails();
+    this.isModalOpen.set(true);
+  }
+
+  loadClosureDetails() {
+    if (!this.selectedClosureId()) return;
+    this.inventoryService
+      .getClosureDetails(this.selectedClosureId()!, this.detailsPage(), 20)
+      .subscribe({
+        next: (response) => {
+          this.closureDetails.set(response.data);
+          this.detailsTotalPages.set(Number(response.pagination.totalPages));
+          this.detailsTotalItems.set(Number(response.pagination.totalItems));
+        },
+        error: (error) => {
+          console.error('Error loading closure details:', error);
+        },
+      });
+  }
+
+  closeModal() {
+    this.isModalOpen.set(false);
+    this.closureDetails.set([]);
+    this.selectedClosureId.set(null);
+  }
+
+  prevDetailsPage() {
+    if (this.detailsPage() > 1) {
+      this.detailsPage.update((p) => p - 1);
+      this.loadClosureDetails();
+    }
+  }
+
+  nextDetailsPage() {
+    if (this.detailsPage() < this.detailsTotalPages()) {
+      this.detailsPage.update((p) => p + 1);
+      this.loadClosureDetails();
     }
   }
 }
