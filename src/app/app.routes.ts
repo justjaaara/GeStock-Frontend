@@ -11,7 +11,6 @@ import { Closures } from './core-ui/pages/closures/closure';
 import { Dashboard } from './core-ui/pages/dashboard/dashboard';
 import { Inventory } from './core-ui/pages/inventory/inventory';
 import { MovementHistory } from './core-ui/pages/movement-history/movement-history';
-import { Projections } from './core-ui/pages/projections/projections';
 import { Report } from './core-ui/pages/report/report';
 import { Settings } from './core-ui/pages/settings/settings';
 import { Shopping } from './core-ui/pages/shopping/shopping';
@@ -93,17 +92,7 @@ export const routes: Routes = [
     ],
     canActivate: [authGuard],
   },
-  {
-    path: 'proyecciones',
-    component: Layout,
-    children: [
-      {
-        path: '',
-        component: Projections,
-      },
-    ],
-    canActivate: [authGuard],
-  },
+
   {
     path: 'alertas',
     component: Layout,

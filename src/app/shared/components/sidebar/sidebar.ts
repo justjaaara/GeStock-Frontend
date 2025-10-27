@@ -68,7 +68,6 @@ export class Sidebar {
       title: 'ANÁLISIS',
       items: [
         { label: 'Reportes', link: '/reportes', icon: '📑' },
-        { label: 'Proyecciones', link: '/proyecciones', icon: '📈' },
         { label: 'Alertas Stock', link: '/alertas', icon: '⚠️', notificationCount: 5 },
       ],
     },
@@ -85,9 +84,7 @@ export class Sidebar {
     },
     {
       title: 'SISTEMA',
-      items: [
-        { label: 'Configuraciones', link: '/configuraciones', icon: '⚙️' },
-      ],
+      items: [{ label: 'Configuraciones', link: '/configuraciones', icon: '⚙️' }],
     },
   ]);
 
