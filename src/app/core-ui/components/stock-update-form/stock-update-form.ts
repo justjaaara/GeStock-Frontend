@@ -27,6 +27,7 @@ export class StockUpdateFormComponent implements OnInit {
     productCode: string;
     userId: number;
     type: string;
+    movementReason: 'AJUSTE INVENTARIO' | 'DEVOLUCION CLIENTE' | 'DAÑO';
   }>();
   @Output() cancel = new EventEmitter<void>();
 
@@ -48,6 +49,7 @@ export class StockUpdateFormComponent implements OnInit {
 
     this.step2Form = this.fb.group({
       quantity: ['', [Validators.required, Validators.min(1)]],
+      movementReason: ['', [Validators.required]],
     });
   }
 
@@ -81,16 +83,17 @@ export class StockUpdateFormComponent implements OnInit {
   onStep2Submit(): void {
     if (this.step2Form.valid && this.productData() && this.userId) {
       const product = this.productData();
-      const { quantity } = this.step2Form.value;
+      const { quantity, movementReason } = this.step2Form.value;
       const { type } = this.step1Form.value;
 
       const updateData = {
         productId: product.productId,
-        lotId: product.lotId || null, // Enviar null si no existe lotId
+        lotId: product.lotId || null,
         quantity: parseInt(quantity),
         productCode: product.productCode,
         userId: this.userId,
         type,
+        movementReason,
       };
 
       this.submitStockUpdate.emit(updateData);
@@ -126,5 +129,9 @@ export class StockUpdateFormComponent implements OnInit {
 
   get quantity() {
     return this.step2Form.get('quantity');
+  }
+
+  get movementReason() {
+    return this.step2Form.get('movementReason');
   }
 }

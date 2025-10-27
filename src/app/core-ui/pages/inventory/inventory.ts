@@ -257,6 +257,7 @@ export class Inventory implements OnInit, OnDestroy {
     productCode: string;
     userId: number;
     type: string;
+    movementReason: 'AJUSTE INVENTARIO' | 'DEVOLUCION CLIENTE' | 'DAÑO';
   }): void {
     this.isUpdatingStock.set(true);
     this.inventoryService.updateStock(updateData).subscribe({
@@ -464,10 +465,10 @@ export class Inventory implements OnInit, OnDestroy {
       subtitle: product.productDescription,
       category: product.productCategory,
       stock: product.currentStock,
-      min: product.minimumStock,
+      min: product.minimunStock || product.minimumStock || 0, // Soporta ambas ortografías
       price: product.unitPrice,
-      status: product.productState,
-      measurementType: product.measurementType,
+      status: product.productState || product.stateName || 'Desconocido',
+      measurementType: product.measurementType || product.measurementName,
       lotId: product.lotId,
     }));
   }

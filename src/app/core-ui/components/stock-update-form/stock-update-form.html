@@ -82,11 +82,11 @@
       </div>
       <div class="info-item">
         <label>Stock Actual:</label>
-        <span class="info-value">{{ productData().actualStock }} </span>
+        <span class="info-value">{{ productData().currentStock }} </span>
       </div>
       <div class="info-item">
         <label>Categoría:</label>
-        <span class="info-value">{{ productData().categoryName }}</span>
+        <span class="info-value">{{ productData().productCategory }}</span>
       </div>
       <div class="info-item">
         <label>Tipo de Movimiento:</label>
@@ -115,6 +115,26 @@
       />
       @if (quantity?.invalid && quantity?.touched) {
       <div class="form-error">La cantidad es requerida y debe ser mayor a 0</div>
+      }
+    </div>
+
+    <!-- Razón del movimiento -->
+    <div class="form-group">
+      <label for="movementReason">Razón del Movimiento</label>
+      <select
+        id="movementReason"
+        formControlName="movementReason"
+        class="form-control"
+        [class.is-invalid]="movementReason?.invalid && movementReason?.touched"
+        [disabled]="isLoading"
+      >
+        <option value="">Selecciona una razón...</option>
+        <option value="AJUSTE INVENTARIO">Ajuste de Inventario</option>
+        <option value="DEVOLUCION CLIENTE">Devolución de Cliente</option>
+        <option value="DAÑO">Daño</option>
+      </select>
+      @if (movementReason?.invalid && movementReason?.touched) {
+      <div class="form-error">La razón del movimiento es requerida</div>
       }
     </div>
 
