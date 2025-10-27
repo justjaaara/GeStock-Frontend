@@ -1,18 +1,18 @@
 :host {
-    display: block;
+  display: block;
 }
 
 .side {
-    width: 260px;
-    background: #0f2745;
-    color: #eaf0f6;
-    height: 100vh;
-    position: sticky;
-    top: 0;
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.3s ease, width 0.3s ease;
-    z-index: 999;
+  width: 260px;
+  background: #0f2745;
+  color: #eaf0f6;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease, width 0.3s ease;
+  z-index: 999;
 }
 
 /* Estado cerrado en desktop */
@@ -47,105 +47,126 @@
 }
 
 .brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-weight: 700;
-    padding: 16px 20px;
-    border-bottom: 1px solid #19365e;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 700;
+  padding: 16px 20px;
+  border-bottom: 1px solid #19365e;
 }
 
 .brand-logo {
-    width: 36px;
-    height: 36px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, .08);
-    padding: 6px;
-    object-fit: contain;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 6px;
+  object-fit: contain;
 }
 
 .brand-name {
-    font-size: 18px;
+  font-size: 18px;
 }
 
 .menu {
-    padding: 8px 6px;
-    overflow: auto;
-    flex: 1;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, .2) transparent;
+  padding: 8px 6px;
+  overflow: auto;
+  flex: 1;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
 .group-title {
-    font-size: 11px;
-    letter-spacing: .08em;
-    opacity: .7;
-    margin: 14px 14px 8px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+  margin: 14px 14px 8px;
 }
 
 .divider {
-    border: 0;
-    border-top: 1px solid rgba(255, 255, 255, .12);
-    margin: 10px 10px;
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  margin: 10px 10px;
 }
 
 nav {
-    display: grid;
-    gap: 6px;
-    padding: 0 4px;
+  display: grid;
+  gap: 6px;
+  padding: 0 4px;
 }
 
 .item {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 14px;
-    color: inherit;
-    text-decoration: none;
-    border-radius: 10px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 10px;
 }
 
 .item:hover {
-    background: #17345a;
+  background: #17345a;
 }
 
 .active {
-    background: #1e4478;
+  background: #1e4478;
 }
 
 .left {
-    display: flex;
-    gap: 10px;
-    align-items: center;
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
 .ico {
-    width: 22px;
-    text-align: center;
+  width: 22px;
+  min-width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .count {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 26px;
-    height: 20px;
-    padding: 0 8px;
-    border-radius: 999px;
-    font-size: 12px;
-    line-height: 1;
-    background: rgba(255, 255, 255, .12);
-    color: #eaf0f6;
-    border: 1px solid rgba(255, 255, 255, .18);
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 1;
+  background: rgba(255, 255, 255, 0.12);
+  color: #eaf0f6;
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .foot {
-    font-size: 12px;
-    opacity: .7;
-    padding: 14px 16px;
-    border-top: 1px solid #19365e;
+  font-size: 12px;
+  opacity: 0.7;
+  padding: 14px 16px;
+  border-top: 1px solid #19365e;
+}
+
+.ico svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  stroke: #eaf0f6;
+  fill: none;
+  stroke-width: 2;
+}
+
+.item:hover .ico svg {
+  stroke: #ffffff;
+}
+
+.item.active .ico svg {
+  stroke: #ffffff;
 }

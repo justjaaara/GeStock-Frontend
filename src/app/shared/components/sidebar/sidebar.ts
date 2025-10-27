@@ -1,12 +1,15 @@
-import { Component, Input, signal } from '@angular/core';
+import { Component, Input, signal, computed, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { Auth } from '@/auth/services/auth';
 
 type MenuItem = {
   label: string;
   link: string;
-  icon: string;
+  icon: string | SafeHtml;
   notificationCount?: number;
+  adminOnly?: boolean;
 };
 
 type MenuGroup = {
@@ -26,13 +29,37 @@ export class Sidebar {
   @Input() logoUrl = 'logo.png';
   @Input() isOpen = true;
 
+  //Sanitizer para poder usar los svg (Angular considera cualquier contenido HTML o SVG inyectado como potencialmente peligroso)
+  //Con el sanitizer le decimos a angular que confiamos en ese contenido
+  private sanitizer = inject(DomSanitizer);
+  private authService = inject(Auth);
+
+  // Obtener el rol del usuario autenticado
+  userRole = this.authService.userRole;
+  isAdmin = computed(() => this.userRole() === 'ADMIN');
+
+  constructor() {
+    this.groups.update((groups) =>
+      groups.map((group) => ({
+        ...group,
+        items: group.items.map((item) => ({
+          ...item,
+          icon:
+            typeof item.icon === 'string' && item.icon.startsWith('<svg')
+              ? this.sanitizer.bypassSecurityTrustHtml(item.icon)
+              : item.icon,
+        })),
+      }))
+    );
+  }
+
   groups = signal<MenuGroup[]>([
     {
       title: 'GENERAL',
       items: [
         { label: 'Dashboard', link: '/dashboard', icon: '📊' },
         { label: 'Inventario', link: '/inventario', icon: '📦', notificationCount: 182 },
-        { label: 'Movimientos', link: '/movimientos', icon: '🔄' },
+        { label: 'Movimientos', link: '/movimientos', icon: '🔄', adminOnly: true },
         { label: 'Compras', link: '/compras', icon: '🧾' },
         { label: 'Clientes', link: '/clientes', icon: '👥' },
       ],
@@ -46,11 +73,34 @@ export class Sidebar {
       ],
     },
     {
+      title: 'ADMIN',
+      items: [
+        {
+          label: 'Administración',
+          link: '/administracion',
+          icon: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M22 11h-6l-2 2 2 2h6v-4z"/></svg>',
+          adminOnly: true,
+        },
+      ],
+    },
+    {
       title: 'SISTEMA',
       items: [
-        { label: 'Usuarios', link: '/usuarios', icon: '👤' },
         { label: 'Configuraciones', link: '/configuraciones', icon: '⚙️' },
       ],
     },
   ]);
+
+  // Computed signal para filtrar grupos según el rol del usuario
+  filteredGroups = computed(() => {
+    const isAdmin = this.isAdmin();
+    const allGroups = this.groups();
+
+    return allGroups
+      .map((group) => ({
+        ...group,
+        items: group.items.filter((item) => !item.adminOnly || isAdmin),
+      }))
+      .filter((group) => group.items.length > 0); // Eliminar grupos vacíos
+  });
 }
