@@ -7,6 +7,7 @@ export interface RegisterRequestBackend {
   name: string;
   email: string;
   password: string;
+  roleId: number; // ← Ya no es opcional, es obligatorio
 }
 export interface RegisterRequest extends RegisterRequestBackend {
   confirmPassword: string; // Interfaz del frontend
@@ -45,4 +46,13 @@ export interface ResetPasswordRequest {
 }
 export interface ResetPasswordResponse {
   message: string;
+}
+
+export interface Role {
+  roleId: number;
+  roleName: string;
+}
+
+export interface RolesResponse {
+  roles: Role[];
 }
