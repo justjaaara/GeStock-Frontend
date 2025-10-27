@@ -92,6 +92,15 @@ export interface ClosureDetailsResponse {
   pagination: PaginationInfo;
 }
 
+export interface MovementStats {
+  mostMovedProduct: string;
+  mostMovedCount: number;
+  leastMovedProduct: string;
+  leastMovedCount: number;
+  startDate: string;
+  endDate: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -246,6 +255,20 @@ export class InventoryService {
       }),
       catchError((error: any) => {
         console.error('❌ Error fetching closure details:', error);
+        throw error;
+      })
+    );
+  }
+
+  getMovementStats(): Observable<MovementStats> {
+    const url = `${environment.BACKENDBASEURL}/inventory/movement-stats`;
+    console.log('🔍 Fetching movement stats from:', url);
+    return this.http.get<MovementStats>(url).pipe(
+      tap((response: MovementStats) => {
+        console.log('📊 Movement stats response:', response);
+      }),
+      catchError((error: any) => {
+        console.error('❌ Error fetching movement stats:', error);
         throw error;
       })
     );

@@ -1,10 +1,12 @@
 import { StatCard } from '@/shared/components/stat-card/stat-card';
+import { MovementStatsCard } from '@/shared/components/movement-stats-card/movement-stats-card';
 import { Header } from '@/shared/services/header';
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@environments/environment.development';
 import { ToastrService } from 'ngx-toastr';
+import { InventoryService, MovementStats } from '@/core-ui/services/inventory';
 
 export interface Movement {
   movementId: number;
@@ -43,7 +45,7 @@ export interface FilterParams {
 @Component({
   selector: 'app-movement-history',
   standalone: true,
-  imports: [StatCard, CommonModule],
+  imports: [StatCard, MovementStatsCard, CommonModule],
   templateUrl: './movement-history.html',
   styleUrl: './movement-history.css',
 })
@@ -51,6 +53,7 @@ export class MovementHistory implements OnInit, OnDestroy {
   private header = inject(Header);
   private http = inject(HttpClient);
   private toastr = inject(ToastrService);
+  private inventoryService = inject(InventoryService);
 
   // Señales para el estado
   movements = signal<Movement[]>([]);
@@ -59,6 +62,10 @@ export class MovementHistory implements OnInit, OnDestroy {
   error = signal<string | null>(null);
   currentPage = signal(1);
   itemsPerPage = signal(20);
+
+  // Señales para estadísticas de movimientos
+  movementStats = signal<MovementStats | null>(null);
+  isLoadingStats = signal(false);
 
   // Señales para filtros
   startDate = signal<string>('');
@@ -101,6 +108,7 @@ export class MovementHistory implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.setupHeader();
     this.loadMovements(1);
+    this.loadMovementStats();
   }
 
   ngOnDestroy(): void {
@@ -214,5 +222,19 @@ export class MovementHistory implements OnInit, OnDestroy {
 
   get totalProducts() {
     return this.pagination()?.totalItems || 0;
+  }
+
+  loadMovementStats(): void {
+    this.isLoadingStats.set(true);
+    this.inventoryService.getMovementStats().subscribe({
+      next: (stats) => {
+        this.movementStats.set(stats);
+        this.isLoadingStats.set(false);
+      },
+      error: (error) => {
+        console.error('Error loading movement stats:', error);
+        this.isLoadingStats.set(false);
+      },
+    });
   }
 }
