@@ -140,7 +140,9 @@ export class Inventory implements OnInit, OnDestroy {
       { label: 'Reporte Stock', onClick: () => this.generateStockReport() },
       { label: 'Actualizar', onClick: () => this.loadInventory() },
       // Botón condicional para generar cierre mensual, visible solo para ADMIN (1) o JEFE DE ALMACEN (2)
-      ...(this.roleId() === 1 || this.roleId() === 2 ? [{ label: 'Generar Cierre Mensual', onClick: () => this.generateMonthlyClosure() }] : []),
+      ...(this.roleId() === 1 || this.roleId() === 2
+        ? [{ label: 'Generar Cierre Mensual', onClick: () => this.generateMonthlyClosure() }]
+        : []),
     ]);
   }
 
@@ -621,25 +623,27 @@ export class Inventory implements OnInit, OnDestroy {
   }
 
   generateMonthlyClosure(): void {
-    this.http.post<{ message: string; headerId: number; month: number; year: number; createdAt: string }>(
-      `${environment.BACKENDBASEURL}/inventory/generate-monthly-closure`,
-      {}  // Sin body, ya que es automático
-    ).subscribe({
-      next: (response) => {
-        this.toastr.success(response.message, 'Cierre Generado');
-        console.log('Cierre generado:', response);
-        // Opcional: recargar inventario o mostrar mensaje adicional
-      },
-      error: (error) => {
-        if (error.status === 400) {
-          this.toastr.warning(error.error.message, 'Advertencia');
-        } else if (error.status === 401) {
-          this.toastr.error('No autorizado. Verifica tu sesión.', 'Error');
-        } else {
-          this.toastr.error('Error al generar cierre mensual.', 'Error');
-        }
-        console.error('Error generando cierre:', error);
-      }
-    });
+    this.http
+      .post<{ message: string; headerId: number; month: number; year: number; createdAt: string }>(
+        `${environment.BACKENDBASEURL}/inventory/generate-monthly-closure`,
+        {} // Sin body, ya que es automático
+      )
+      .subscribe({
+        next: (response) => {
+          this.toastr.success(response.message, 'Cierre Generado');
+          console.log('Cierre generado:', response);
+          // Opcional: recargar inventario o mostrar mensaje adicional
+        },
+        error: (error) => {
+          if (error.status === 400) {
+            this.toastr.warning(error.error.message, 'Advertencia');
+          } else if (error.status === 401) {
+            this.toastr.error('No autorizado. Verifica tu sesión.', 'Error');
+          } else {
+            this.toastr.error('Error al generar cierre mensual.', 'Error');
+          }
+          console.error('Error generando cierre:', error);
+        },
+      });
   }
 }

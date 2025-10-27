@@ -61,7 +61,7 @@ export class Sidebar {
         { label: 'Inventario', link: '/inventario', icon: '📦', notificationCount: 182 },
         { label: 'Movimientos', link: '/movimientos', icon: '🔄', adminOnly: true },
         { label: 'Compras', link: '/compras', icon: '🧾' },
-        { label: 'Clientes', link: '/clientes', icon: '👥' },
+        { label: 'Cierres', link: '/cierres', icon: '�' },
       ],
     },
     {

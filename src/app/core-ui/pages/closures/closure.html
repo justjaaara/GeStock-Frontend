@@ -1,0 +1,85 @@
+<section class="panel">
+  <header class="panel-header">
+    <h4>Lista de cierres históricos</h4>
+
+    <div class="controls">
+      <div class="field">
+        <label>Mes</label>
+        <select>
+          <option>Todos</option>
+          <option>Enero</option>
+          <option>Febrero</option>
+          <option>Marzo</option>
+          <option>Abril</option>
+          <option>Mayo</option>
+          <option>Junio</option>
+          <option>Julio</option>
+          <option>Agosto</option>
+          <option>Septiembre</option>
+          <option>Octubre</option>
+          <option>Noviembre</option>
+          <option>Diciembre</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Año</label>
+        <select>
+          <option>Todos</option>
+          <option>2025</option>
+          <option>2024</option>
+          <option>2023</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>&nbsp;</label>
+        <button class="btn primary">Filtrar</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID Cierre</th>
+          <th>Fecha Cierre</th>
+          <th>Mes</th>
+          <th>Año</th>
+          <th>Usuario</th>
+          <th class="ta-right">Total Productos</th>
+          <th class="ta-right">Valor Total</th>
+          <th class="ta-right">Acciones</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (closure of closures; track closure.id) {
+        <tr>
+          <td>
+            <a class="link-id" href="javascript:void(0)">#{{ closure.id }}</a>
+          </td>
+          <td>{{ closure.closureDate | date : 'dd/MM/yyyy' }}</td>
+          <td>{{ closure.month }}</td>
+          <td>{{ closure.year }}</td>
+          <td>{{ closure.userName }}</td>
+          <td class="ta-right">{{ closure.totalProducts }}</td>
+          <td class="ta-right">{{ closure.totalValue | currency : 'USD' : 'symbol' : '1.0-0' }}</td>
+          <td class="actions ta-right">
+            <button class="icon-btn" title="Ver Detalle">👁️</button>
+            <button class="icon-btn" title="Exportar PDF">�</button>
+            <button class="icon-btn" title="Exportar Excel">�</button>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <footer class="panel-foot">
+    <button class="btn nav" [disabled]="page === 1" (click)="prevPage()">← Anterior</button>
+    <div class="page-info">Página {{ page }} de {{ totalPages }} ({{ totalClosures }} cierres)</div>
+    <button class="btn nav primary" [disabled]="page === totalPages" (click)="nextPage()">
+      Siguiente →
+    </button>
+  </footer>
+</section>

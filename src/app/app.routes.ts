@@ -7,7 +7,7 @@ import { Login } from './auth/pages/login/login';
 import { ResetPassword } from './auth/pages/reset-password/reset-password';
 import { SignUp } from './auth/pages/sign-up/sign-up';
 import { Alerts } from './core-ui/pages/alerts/alerts';
-import { Client } from './core-ui/pages/client/client';
+import { Closures } from './core-ui/pages/closures/closure';
 import { Dashboard } from './core-ui/pages/dashboard/dashboard';
 import { Inventory } from './core-ui/pages/inventory/inventory';
 import { MovementHistory } from './core-ui/pages/movement-history/movement-history';
@@ -72,12 +72,12 @@ export const routes: Routes = [
   },
 
   {
-    path: 'clientes',
+    path: 'cierres',
     component: Layout,
     children: [
       {
         path: '',
-        component: Client,
+        component: Closures,
       },
     ],
     canActivate: [authGuard],

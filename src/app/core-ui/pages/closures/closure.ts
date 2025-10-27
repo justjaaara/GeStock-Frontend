@@ -17,8 +17,8 @@ type ClosureRow = {
   selector: 'app-closures',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './client.html',
-  styleUrl: './client.css',
+  templateUrl: './closure.html',
+  styleUrl: './closure.css',
 })
 export class Closures implements OnInit, OnDestroy {
   constructor(private header: Header) {}
