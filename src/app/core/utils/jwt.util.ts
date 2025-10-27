@@ -3,6 +3,7 @@ export interface DecodedToken {
   email: string;
   name: string;
   role: string;
+  roleId: number;
   iat: number;
   exp: number;
 }

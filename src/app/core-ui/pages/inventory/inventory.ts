@@ -2,6 +2,7 @@ import { StatCard } from '@/shared/components/stat-card/stat-card';
 import { Header } from '@/shared/services/header';
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, signal, computed, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import {
   InventoryService,
   Product,
@@ -23,6 +24,7 @@ import { EditProductFormComponent } from '@/core-ui/components/edit-product-form
 import { StockUpdateFormComponent } from '@/core-ui/components/stock-update-form/stock-update-form';
 import { JwtUtil } from '@/core/utils/jwt.util';
 import { ToastrService } from 'ngx-toastr';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-inventory',
@@ -43,6 +45,7 @@ export class Inventory implements OnInit, OnDestroy {
   private inventoryService = inject(InventoryService);
   private header = inject(Header);
   private toastr = inject(ToastrService);
+  private http = inject(HttpClient);
 
   // Señales para el estado
   products = signal<ProductUI[]>([]);
@@ -110,13 +113,14 @@ export class Inventory implements OnInit, OnDestroy {
   showStockUpdateModal = signal(false);
   isUpdatingStock = signal(false);
   userId = signal<number | null>(null);
+  roleId = signal<number | null>(null);
 
   ngOnInit(): void {
+    this.extractUserIdFromToken();
     this.setupHeader();
     this.loadInventory();
     this.loadCategories();
     this.loadMeasurementTypes();
-    this.extractUserIdFromToken();
   }
 
   ngOnDestroy(): void {
@@ -135,6 +139,8 @@ export class Inventory implements OnInit, OnDestroy {
       { label: 'Importar', onClick: () => console.log('Importar') },
       { label: 'Reporte Stock', onClick: () => this.generateStockReport() },
       { label: 'Actualizar', onClick: () => this.loadInventory() },
+      // Botón condicional para generar cierre mensual, visible solo para ADMIN (1) o JEFE DE ALMACEN (2)
+      ...(this.roleId() === 1 || this.roleId() === 2 ? [{ label: 'Generar Cierre Mensual', onClick: () => this.generateMonthlyClosure() }] : []),
     ]);
   }
 
@@ -149,11 +155,17 @@ export class Inventory implements OnInit, OnDestroy {
         } else {
           console.warn('Could not extract user ID from token');
         }
+        if (decoded && decoded.roleId) {
+          this.roleId.set(decoded.roleId);
+          console.log('User roleId extracted from token:', decoded.roleId);
+        } else {
+          console.warn('Could not extract user roleId from token');
+        }
       } else {
         console.warn('No access token found in localStorage');
       }
     } catch (error) {
-      console.error('Error extracting user ID from token:', error);
+      console.error('Error extracting user ID/roleId from token:', error);
     }
   }
 
@@ -606,5 +618,28 @@ export class Inventory implements OnInit, OnDestroy {
     }
 
     return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
+  }
+
+  generateMonthlyClosure(): void {
+    this.http.post<{ message: string; headerId: number; month: number; year: number; createdAt: string }>(
+      `${environment.BACKENDBASEURL}/inventory/generate-monthly-closure`,
+      {}  // Sin body, ya que es automático
+    ).subscribe({
+      next: (response) => {
+        this.toastr.success(response.message, 'Cierre Generado');
+        console.log('Cierre generado:', response);
+        // Opcional: recargar inventario o mostrar mensaje adicional
+      },
+      error: (error) => {
+        if (error.status === 400) {
+          this.toastr.warning(error.error.message, 'Advertencia');
+        } else if (error.status === 401) {
+          this.toastr.error('No autorizado. Verifica tu sesión.', 'Error');
+        } else {
+          this.toastr.error('Error al generar cierre mensual.', 'Error');
+        }
+        console.error('Error generando cierre:', error);
+      }
+    });
   }
 }
