@@ -1,0 +1,186 @@
+<div class="admin-users-container">
+    <div class="header">
+        <h1>Gestión de Usuarios</h1>
+        <button class="btn-primary" (click)="openModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M22 11h-4m-2 0h4m0 0v-4m0 4v4" />
+            </svg>
+            Crear Usuario
+        </button>
+    </div>
+
+    @if (successMessage) {
+    <div class="alert alert-success">{{ successMessage }}</div>
+    }
+
+    @if (errorMessage) {
+    <div class="alert alert-error">{{ errorMessage }}</div>
+    }
+
+    @if (isLoading) {
+    <div class="loading">Cargando usuarios...</div>
+    } @else if (users.length === 0 && !errorMessage) {
+    <div class="empty-state">
+        <p>No hay usuarios registrados todavía.</p>
+        <p>Crea el primer usuario haciendo clic en "Crear Usuario".</p>
+    </div>
+    } @else if (users.length > 0) {
+    <div class="users-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (user of users; track user.id) {
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        <select [value]="user.roleId" (change)="onRoleSelectChange($event, user.id)"
+                            class="role-select">
+                            <option value="1">ADMIN</option>
+                            <option value="2">JEFE DE ALMACEN</option>
+                            <option value="3">OPERARIO</option>
+                        </select>
+                    </td>
+                    <td>
+                        <span class="badge" [class.active]="user.stateId === 1" [class.inactive]="user.stateId === 2">
+                            {{ user.state }}
+                        </span>
+                    </td>
+                    <td>
+                        <button 
+                            [class]="user.stateId === 1 ? 'btn-warning' : 'btn-success'" 
+                            (click)="toggleUserState(user.id)"
+                            [title]="user.stateId === 1 ? 'Desactivar usuario' : 'Activar usuario'">
+                            {{ user.stateId === 1 ? 'Desactivar' : 'Activar' }}
+                        </button>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    }
+
+    @if (showModal) {
+    <app-user-modal (closeModal)="closeModal()" (userCreated)="onUserCreated()">
+    </app-user-modal>
+    }
+
+    @if (showConfirmationModal && pendingRoleChange) {
+    <div class="modal-overlay" (click)="closeConfirmationModal()">
+        <div class="confirmation-modal" (click)="$event.stopPropagation()">
+            <div class="confirmation-header">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                    stroke="#f59e0b" stroke-width="2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                    </path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <h3>Confirmar Cambio de Rol</h3>
+            </div>
+
+            <div class="confirmation-body">
+                <p>¿Estás seguro de que deseas cambiar el rol del usuario?</p>
+                <div class="user-info">
+                    <strong>Usuario:</strong> {{ pendingRoleChange.userName }}
+                </div>
+                <div class="role-change-info">
+                    <div class="role-item old-role">
+                        <span class="label">Rol actual:</span>
+                        <span class="role-badge">{{ pendingRoleChange.oldRoleName }}</span>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="role-item new-role">
+                        <span class="label">Nuevo rol:</span>
+                        <span class="role-badge">{{ pendingRoleChange.newRoleName }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="confirmation-footer">
+                <button class="btn-cancel" (click)="closeConfirmationModal()">
+                    Cancelar
+                </button>
+                <button class="btn-confirm" (click)="confirmRoleChange()">
+                    Confirmar Cambio
+                </button>
+            </div>
+        </div>
+    </div>
+    }
+
+    @if (showStateConfirmationModal && pendingStateChange) {
+    <div class="modal-overlay" (click)="closeStateConfirmationModal()">
+        <div class="confirmation-modal state-modal" (click)="$event.stopPropagation()">
+            <div class="confirmation-header">
+                @if (pendingStateChange.newStateId === 2) {
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                    stroke="#dc3545" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                </svg>
+                } @else {
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                    stroke="#28a745" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                }
+                <h3>{{ pendingStateChange.newStateId === 2 ? 'Desactivar Usuario' : 'Activar Usuario' }}</h3>
+            </div>
+
+            <div class="confirmation-body">
+                <p>{{ pendingStateChange.newStateId === 2 
+                    ? '¿Estás seguro de que deseas desactivar este usuario? No podrá iniciar sesión.' 
+                    : '¿Estás seguro de que deseas activar este usuario? Podrá iniciar sesión nuevamente.' }}
+                </p>
+                <div class="user-info">
+                    <strong>Usuario:</strong> {{ pendingStateChange.userName }}
+                </div>
+                <div class="state-change-info">
+                    <div class="state-item">
+                        <span class="label">Estado actual:</span>
+                        <span class="state-badge" [class.active]="pendingStateChange.currentStateId === 1" 
+                              [class.inactive]="pendingStateChange.currentStateId === 2">
+                            {{ pendingStateChange.currentState }}
+                        </span>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="state-item">
+                        <span class="label">Nuevo estado:</span>
+                        <span class="state-badge" [class.active]="pendingStateChange.newStateId === 1" 
+                              [class.inactive]="pendingStateChange.newStateId === 2">
+                            {{ pendingStateChange.newState }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="confirmation-footer">
+                <button class="btn-cancel" (click)="closeStateConfirmationModal()">
+                    Cancelar
+                </button>
+                <button [class]="pendingStateChange.newStateId === 2 ? 'btn-confirm-danger' : 'btn-confirm-success'" 
+                        (click)="confirmStateChange()">
+                    {{ pendingStateChange.newStateId === 2 ? 'Desactivar' : 'Activar' }}
+                </button>
+            </div>
+        </div>
+    </div>
+    }
+</div>
