@@ -10,6 +10,8 @@ import {
   ForgotPasswordRequest,
   ResetPasswordRequest,
   ResetPasswordResponse,
+  Role,
+  RolesResponse,
 } from '@/auth/interfaces/auth';
 import { Router } from '@angular/router';
 import { environment } from '@environments/environment.development';
@@ -48,18 +50,39 @@ export class Auth {
     this.initializeAuthState();
   }
 
+  //CREAR UN  isAuth?
+
+
   register(registerData: RegisterRequestBackend): Observable<AuthResponse> {
+    const token = this._token();
+
+    if (!token) {
+      return throwError(() => new Error('No hay token de autenticación. Debes estar autenticado como admin.'));
+    }
+
+    const authHeaders = this.headers.set('Authorization', `Bearer ${token}`);
+
+    // El roleId ahora es obligatorio, enviarlo directamente
+    const payload = {
+      name: registerData.name,
+      email: registerData.email,
+      password: registerData.password,
+      roleId: registerData.roleId,
+    };
+
+    console.log('Payload enviado al backend:', payload);
+
     return this.http
       .post<AuthResponse>(
         `${environment.BACKENDBASEURL}/auth/register`,
-        { ...registerData, roleId: 1 },
+        payload,
         {
-          headers: this.headers,
+          headers: authHeaders,
         }
       )
       .pipe(
         tap((response) => {
-          this.setAuthenticatedUser(response.access_token);
+          console.log('Usuario registrado exitosamente por admin');
         }),
         catchError((error) => {
           console.error('Error en registro:', error);
@@ -68,6 +91,95 @@ export class Auth {
       );
   }
 
+  //Creo que deberia estar en un servicio de admin
+  getRoles(): Observable<RolesResponse> {
+    const token = this._token();
+
+    if (!token) {
+      return throwError(() => new Error('No hay token de autenticación'));
+    }
+
+    const authHeaders = this.headers.set('Authorization', `Bearer ${token}`);
+
+    return this.http
+      .get<RolesResponse>(`${environment.BACKENDBASEURL}/auth/roles`, { headers: authHeaders })
+      .pipe(
+        catchError((error) => {
+          console.error('Error obteniendo roles:', error);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  //Creo que deberia estar en un servicio de admin
+  getAllUsers(): Observable<any[]> {
+    const token = this._token();
+
+    if (!token) {
+      return throwError(() => new Error('No hay token de autenticación'));
+    }
+
+    const authHeaders = this.headers.set('Authorization', `Bearer ${token}`);
+
+    return this.http
+      .get<any[]>(`${environment.BACKENDBASEURL}/users`, { headers: authHeaders })
+      .pipe(
+        catchError((error) => {
+          console.error('Error obteniendo usuarios:', error);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  //Creo que deberia estar en un servicio de admin
+  updateUserRole(userId: number, newRoleId: number): Observable<{ message: string }> {
+    const token = this._token();
+
+    if (!token) {
+      return throwError(() => new Error('No hay token de autenticación'));
+    }
+
+    const authHeaders = this.headers.set('Authorization', `Bearer ${token}`);
+
+    return this.http
+      .patch<{ message: string }>(
+        `${environment.BACKENDBASEURL}/users/${userId}/role`,
+        { roleId: newRoleId },
+        { headers: authHeaders }
+      )
+      .pipe(
+        catchError((error) => {
+          console.error('Error actualizando rol:', error);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  //Creo que deberia estar en un servicio de admin
+  toggleUserState(userId: number): Observable<{ message: string; newStateId: number; newStateName: string }> {
+    const token = this._token();
+
+    if (!token) {
+      return throwError(() => new Error('No hay token de autenticación'));
+    }
+
+    const authHeaders = this.headers.set('Authorization', `Bearer ${token}`);
+
+    return this.http
+      .patch<{ message: string; newStateId: number; newStateName: string }>(
+        `${environment.BACKENDBASEURL}/users/${userId}/toggle-state`,
+        {},
+        { headers: authHeaders }
+      )
+      .pipe(
+        catchError((error) => {
+          console.error('Error cambiando estado del usuario:', error);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  
   login(loginData: LoginRequest): Observable<AuthResponse> {
     return this.http
       .post<AuthResponse>(`${environment.BACKENDBASEURL}/auth/login`, loginData, {
