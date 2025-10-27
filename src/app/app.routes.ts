@@ -79,7 +79,7 @@ export const routes: Routes = [
         component: Closures,
       },
     ],
-    canActivate: [authGuard],
+    canActivate: [adminGuard],
   },
   {
     path: 'reportes',

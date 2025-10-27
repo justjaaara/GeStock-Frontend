@@ -67,7 +67,14 @@
           <td>{{ closure.userName }}</td>
           <td>{{ closure.status }}</td>
           <td class="actions ta-right">
-            <button class="icon-btn" title="Ver Detalle" (click)="viewDetails(closure)">👁️</button>
+            <button
+              *ngIf="isAdmin()"
+              class="icon-btn"
+              title="Ver Detalle"
+              (click)="viewDetails(closure)"
+            >
+              👁️
+            </button>
             <button class="icon-btn" title="Exportar PDF">📄</button>
             <button class="icon-btn" title="Exportar Excel">📊</button>
           </td>
@@ -133,9 +140,7 @@
         ← Anterior
       </button>
       <div class="page-info">
-        Página {{ detailsPage() }} de {{ detailsTotalPages() }} ({{
-          detailsTotalItems()
-        }}
+        Página {{ detailsPage() }} de {{ detailsTotalPages() }} ({{ detailsTotalItems() }}
         productos)
       </div>
       <button

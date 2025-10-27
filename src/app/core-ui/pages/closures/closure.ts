@@ -1,9 +1,10 @@
 import { StatCard } from '@/shared/components/stat-card/stat-card';
 import { Header } from '@/shared/services/header';
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal, computed } from '@angular/core';
 import { InventoryService, Closure, ClosureDetail } from '@/core-ui/services/inventory';
 import { Modal } from '@/shared/components/modal/modal';
+import { Auth } from '@/auth/services/auth';
 
 type ClosureRow = {
   headerId: number;
@@ -22,7 +23,11 @@ type ClosureRow = {
   styleUrl: './closure.css',
 })
 export class Closures implements OnInit, OnDestroy {
-  constructor(private header: Header, private inventoryService: InventoryService) {}
+  constructor(
+    private header: Header,
+    private inventoryService: InventoryService,
+    private auth: Auth
+  ) {}
 
   ngOnInit(): void {
     console.log('Closures component initialized');
@@ -57,6 +62,9 @@ export class Closures implements OnInit, OnDestroy {
   detailsPage = signal(1);
   detailsTotalPages = signal(1);
   detailsTotalItems = signal(0);
+
+  // Computed properties
+  isAdmin = computed(() => this.auth.userProfile()?.role === 'ADMIN');
 
   loadClosures() {
     console.log('Loading closures for page:', this.page());
@@ -132,5 +140,9 @@ export class Closures implements OnInit, OnDestroy {
       this.detailsPage.update((p) => p + 1);
       this.loadClosureDetails();
     }
+  }
+
+  isUserAdmin(): boolean {
+    return this.auth.userRole() === 'admin';
   }
 }
