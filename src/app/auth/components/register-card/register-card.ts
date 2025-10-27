@@ -1,25 +1,30 @@
-import { ChangeDetectorRef, Component, ViewChildren, QueryList } from '@angular/core';
+import { ChangeDetectorRef, Component, ViewChildren, QueryList, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { passwordMatchValidator } from '@/auth/validators/password-match';
 import { Auth } from '@/auth/services/auth';
 import { InputField } from '@/shared/components/input/input-field';
-import { RegisterRequestBackend } from '@/auth/interfaces/auth';
+import { RegisterRequestBackend, Role, RolesResponse } from '@/auth/interfaces/auth';
 import { strongPasswordValidator } from '@/shared/validators/strong-password.validator';
 
 @Component({
   selector: 'app-register-card',
-  imports: [ReactiveFormsModule, InputField],
+  imports: [CommonModule, ReactiveFormsModule, InputField],
   templateUrl: './register-card.html',
   styleUrl: './register-card.css',
 })
-export class RegisterCard {
+export class RegisterCard implements OnInit {
   @ViewChildren(InputField) inputFields!: QueryList<InputField>;
 
   registerForm: FormGroup;
   isLoading = false;
   errorMessage = '';
   successMessage = '';
+
+  availableRoles: Role[] = [];
+  loadingRoles = false;
+  isAdmin = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -34,21 +39,41 @@ export class RegisterCard {
           [Validators.required, Validators.minLength(2), Validators.pattern(/^[a-zA-ZÀ-ÿ\s]+$/)],
         ],
         Email: ['', [Validators.required, Validators.email]],
-        Contraseña: [
-          '',
-          [
-            Validators.required,
-            strongPasswordValidator(),
-          ],
-        ],
+        Contraseña: ['', [Validators.required, strongPasswordValidator()]],
         'Confirmar contraseña': ['', [Validators.required]],
+        Rol: [null],
       },
       { validators: passwordMatchValidator } // ← USAR EL VALIDADOR IMPORTADO (sin 'this')
     );
   }
 
+  ngOnInit(): void {
+    this.checkUserRole();
+    this.loadRoles();
+  }
+
+  private checkUserRole(): void {
+    const currentUser = this.authService.userProfile();
+    this.isAdmin = currentUser?.role === 'ADMIN';
+  }
+
+  private loadRoles(): void {
+    if (!this.isAdmin) return;
+    
+    this.loadingRoles = true;
+    this.authService.getRoles().subscribe({
+      next: (response: RolesResponse) => {
+        this.availableRoles = response.roles;
+        this.loadingRoles = false;
+      },
+      error: () => {
+        this.loadingRoles = false;
+      },
+    });
+  }
+
   focusField(fieldId: string): void {
-    const inputField = this.inputFields?.find(field => field.id === fieldId);
+    const inputField = this.inputFields?.find((field) => field.id === fieldId);
     if (inputField) {
       inputField.focusInput();
     }
@@ -76,6 +101,7 @@ export class RegisterCard {
       name: formData.Nombre,
       email: formData.Email,
       password: formData.Contraseña,
+      ...(formData.Rol && { roleId: formData.Rol }),
     };
 
     this.authService.register(registerData).subscribe({
@@ -169,5 +195,9 @@ export class RegisterCard {
     };
 
     return patternMessages[fieldName] || 'Formato inválido';
+  }
+
+  get shouldShowRoleSelector(): boolean {
+    return this.isAdmin && this.availableRoles.length > 0;
   }
 }
