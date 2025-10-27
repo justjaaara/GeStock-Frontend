@@ -34,9 +34,7 @@ export class Closures implements OnInit, OnDestroy {
     this.header.title.set('Cierres Históricos de Inventario');
     this.header.breadcrumbs.set([{ label: 'Inicio', link: '/' }, { label: 'Cierres' }]);
     this.header.showSearch.set(true);
-    this.header.actionsTopbar.set([
-      { label: 'Nuevo Cierre', icon: '➕', onClick: () => console.log('Nuevo cierre') },
-    ]);
+    this.header.actionsTopbar.set([]);
     this.header.actionsTitle.set([
       { label: 'Exportar Lista', onClick: () => console.log('Exportar lista') },
       { label: 'Importar CSV', onClick: () => console.log('Importar CSV') },
