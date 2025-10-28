@@ -10,6 +10,7 @@ import { MovementStats } from '@/core-ui/services/inventory';
   styleUrl: './movement-stats-card.css',
 })
 export class MovementStatsCard implements OnChanges {
+  
   @Input() stats: MovementStats | null = null;
   @Input() isLoading = false;
 

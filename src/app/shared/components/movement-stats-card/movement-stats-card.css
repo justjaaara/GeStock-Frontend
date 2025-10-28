@@ -95,3 +95,9 @@
     padding: 10px;
   }
 }
+
+.icon img {
+  display: block;
+  width: 25px;
+  height: 25px;
+}

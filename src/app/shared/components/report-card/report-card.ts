@@ -8,7 +8,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   styleUrl: './report-card.css'
 })
 export class ReportCard {
-  @Input() icon = '📄';
+  @Input() icon = '/icon/paper_2.svg';
   @Input({ required: true }) title!: string;
   @Input() description = '';
   @Input() cta = 'Generar';

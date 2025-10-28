@@ -42,33 +42,57 @@ export class Sidebar {
     this.groups.update((groups) =>
       groups.map((group) => ({
         ...group,
-        items: group.items.map((item) => ({
-          ...item,
-          icon:
-            typeof item.icon === 'string' && item.icon.startsWith('<svg')
-              ? this.sanitizer.bypassSecurityTrustHtml(item.icon)
-              : item.icon,
-        })),
+        items: group.items.map((item) => {
+          if (typeof item.icon !== 'string') return item;
+
+          const val = item.icon.trim();
+
+          // 1) SVG inline: ya lo tienes
+          if (val.startsWith('<svg')) {
+            return {
+              ...item,
+              icon: this.sanitizer.bypassSecurityTrustHtml(val),
+            };
+          }
+
+          // 2) Ruta a archivo en /public/icon/*.svg  -> envolver en <img>
+          // (También sirve si usas .png/.jpg en el futuro)
+          const isIconPath =
+            val.startsWith('/icon/') ||
+            /\.(svg|png|jpe?g|gif|webp)$/i.test(val);
+
+          if (isIconPath) {
+            const imgTag = `<img src="${val}" alt="" width="20" height="20" />`;
+            return {
+              ...item,
+              icon: this.sanitizer.bypassSecurityTrustHtml(imgTag),
+            };
+          }
+
+          // 3) Emoji u otros textos: déjalo tal cual (se renderiza con innerHTML)
+          return item;
+        }),
       }))
     );
   }
+
 
   groups = signal<MenuGroup[]>([
     {
       title: 'GENERAL',
       items: [
-        { label: 'Dashboard', link: '/dashboard', icon: '📊' },
-        { label: 'Inventario', link: '/inventario', icon: '📦', notificationCount: 182 },
-        { label: 'Movimientos', link: '/movimientos', icon: '🔄', adminOnly: true },
-        { label: 'Compras', link: '/compras', icon: '🧾' },
-        { label: 'Cierres', link: '/cierres', icon: '�', adminOnly: true },
+        { label: 'Dashboard', link: '/dashboard', icon: '/icon/diagrama_de_barras.svg' }, //📊
+        { label: 'Inventario', link: '/inventario', icon: '/icon/caja.svg', notificationCount: 182 },
+        { label: 'Movimientos', link: '/movimientos', icon: '/icon/reload.svg', adminOnly: true },
+        { label: 'Compras', link: '/compras', icon: '/icon/paper.svg' },
+        { label: 'Cierres', link: '/cierres', icon: '/icon/closes.svg', adminOnly: true },
       ],
     },
     {
       title: 'ANÁLISIS',
       items: [
-        { label: 'Reportes', link: '/reportes', icon: '📑' },
-        { label: 'Alertas Stock', link: '/alertas', icon: '⚠️', notificationCount: 5 },
+        { label: 'Reportes', link: '/reportes', icon: '/icon/report.svg' },
+        { label: 'Alertas Stock', link: '/alertas', icon: '/icon/alert.svg', notificationCount: 5 },
       ],
     },
     {
@@ -84,7 +108,7 @@ export class Sidebar {
     },
     {
       title: 'SISTEMA',
-      items: [{ label: 'Configuraciones', link: '/configuraciones', icon: '⚙️' }],
+      items: [{ label: 'Configuraciones', link: '/configuraciones', icon: '/icon/settings.svg' }],
     },
   ]);
 

@@ -185,6 +185,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -247,6 +248,7 @@
 }
 
 @media (max-width: 480px) {
+
   /* En pantallas muy pequeñas, hacer scroll horizontal en los botones */
   .actions {
     overflow-x: auto;
@@ -257,4 +259,10 @@
   .actions::-webkit-scrollbar {
     display: none;
   }
+}
+
+.ico img {
+  display: block;
+  width: 14px;
+  height: 14px;
 }
