@@ -20,9 +20,6 @@ export class ProductService {
         headers: this.headers,
       })
       .pipe(
-        tap((response) => {
-          console.log('Producto creado:', response);
-        }),
         catchError((error) => {
           console.error('Error al crear el producto:', error);
           throw error;

@@ -63,23 +63,14 @@ export class SalesFormComponent implements OnInit {
     this.errorMessage = '';
     this.loading = true;
 
-    // Disable the form while loading
     this.step1Form.disable();
 
     this.inventoryService.getProductByCode(productCode).subscribe({
       next: (product: Product) => {
-        console.log('✅ Product mapped correctly for sales form:', product);
-        console.log('🔍 Debugging specific fields:');
-        console.log('  - currentStock:', product.currentStock);
-        console.log('  - productCategory:', product.productCategory);
-        console.log('  - minimumStock:', product.minimumStock);
-        console.log('  - minimunStock:', product.minimunStock);
-
         this.selectedProduct = product;
         this.loading = false;
         this.step1Form.enable();
 
-        // Update max validator for step 2
         const quantityControl = this.step2Form.get('quantity');
         if (quantityControl) {
           quantityControl.setValidators([
@@ -121,7 +112,6 @@ export class SalesFormComponent implements OnInit {
     this.loading = true;
     this.errorMessage = '';
 
-    // Disable the form while loading
     this.step2Form.disable();
 
     this.salesService.createSale(saleData).subscribe({

@@ -76,9 +76,6 @@ export class UserModal implements OnInit {
       roleId: Number(formData.Rol), // ← Convertir a número
     };
 
-    console.log('Datos a enviar:', registerData);
-    console.log('Tipo de roleId:', typeof registerData.roleId);
-
     this.authService.register(registerData).subscribe({
       next: (response) => {
         this.handleSuccessfulRegistration(response);
@@ -98,18 +95,17 @@ export class UserModal implements OnInit {
     this.isLoading = false;
     this.successMessage = 'Usuario registrado exitosamente';
     this.registerForm.reset();
-    
-    // Emitir evento para que el componente padre actualice la lista
+
     // No cerramos inmediatamente para que el usuario vea el mensaje
     setTimeout(() => {
       this.userCreated.emit();
       this.close();
     }, 1500);
-  }  private handleRegistrationError(error: any): void {
+  }
+  private handleRegistrationError(error: any): void {
     this.isLoading = false;
     this.successMessage = '';
 
-    // Log detallado del error para debugging
     console.error('Error completo:', error);
     console.error('Error message:', error.error?.message);
     console.error('Error details:', error.error);
@@ -122,7 +118,6 @@ export class UserModal implements OnInit {
   }
 
   private getErrorMessage(status: number, error: any): string {
-    // Si hay mensajes de validación específicos del backend
     if (error.error?.message && Array.isArray(error.error.message)) {
       return error.error.message.join('. ');
     }

@@ -123,11 +123,7 @@ export class MovementHistory implements OnInit, OnDestroy {
     ]);
     this.header.showSearch.set(true);
 
-    this.header.actionsTitle.set([
-      { label: 'Exportar Excel', onClick: () => console.log('Exportar excel') },
-      { label: 'Importar CSV', onClick: () => console.log('Importar') },
-      { label: 'Reporte Diario', onClick: () => console.log('Reportes') },
-    ]);
+    this.header.actionsTitle.set([]);
   }
 
   private loadMovements(page: number = 1): void {
@@ -211,7 +207,6 @@ export class MovementHistory implements OnInit, OnDestroy {
     return 'Error desconocido al cargar los movimientos';
   }
 
-  // Getters para el template
   get page() {
     return this.currentPage();
   }

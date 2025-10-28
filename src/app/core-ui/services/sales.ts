@@ -69,13 +69,7 @@ export class SalesService {
 
   getSalesHistory(page: number = 1, limit: number = 20): Observable<SalesHistoryResponse> {
     const url = `${environment.BACKENDBASEURL}/historical-movements/reason/sales?page=${page}&limit=${limit}`;
-    console.log('Fetching from URL:', url);
     return this.http.get<any>(url).pipe(
-      tap((response: any) => {
-        console.log('Raw response from backend:', response);
-        console.log('Response data:', response.data);
-        console.log('Response pagination:', response.pagination);
-      }),
       catchError((error: any) => {
         console.error('Error in getSalesHistory:', error);
         throw error;
@@ -98,11 +92,7 @@ export class SalesService {
       url += `&endDate=${endDate}`;
     }
 
-    console.log('Fetching filtered sales from URL:', url);
     return this.http.get<any>(url).pipe(
-      tap((response: any) => {
-        console.log('Filtered sales response:', response);
-      }),
       catchError((error: any) => {
         console.error('Error in getFilteredSales:', error);
         throw error;
@@ -112,11 +102,7 @@ export class SalesService {
 
   getSalesStats(): Observable<SalesStats> {
     const url = `${environment.BACKENDBASEURL}/sales/stats`;
-    console.log('Fetching sales stats from URL:', url);
     return this.http.get<SalesStats>(url).pipe(
-      tap((response: any) => {
-        console.log('Sales stats response:', response);
-      }),
       catchError((error: any) => {
         console.error('Error in getSalesStats:', error);
         throw error;

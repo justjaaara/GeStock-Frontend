@@ -21,14 +21,8 @@ export class Alerts implements OnInit, OnDestroy {
       { label: 'Alertas' },
     ]);
     this.header.showSearch.set(true);
-    this.header.actionsTopbar.set([
-      { label: 'Configurar', icon: '⚙️', onClick: () => console.log('Configurar Alertas') },
-      { label: 'Marcar Todas Leídas', onClick: () => console.log('Filtrar Alertas') },
-    ]);
-    this.header.actionsTitle.set([
-      { label: 'Historial', onClick: () => console.log('Historial') },
-      { label: 'Exportar Logs', onClick: () => console.log('Exportar Logs') },
-    ]);
+    this.header.actionsTopbar.set([]);
+    this.header.actionsTitle.set([]);
   }
 
   ngOnDestroy(): void {

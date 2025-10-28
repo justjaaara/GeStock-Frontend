@@ -55,30 +55,23 @@ export class AdminUsers implements OnInit {
     private toastr: ToastrService,
     private cdr: ChangeDetectorRef
   ) {
-    // Usar afterNextRender para asegurar que se ejecute después del render inicial
     afterNextRender(() => {
-      console.log('🔄 afterNextRender - Iniciando carga de usuarios...');
       this.loadUsers();
     });
   }
 
-  ngOnInit(): void {
-    console.log('🔄 AdminUsers ngOnInit ejecutado');
-  }
+  ngOnInit(): void {}
 
   loadUsers(): void {
-    console.log('📋 loadUsers() llamado');
     this.isLoading = true;
     this.errorMessage = '';
-    this.cdr.markForCheck(); // ← Forzar detección de cambios
+    this.cdr.markForCheck();
 
-    console.log('🌐 Llamando a authService.getAllUsers()...');
     this.authService.getAllUsers().subscribe({
       next: (users) => {
-        console.log('✅ Usuarios recibidos:', users);
         this.users = users;
         this.isLoading = false;
-        this.cdr.markForCheck(); // ← Forzar detección de cambios después de actualizar
+        this.cdr.markForCheck();
       },
       error: (error) => {
         console.error('❌ Error cargando usuarios:', error);
@@ -89,7 +82,7 @@ export class AdminUsers implements OnInit {
         const errorMsg = this.getUsersErrorMessage(error.status);
         this.errorMessage = errorMsg;
         this.isLoading = false;
-        this.cdr.markForCheck(); // ← Forzar detección de cambios
+        this.cdr.markForCheck();
 
         this.toastr.error(errorMsg, 'Error al cargar usuarios', {
           progressBar: true,
@@ -97,7 +90,8 @@ export class AdminUsers implements OnInit {
         });
       },
     });
-  }  private getUsersErrorMessage(status: number): string {
+  }
+  private getUsersErrorMessage(status: number): string {
     const errorMessages: { [key: number]: string } = {
       0: 'No se puede conectar al servidor',
       401: 'No estás autenticado. Por favor inicia sesión nuevamente',
@@ -163,8 +157,7 @@ export class AdminUsers implements OnInit {
   confirmRoleChange(): void {
     if (!this.pendingRoleChange) return;
 
-    const { userId, newRoleId, newRoleName, oldRoleId, oldRoleName } =
-      this.pendingRoleChange;
+    const { userId, newRoleId, newRoleName, oldRoleId, oldRoleName } = this.pendingRoleChange;
 
     // Cerrar el modal inmediatamente
     this.closeConfirmationModal();
@@ -174,20 +167,15 @@ export class AdminUsers implements OnInit {
     if (user) {
       user.roleId = newRoleId;
       user.role = newRoleName;
-      this.cdr.markForCheck(); // ← Forzar actualización visual
+      this.cdr.markForCheck();
     }
 
     // Llamar al backend
     this.authService.updateUserRole(userId, newRoleId).subscribe({
       next: () => {
-        console.log('✅ Rol actualizado correctamente');
-        this.toastr.success(
-          `El rol se cambió a ${newRoleName}`,
-          'Rol actualizado',
-          {
-            progressBar: true,
-          }
-        );
+        this.toastr.success(`El rol se cambió a ${newRoleName}`, 'Rol actualizado', {
+          progressBar: true,
+        });
       },
       error: (error) => {
         console.error('❌ Error al actualizar rol:', error);
@@ -196,7 +184,7 @@ export class AdminUsers implements OnInit {
         if (user) {
           user.roleId = oldRoleId;
           user.role = oldRoleName;
-          this.cdr.markForCheck(); // ← Forzar actualización visual
+          this.cdr.markForCheck();
         }
 
         const errorMsg = this.getUpdateRoleErrorMessage(error.status);
@@ -266,14 +254,9 @@ export class AdminUsers implements OnInit {
     // Llamar al backend
     this.authService.toggleUserState(userId).subscribe({
       next: (response) => {
-        console.log('✅ Estado actualizado correctamente:', response);
-        this.toastr.success(
-          response.message,
-          'Estado actualizado',
-          {
-            progressBar: true,
-          }
-        );
+        this.toastr.success(response.message, 'Estado actualizado', {
+          progressBar: true,
+        });
       },
       error: (error) => {
         console.error('❌ Error al cambiar estado:', error);

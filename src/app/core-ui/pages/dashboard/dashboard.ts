@@ -2,7 +2,15 @@ import { StatCard } from '@/shared/components/stat-card/stat-card';
 import { UiModal } from '@/shared/components/ui-modal/ui-modal';
 import { Header } from '@/shared/services/header';
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, computed, signal, inject, afterNextRender } from '@angular/core';
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  computed,
+  signal,
+  inject,
+  afterNextRender,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Auth } from '@/auth/services/auth';
 import { AlertsService } from '@/alerts/services/alerts.service';
@@ -62,10 +70,7 @@ export class Dashboard implements OnInit, OnDestroy {
     this.header.breadcrumbs.set([{ label: 'Inicio', link: '/' }, { label: 'Dashboard' }]);
     this.header.showSearch.set(true);
     this.header.actionsTopbar.set([{ label: 'Nuevo', icon: '➕', onClick: () => this.openNew() }]);
-    this.header.actionsTitle.set([
-      { label: 'Exportar', onClick: () => console.log('Exportar') },
-      { label: 'Reportes rapidos', onClick: () => console.log('Nuevo') },
-    ]);
+    this.header.actionsTitle.set([]);
   }
 
   ngOnDestroy(): void {
@@ -74,10 +79,9 @@ export class Dashboard implements OnInit, OnDestroy {
 
   loadAlerts(): void {
     this.alertsLoading.set(true);
-    
+
     this.alertsService.getAllStockAlerts().subscribe({
       next: (alerts) => {
-        console.log('✅ Alertas cargadas:', alerts);
         this.alerts.set(alerts);
         this.totalAlerts.set(alerts.length);
         this.alertsLoading.set(false);
@@ -85,18 +89,15 @@ export class Dashboard implements OnInit, OnDestroy {
       error: (error) => {
         console.error('❌ Error cargando alertas:', error);
         this.alertsLoading.set(false);
-      }
+      },
     });
   }
 
   loadProductStats(): void {
     this.productsLoading.set(true);
-    
-    console.log('🔄 Iniciando carga de estadísticas de productos...');
-    
+
     this.productsService.getProductStats().subscribe({
       next: (stats) => {
-        console.log('✅ Estadísticas de productos cargadas:', stats);
         this.totalProducts.set(stats.totalProducts);
         this.productsLoading.set(false);
       },
@@ -106,12 +107,12 @@ export class Dashboard implements OnInit, OnDestroy {
           status: error.status,
           statusText: error.statusText,
           message: error.message,
-          url: error.url
+          url: error.url,
         });
         // Establecer un valor por defecto en caso de error
         this.totalProducts.set(0);
         this.productsLoading.set(false);
-      }
+      },
     });
   }
 
@@ -134,9 +135,9 @@ export class Dashboard implements OnInit, OnDestroy {
   get stockTop() {
     return this.alerts()
       .slice(0, 5)
-      .map(alert => ({
+      .map((alert) => ({
         label: alert.productName,
-        value: alert.currentStock
+        value: alert.currentStock,
       }));
   }
 
@@ -159,7 +160,6 @@ export class Dashboard implements OnInit, OnDestroy {
 
   saveNew(e: Event) {
     e.preventDefault();
-    console.log('Simulacro guardado');
     this.closeNew();
   }
 }

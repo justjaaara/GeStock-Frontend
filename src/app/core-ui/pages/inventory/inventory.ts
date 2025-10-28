@@ -165,8 +165,6 @@ export class Inventory implements OnInit, OnDestroy {
       { label: 'Nuevo producto', icon: '➕', onClick: () => this.openCreateProductModal() },
     ]);
     this.header.actionsTitle.set([
-      { label: 'Exportar Excel', onClick: () => console.log('Exportar excel') },
-      { label: 'Importar', onClick: () => console.log('Importar') },
       { label: 'Reporte Stock', onClick: () => this.generateStockReport() },
       { label: 'Actualizar', onClick: () => this.loadInventory() },
       // Botón condicional para generar cierre mensual, visible solo para ADMIN (1) o JEFE DE ALMACEN (2)
@@ -183,13 +181,11 @@ export class Inventory implements OnInit, OnDestroy {
         const decoded = JwtUtil.decode(token);
         if (decoded && decoded.sub) {
           this.userId.set(decoded.sub);
-          console.log('User ID extracted from token:', decoded.sub);
         } else {
           console.warn('Could not extract user ID from token');
         }
         if (decoded && decoded.roleId) {
           this.roleId.set(decoded.roleId);
-          console.log('User roleId extracted from token:', decoded.roleId);
         } else {
           console.warn('Could not extract user roleId from token');
         }
@@ -215,17 +211,17 @@ export class Inventory implements OnInit, OnDestroy {
 
     // Convertir ProductUI a ProductDetail usando los datos del backend
     const productDetail: ProductDetailView = {
-      productId: 0, // Este vendría del backend si se agrega
+      productId: 0,
       productCode: product.code,
       productName: product.name,
       productDescription: product.subtitle,
       unitPrice: product.price,
       categoryName: product.category,
-      measurementName: product.measurementType || 'N/A', // Usar el tipo de medida del backend
+      measurementName: product.measurementType || 'N/A',
       currentStock: product.stock,
       minimumStock: product.min,
       lotId: product.lotId || undefined,
-      createdAt: new Date().toISOString(), // Este vendría del backend
+      createdAt: new Date().toISOString(),
       updatedAt: undefined,
       status: product.status,
     };
@@ -240,7 +236,6 @@ export class Inventory implements OnInit, OnDestroy {
   }
 
   handleEditProduct(product: ProductDetailView): void {
-    console.log('Editar producto:', product);
     this.closeProductDetailModal();
     // Convertir ProductDetailView a ProductUI para edición
     const productForEdit: ProductUI = {
@@ -259,12 +254,9 @@ export class Inventory implements OnInit, OnDestroy {
   }
 
   handleUpdateStock(product: ProductDetailView): void {
-    console.log('Actualizar stock:', product);
     this.closeProductDetailModal();
-    // Aquí abrirías el modal de actualización de stock
   }
 
-  // Nuevos métodos para edición
   openEditProductModal(product: ProductUI): void {
     this.selectedProductForEdit.set(product);
     this.showEditProductModal.set(true);
@@ -275,7 +267,6 @@ export class Inventory implements OnInit, OnDestroy {
     this.selectedProductForEdit.set(null);
   }
 
-  // Nuevos métodos para eliminación
   openDeleteConfirmModal(product: ProductUI): void {
     this.selectedProductForDelete.set(product);
     this.showDeleteConfirmModal.set(true);
@@ -324,11 +315,8 @@ export class Inventory implements OnInit, OnDestroy {
     const productToEdit = this.selectedProductForEdit();
     if (!productToEdit) return;
 
-    console.log('Actualizando producto:', productToEdit.code, productData);
-
     this.inventoryService.updateProduct(productToEdit.code, productData).subscribe({
       next: (response) => {
-        console.log('Producto actualizado:', response);
         this.toastr.success('Producto actualizado con éxito', 'Actualización Exitosa');
         this.closeEditProductModal();
         this.loadInventory(this.currentPage());
@@ -348,7 +336,6 @@ export class Inventory implements OnInit, OnDestroy {
 
     this.inventoryService.deleteProduct(productToDelete.code).subscribe({
       next: (response) => {
-        console.log('Producto eliminado:', response);
         this.toastr.success('Producto eliminado con éxito', 'Eliminación Exitosa');
         this.isDeleting.set(false);
         this.closeDeleteConfirmModal();
@@ -363,7 +350,6 @@ export class Inventory implements OnInit, OnDestroy {
   }
 
   handleCreateProduct(productData: CreateProductDto): void {
-    console.log('Producto a crear:', productData);
     setTimeout(() => {
       this.toastr.success('Producto creado con éxito', 'Creación Exitosa');
       this.closeCreateProductModal();
@@ -405,24 +391,15 @@ export class Inventory implements OnInit, OnDestroy {
 
   private loadInventory(page?: number): void {
     const pageToLoad = page || this.currentPage();
-    console.log(
-      '🔄 Loading inventory - Page to load:',
-      pageToLoad,
-      'Current page signal:',
-      this.currentPage()
-    );
     this.isLoading.set(true);
     this.error.set(null);
 
     this.inventoryService.getInventory(pageToLoad, this.itemsPerPage()).subscribe({
       next: (response) => {
-        console.log('📦 Inventory response:', response.pagination);
         const mappedProducts = this.mapProductsToUI(response.data);
-        console.log('🚀 ~ Inventory ~ loadInventory ~ mappedProducts:', mappedProducts);
         this.products.set(mappedProducts);
         this.pagination.set(response.pagination);
         this.currentPage.set(response.pagination.currentPage);
-        console.log('✅ Updated currentPage signal to:', response.pagination.currentPage);
         this.isLoading.set(false);
       },
       error: (error) => {
@@ -435,7 +412,6 @@ export class Inventory implements OnInit, OnDestroy {
 
   private loadFilteredInventory(page?: number): void {
     const pageToLoad = page || this.currentPage();
-    console.log('🔄 Loading filtered inventory - Page:', pageToLoad);
     this.isLoading.set(true);
     this.error.set(null);
 
@@ -448,7 +424,6 @@ export class Inventory implements OnInit, OnDestroy {
       .getFilteredInventory(pageToLoad, this.itemsPerPage(), categoryName, stockLevel, state)
       .subscribe({
         next: (response) => {
-          console.log('📦 Filtered inventory response:', response.pagination);
           const mappedProducts = this.mapProductsToUI(response.data);
           this.products.set(mappedProducts);
           this.pagination.set(response.pagination);
@@ -483,11 +458,6 @@ export class Inventory implements OnInit, OnDestroy {
   }
 
   applyFilters(): void {
-    console.log('🔍 Applying filters:', {
-      category: this.categoryFilter(),
-      stockLevel: this.stockLevelFilter(),
-      state: this.stateFilter(),
-    });
     this.hasAppliedFilters.set(true);
     this.currentPage.set(1);
     this.loadFilteredInventory(1);
@@ -536,16 +506,8 @@ export class Inventory implements OnInit, OnDestroy {
   // Métodos de paginación
   goToPage(page: number): void {
     const pag = this.pagination();
-    console.log(
-      '🎯 goToPage called - Target page:',
-      page,
-      'Backend current page:',
-      pag?.currentPage
-    );
-    console.log('📊 Pagination info:', pag);
 
     if (pag && page >= 1 && page <= pag.totalPages && page !== pag.currentPage) {
-      console.log('✅ Conditions met, loading page:', page);
       this.pagination.set({ ...pag, currentPage: page });
 
       // Usar el endpoint correcto según si hay filtros aplicados
@@ -554,42 +516,21 @@ export class Inventory implements OnInit, OnDestroy {
       } else {
         this.loadInventory(page);
       }
-    } else {
-      console.log('❌ Conditions not met:', {
-        hasValidPagination: !!pag,
-        pageInRange: page >= 1 && page <= (pag?.totalPages || 0),
-        isDifferentPage: page !== pag?.currentPage,
-      });
     }
   }
 
   prevPage(): void {
     const pag = this.pagination();
-    console.log(
-      '⬅️ prevPage called - Pagination current:',
-      pag?.currentPage,
-      'Has previous:',
-      pag?.hasPreviousPage
-    );
     if (pag && pag.hasPreviousPage) {
       const targetPage = pag.currentPage - 1;
-      console.log('🎯 prevPage - Going to page:', targetPage);
       this.goToPage(targetPage);
     }
   }
 
   nextPage(): void {
     const pag = this.pagination();
-    console.log(
-      '➡️ nextPage called - Pagination current:',
-      pag?.currentPage,
-      'Has next:',
-      pag?.hasNextPage
-    );
     if (pag && pag.hasNextPage) {
       const targetPage = Number(pag.currentPage) + 1;
-      console.log('🚀 ~ Inventory ~ nextPage ~ currentPage:', pag.currentPage);
-      console.log('🎯 nextPage - Going to page:', targetPage);
       this.goToPage(targetPage);
     }
   }
@@ -603,18 +544,15 @@ export class Inventory implements OnInit, OnDestroy {
     const lowStockItems = this.products().filter(
       (p) => p.status !== 'Activo' // Filtrar productos que no estén activos
     );
-    console.log('Productos con problemas de stock:', lowStockItems);
-    // Aquí puedes implementar la lógica para generar/descargar el reporte
   }
 
   // Método para cambiar items por página
   changeItemsPerPage(newLimit: number): void {
     this.itemsPerPage.set(newLimit);
-    this.currentPage.set(1); // Asegurarse de que la señal esté en 1
-    this.loadInventory(1); // Volver a la primera página
+    this.currentPage.set(1);
+    this.loadInventory(1);
   }
 
-  // Getters para el template (compatibilidad)
   get page() {
     return this.currentPage();
   }
@@ -625,7 +563,6 @@ export class Inventory implements OnInit, OnDestroy {
     return this.pagination()?.totalItems || 0;
   }
 
-  // Método mejorado para la paginación
   getPaginationPages(): number[] {
     const pag = this.pagination();
     if (!pag) return [];
@@ -653,7 +590,6 @@ export class Inventory implements OnInit, OnDestroy {
   }
 
   generateMonthlyClosure(): void {
-    // Mostrar modal de confirmación
     this.showClosureConfirmModal.set(true);
   }
 
@@ -664,14 +600,12 @@ export class Inventory implements OnInit, OnDestroy {
     this.http
       .post<{ message: string; headerId: number; month: number; year: number; createdAt: string }>(
         `${environment.BACKENDBASEURL}/inventory/generate-monthly-closure`,
-        {} // Sin body, ya que es automático
+        {}
       )
       .subscribe({
         next: (response) => {
           this.toastr.success(response.message, 'Cierre Generado');
-          console.log('Cierre generado:', response);
           this.isGeneratingClosure.set(false);
-          // Opcional: recargar inventario o mostrar mensaje adicional
         },
         error: (error) => {
           if (error.status === 400) {

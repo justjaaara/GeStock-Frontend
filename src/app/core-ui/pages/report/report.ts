@@ -27,7 +27,7 @@ type ReportRow = {
 })
 export class Report implements OnInit, OnDestroy {
   private reportsService = inject(ReportsService);
-  
+
   constructor(private header: Header) {}
 
   ngOnInit(): void {
@@ -38,13 +38,8 @@ export class Report implements OnInit, OnDestroy {
       { label: 'Reportes' },
     ]);
     this.header.showSearch.set(true);
-    this.header.actionsTopbar.set([
-      { label: 'Nuevo Reporte', icon: '➕', onClick: () => console.log('Nuevo proveedor') },
-    ]);
-    this.header.actionsTitle.set([
-      { label: 'Programar envio', onClick: () => console.log('Programar envio') },
-      { label: 'Exportar todo', onClick: () => console.log('Exportar todo') },
-    ]);
+    this.header.actionsTopbar.set([]);
+    this.header.actionsTitle.set([]);
   }
 
   ngOnDestroy(): void {
@@ -68,7 +63,7 @@ export class Report implements OnInit, OnDestroy {
       icon: '🛒',
       title: 'Reporte de Compras',
       desc: 'Órdenes, proveedores y análisis de gastos',
-      onClick: () => console.log('Compras'),
+      onClick: () => {},
     },
     {
       icon: '💵',
@@ -80,13 +75,13 @@ export class Report implements OnInit, OnDestroy {
       icon: '📊',
       title: 'Análisis ABC',
       desc: 'Clasificación de productos por importancia',
-      onClick: () => console.log('ABC'),
+      onClick: () => {},
     },
     {
       icon: '🔁',
       title: 'Rotación de Inventario',
       desc: 'Velocidad de rotación y días de inventario',
-      onClick: () => console.log('Rotación'),
+      onClick: () => {},
     },
   ];
 
@@ -158,15 +153,14 @@ export class Report implements OnInit, OnDestroy {
 
   async downloadInventoryReport() {
     try {
-      console.log('📊 Descargando reporte de inventario...');
       const data = await lastValueFrom(this.reportsService.getInventoryReport());
-      
+
       // Importar xlsx dinámicamente
       const XLSX = await import('xlsx');
-      
+
       // Preparar datos para el Excel
       const today = new Date().toISOString().split('T')[0];
-      
+
       // Crear hoja de resumen
       const summaryData = [
         ['REPORTE GENERAL DE INVENTARIO'],
@@ -175,12 +169,15 @@ export class Report implements OnInit, OnDestroy {
         ['RESUMEN'],
         ['Total de Productos:', data.totalProducts],
         ['Total de Unidades:', data.totalUnits],
-        ['Valor Total del Inventario:', `$${data.totalInventoryValue.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`],
+        [
+          'Valor Total del Inventario:',
+          `$${data.totalInventoryValue.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`,
+        ],
         ['Productos con Stock Bajo:', data.lowStockProducts],
         [''],
         ['DETALLE DE PRODUCTOS'],
       ];
-      
+
       // Encabezados de la tabla
       const headers = [
         'Código',
@@ -192,13 +189,13 @@ export class Report implements OnInit, OnDestroy {
         'Valor Total',
         'Estado',
         'Lote',
-        'Última Actualización'
+        'Última Actualización',
       ];
-      
+
       summaryData.push(headers);
-      
+
       // Agregar datos de productos
-      data.products.forEach(p => {
+      data.products.forEach((p) => {
         summaryData.push([
           p.productCode,
           p.productName,
@@ -209,34 +206,32 @@ export class Report implements OnInit, OnDestroy {
           `$${p.totalValue.toFixed(2)}`,
           p.productState,
           p.lotCode,
-          new Date(p.lastUpdate).toLocaleString('es-MX')
+          new Date(p.lastUpdate).toLocaleString('es-MX'),
         ]);
       });
-      
+
       // Crear libro y hoja
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.aoa_to_sheet(summaryData);
-      
+
       // Establecer anchos de columna
       ws['!cols'] = [
-        { wch: 12 },  // Código
-        { wch: 30 },  // Producto
-        { wch: 20 },  // Categoría
-        { wch: 18 },  // Unidades
-        { wch: 15 },  // Stock Mínimo
-        { wch: 15 },  // Precio
-        { wch: 15 },  // Valor Total
-        { wch: 12 },  // Estado
-        { wch: 15 },  // Lote
-        { wch: 20 },  // Última Actualización
+        { wch: 12 }, // Código
+        { wch: 30 }, // Producto
+        { wch: 20 }, // Categoría
+        { wch: 18 }, // Unidades
+        { wch: 15 }, // Stock Mínimo
+        { wch: 15 }, // Precio
+        { wch: 15 }, // Valor Total
+        { wch: 12 }, // Estado
+        { wch: 15 }, // Lote
+        { wch: 20 }, // Última Actualización
       ];
-      
+
       XLSX.utils.book_append_sheet(wb, ws, 'Inventario');
-      
+
       // Descargar archivo
       XLSX.writeFile(wb, `Reporte-Inventario-${today}.xlsx`);
-      
-      console.log('✅ Reporte descargado exitosamente');
     } catch (error) {
       console.error('❌ Error al descargar reporte:', error);
       alert('Error al generar el reporte. Por favor intente nuevamente.');
@@ -245,28 +240,30 @@ export class Report implements OnInit, OnDestroy {
 
   async downloadSalesByCategoryReport() {
     try {
-      console.log('📊 Descargando reporte de productos vendidos por categoría...');
       const data = await lastValueFrom(this.reportsService.getSalesByCategoryReport());
-      
+
       // Importar xlsx dinámicamente
       const XLSX = await import('xlsx');
-      
+
       // Preparar datos para el Excel
       const today = new Date().toISOString().split('T')[0];
-      
-      // Agrupar productos por categoría
-      const categoriesMap = new Map<string, {
-        products: any[];
-        totalUnits: number;
-        totalValue: number;
-      }>();
 
-      data.products.forEach(p => {
+      // Agrupar productos por categoría
+      const categoriesMap = new Map<
+        string,
+        {
+          products: any[];
+          totalUnits: number;
+          totalValue: number;
+        }
+      >();
+
+      data.products.forEach((p) => {
         if (!categoriesMap.has(p.categoryName)) {
           categoriesMap.set(p.categoryName, {
             products: [],
             totalUnits: 0,
-            totalValue: 0
+            totalValue: 0,
           });
         }
         const category = categoriesMap.get(p.categoryName)!;
@@ -284,7 +281,10 @@ export class Report implements OnInit, OnDestroy {
         ['Total de Categorías:', data.totalCategories],
         ['Total de Productos:', data.totalProducts],
         ['Total de Unidades Vendidas:', data.totalUnitsSold],
-        ['Valor Total de Ventas:', `$${data.totalSalesValue.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`],
+        [
+          'Valor Total de Ventas:',
+          `$${data.totalSalesValue.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`,
+        ],
         ['Categoría Top:', data.topCategory],
         [''],
       ];
@@ -297,27 +297,25 @@ export class Report implements OnInit, OnDestroy {
         summaryData.push([
           categoryName,
           categoryData.totalUnits,
-          `$${categoryData.totalValue.toFixed(2)}`
+          `$${categoryData.totalValue.toFixed(2)}`,
         ]);
       });
 
       // Crear libro y hoja
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.aoa_to_sheet(summaryData);
-      
+
       // Establecer anchos de columna
       ws['!cols'] = [
-        { wch: 20 },  // Categoría
-        { wch: 20 },  // Unidades vendidas
-        { wch: 20 },  // Valor Total Ventas
+        { wch: 20 }, // Categoría
+        { wch: 20 }, // Unidades vendidas
+        { wch: 20 }, // Valor Total Ventas
       ];
-      
+
       XLSX.utils.book_append_sheet(wb, ws, 'Ventas por Categoría');
-      
+
       // Descargar archivo
       XLSX.writeFile(wb, `Reporte-Ventas-Categoria-${today}.xlsx`);
-      
-      console.log('✅ Reporte de ventas por categoría descargado exitosamente');
     } catch (error) {
       console.error('❌ Error al descargar reporte:', error);
       alert('Error al generar el reporte. Por favor intente nuevamente.');
@@ -326,15 +324,14 @@ export class Report implements OnInit, OnDestroy {
 
   async downloadIncomeByLotReport() {
     try {
-      console.log('📥 Descargando reporte de ingresos por lote...');
       const data = await lastValueFrom(this.reportsService.getIncomeByLotReport());
-      
+
       // Importar xlsx dinámicamente
       const XLSX = await import('xlsx');
-      
+
       // Preparar datos para el Excel
       const today = new Date().toISOString().split('T')[0];
-      
+
       // Crear hoja de resumen
       const summaryData = [
         ['REPORTE DE INGRESOS POR LOTE'],
@@ -344,12 +341,15 @@ export class Report implements OnInit, OnDestroy {
         ['Total de Lotes:', data.totalLots],
         ['Total de Productos:', data.totalProducts],
         ['Total de Unidades:', data.totalUnits],
-        ['Valor Total:', `$${data.totalValue.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`],
+        [
+          'Valor Total:',
+          `$${data.totalValue.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`,
+        ],
         ['Entrada Más Reciente:', new Date(data.mostRecentEntry).toLocaleDateString('es-MX')],
         [''],
         ['DETALLE DE INGRESOS POR LOTE'],
       ];
-      
+
       // Encabezados de la tabla
       const headers = [
         'Lote',
@@ -364,13 +364,13 @@ export class Report implements OnInit, OnDestroy {
         'Precio Unitario',
         'Valor Total',
         'Estado',
-        'Última Actualización'
+        'Última Actualización',
       ];
-      
+
       summaryData.push(headers);
-      
+
       // Agregar datos de lotes
-      data.items.forEach(item => {
+      data.items.forEach((item) => {
         summaryData.push([
           item.lotId,
           item.lotCode,
@@ -384,37 +384,35 @@ export class Report implements OnInit, OnDestroy {
           `$${item.unitPrice.toFixed(2)}`,
           `$${item.totalValue.toFixed(2)}`,
           item.productState,
-          new Date(item.lastUpdate).toLocaleString('es-MX')
+          new Date(item.lastUpdate).toLocaleString('es-MX'),
         ]);
       });
-      
+
       // Crear libro y hoja
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.aoa_to_sheet(summaryData);
-      
+
       // Establecer anchos de columna
       ws['!cols'] = [
-        { wch: 10 },  // Lote ID
-        { wch: 15 },  // Código Lote
-        { wch: 25 },  // Descripción
-        { wch: 15 },  // Fecha Entrada
-        { wch: 15 },  // Código Producto
-        { wch: 30 },  // Producto
-        { wch: 20 },  // Categoría
-        { wch: 12 },  // Medida
-        { wch: 15 },  // Unidades
-        { wch: 15 },  // Precio
-        { wch: 15 },  // Valor Total
-        { wch: 12 },  // Estado
-        { wch: 20 },  // Última Actualización
+        { wch: 10 }, // Lote ID
+        { wch: 15 }, // Código Lote
+        { wch: 25 }, // Descripción
+        { wch: 15 }, // Fecha Entrada
+        { wch: 15 }, // Código Producto
+        { wch: 30 }, // Producto
+        { wch: 20 }, // Categoría
+        { wch: 12 }, // Medida
+        { wch: 15 }, // Unidades
+        { wch: 15 }, // Precio
+        { wch: 15 }, // Valor Total
+        { wch: 12 }, // Estado
+        { wch: 20 }, // Última Actualización
       ];
-      
+
       XLSX.utils.book_append_sheet(wb, ws, 'Ingresos por Lote');
-      
+
       // Descargar archivo
       XLSX.writeFile(wb, `Reporte-Ingresos-Lote-${today}.xlsx`);
-      
-      console.log('✅ Reporte de ingresos por lote descargado exitosamente');
     } catch (error) {
       console.error('❌ Error al descargar reporte:', error);
       alert('Error al generar el reporte. Por favor intente nuevamente.');

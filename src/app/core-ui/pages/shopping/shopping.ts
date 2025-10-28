@@ -41,11 +41,7 @@ export class Shopping implements OnInit, OnDestroy {
     this.header.actionsTopbar.set([
       { label: 'Nueva orden', icon: '➕', onClick: () => this.openSalesModal() },
     ]);
-    this.header.actionsTitle.set([
-      { label: 'Exportar Ordenes', onClick: () => console.log('Exportar excel') },
-      { label: 'Plantilla Compra', onClick: () => console.log('Importar') },
-      { label: 'Reporte Mensual', onClick: () => console.log('Reportes') },
-    ]);
+    this.header.actionsTitle.set([]);
 
     this.loadSalesHistory();
     this.loadSalesStats();
@@ -61,7 +57,6 @@ export class Shopping implements OnInit, OnDestroy {
       next: (stats) => {
         this.stats.set(stats);
         this.isLoadingStats.set(false);
-        console.log('Estadísticas cargadas:', stats);
       },
       error: (error) => {
         this.isLoadingStats.set(false);
@@ -73,7 +68,6 @@ export class Shopping implements OnInit, OnDestroy {
 
   loadSalesHistory(): void {
     this.isLoading.set(true);
-    console.log('Iniciando carga de historial de ventas, página:', this.currentPage());
 
     // Determinar si hay filtros activos
     const hasFilters = this.startDate() || this.endDate();
@@ -89,15 +83,10 @@ export class Shopping implements OnInit, OnDestroy {
 
     request$.subscribe({
       next: (response: any) => {
-        console.log('Respuesta completa recibida:', response);
-
-        // Manejo flexible de la respuesta
         if (response.data && Array.isArray(response.data)) {
           this.sales.set(response.data);
-          console.log('Datos asignados (array directo):', this.sales());
         } else if (response.data?.data && Array.isArray(response.data.data)) {
           this.sales.set(response.data.data);
-          console.log('Datos asignados (data.data):', this.sales());
         } else {
           console.warn('Estructura de respuesta no esperada:', response);
           this.sales.set([]);
@@ -113,7 +102,6 @@ export class Shopping implements OnInit, OnDestroy {
           this.pagination.set(null);
         }
 
-        console.log('Estado final - Sales:', this.sales().length, 'Pagination:', this.pagination());
         this.isLoading.set(false);
       },
       error: (error) => {
@@ -162,7 +150,6 @@ export class Shopping implements OnInit, OnDestroy {
   }
 
   onSaleCreated(sale: any): void {
-    console.log('Venta creada:', sale);
     // Recargar la lista de ventas y estadísticas
     this.currentPage.set(1);
     this.loadSalesHistory();

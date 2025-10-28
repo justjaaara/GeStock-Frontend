@@ -30,16 +30,11 @@ export class Closures implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    console.log('Closures component initialized');
     this.header.title.set('Cierres Históricos de Inventario');
     this.header.breadcrumbs.set([{ label: 'Inicio', link: '/' }, { label: 'Cierres' }]);
     this.header.showSearch.set(true);
     this.header.actionsTopbar.set([]);
-    this.header.actionsTitle.set([
-      { label: 'Exportar Lista', onClick: () => console.log('Exportar lista') },
-      { label: 'Importar CSV', onClick: () => console.log('Importar CSV') },
-      { label: 'Reporte General', onClick: () => console.log('Reporte General') },
-    ]);
+    this.header.actionsTitle.set([]);
     this.loadClosures();
   }
 
@@ -65,16 +60,11 @@ export class Closures implements OnInit, OnDestroy {
   isAdmin = computed(() => this.auth.userProfile()?.role === 'ADMIN');
 
   loadClosures() {
-    console.log('Loading closures for page:', this.page());
     this.inventoryService.getClosures(this.page(), 10).subscribe({
       next: (response) => {
-        console.log('Full response:', response);
         this.closures.set(response.data);
         this.totalPages.set(Number(response.pagination.totalPages));
         this.totalClosures.set(Number(response.pagination.totalItems));
-        console.log('Closures loaded:', this.closures());
-        console.log('Closures array length:', this.closures().length);
-        console.log('Pagination:', response.pagination);
       },
       error: (error) => {
         console.error('Error loading closures:', error);

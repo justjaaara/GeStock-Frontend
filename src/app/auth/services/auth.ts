@@ -52,17 +52,17 @@ export class Auth {
 
   //CREAR UN  isAuth?
 
-
   register(registerData: RegisterRequestBackend): Observable<AuthResponse> {
     const token = this._token();
 
     if (!token) {
-      return throwError(() => new Error('No hay token de autenticación. Debes estar autenticado como admin.'));
+      return throwError(
+        () => new Error('No hay token de autenticación. Debes estar autenticado como admin.')
+      );
     }
 
     const authHeaders = this.headers.set('Authorization', `Bearer ${token}`);
 
-    // El roleId ahora es obligatorio, enviarlo directamente
     const payload = {
       name: registerData.name,
       email: registerData.email,
@@ -70,20 +70,11 @@ export class Auth {
       roleId: registerData.roleId,
     };
 
-    console.log('Payload enviado al backend:', payload);
-
     return this.http
-      .post<AuthResponse>(
-        `${environment.BACKENDBASEURL}/auth/register`,
-        payload,
-        {
-          headers: authHeaders,
-        }
-      )
+      .post<AuthResponse>(`${environment.BACKENDBASEURL}/auth/register`, payload, {
+        headers: authHeaders,
+      })
       .pipe(
-        tap((response) => {
-          console.log('Usuario registrado exitosamente por admin');
-        }),
         catchError((error) => {
           console.error('Error en registro:', error);
           return throwError(() => error);
@@ -156,7 +147,9 @@ export class Auth {
   }
 
   //Creo que deberia estar en un servicio de admin
-  toggleUserState(userId: number): Observable<{ message: string; newStateId: number; newStateName: string }> {
+  toggleUserState(
+    userId: number
+  ): Observable<{ message: string; newStateId: number; newStateName: string }> {
     const token = this._token();
 
     if (!token) {
@@ -179,7 +172,6 @@ export class Auth {
       );
   }
 
-  
   login(loginData: LoginRequest): Observable<AuthResponse> {
     return this.http
       .post<AuthResponse>(`${environment.BACKENDBASEURL}/auth/login`, loginData, {
@@ -204,9 +196,6 @@ export class Auth {
         { headers: this.headers }
       )
       .pipe(
-        tap((response) => {
-          console.log('Respuesta de forgot password:', response);
-        }),
         catchError((error) => {
           console.error('Error en forgot password:', error);
           return throwError(() => error);
@@ -222,9 +211,6 @@ export class Auth {
         { headers: this.headers }
       )
       .pipe(
-        tap((response) => {
-          console.log('Respuesta de reset password:', response);
-        }),
         catchError((error) => {
           console.error('Error en reset password:', error);
           return throwError(() => error);

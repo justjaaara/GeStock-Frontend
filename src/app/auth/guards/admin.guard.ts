@@ -16,7 +16,7 @@ export const adminGuard: CanActivateFn = (route, state) => {
     return false;
   }
 
-  // Verificar si es administrador (role_id = 1 en BD se mapea como 'Administrador' o 'ADMIN')
+  // Verificar si es administrador (role_id = 1 en BD se mapea como 'ADMIN')
   const isAdmin = userProfile?.role === 'ADMIN';
 
   if (!isAdmin) {
@@ -25,6 +25,5 @@ export const adminGuard: CanActivateFn = (route, state) => {
     return false;
   }
 
-  console.log('✅ Acceso permitido: Usuario administrador');
   return true;
 };
