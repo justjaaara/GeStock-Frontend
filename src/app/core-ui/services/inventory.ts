@@ -123,7 +123,7 @@ export class InventoryService {
 
   getMeasurementTypes(): Observable<MeasurementType[]> {
     return this.http.get<MeasurementType[]>(
-      `${environment.BACKENDBASEURL}/products/measurement-types`
+      `${environment.BACKENDBASEURL}/products/measurement/measurement-types`
     );
   }
 

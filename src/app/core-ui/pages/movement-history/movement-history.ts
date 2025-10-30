@@ -133,8 +133,8 @@ export class MovementHistory implements OnInit, OnDestroy {
     // Construir parámetros de filtro
     let params = new URLSearchParams();
     params.append('page', page.toString());
-    params.append('limit', this.itemsPerPage().toString());
 
+    // Solo agregar filtros si tienen valor
     if (this.startDate()) {
       params.append('startDate', this.startDate());
     }
@@ -145,29 +145,39 @@ export class MovementHistory implements OnInit, OnDestroy {
       params.append('movementType', this.selectedMovementType());
     }
 
-    this.http
-      .get<HistoricalMovementsResponse>(
-        `${environment.BACKENDBASEURL}/historical-movements/filtered?${params.toString()}`
-      )
-      .subscribe({
-        next: (response) => {
-          this.movements.set(response.data);
-          this.pagination.set(response.pagination);
-          this.currentPage.set(response.pagination.currentPage);
-          this.isLoading.set(false);
-        },
-        error: (error) => {
-          console.error('Error loading movements:', error);
-          this.error.set(this.getErrorMessage(error));
-          this.isLoading.set(false);
-        },
-      });
+    // Determinar el endpoint según si hay filtros o no
+    const hasFilters = this.startDate() || this.endDate() || this.selectedMovementType();
+    const endpoint = hasFilters
+      ? `${environment.BACKENDBASEURL}/historical-movements/filtered?${params.toString()}`
+      : `${environment.BACKENDBASEURL}/historical-movements?${params.toString()}`;
+
+    this.http.get<HistoricalMovementsResponse>(endpoint).subscribe({
+      next: (response) => {
+        this.movements.set(response.data);
+        // Asegurar que currentPage sea un número
+        const paginationData = {
+          ...response.pagination,
+          currentPage: Number(response.pagination.currentPage),
+          totalPages: Number(response.pagination.totalPages),
+          totalItems: Number(response.pagination.totalItems),
+          itemsPerPage: Number(response.pagination.itemsPerPage),
+        };
+        this.pagination.set(paginationData);
+        this.currentPage.set(paginationData.currentPage);
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Error loading movements:', error);
+        this.error.set(this.getErrorMessage(error));
+        this.isLoading.set(false);
+      },
+    });
   }
 
   prevPage(): void {
     const pag = this.pagination();
     if (pag && pag.hasPreviousPage) {
-      const targetPage = pag.currentPage - 1;
+      const targetPage = Number(pag.currentPage) - 1;
       this.loadMovements(targetPage);
     }
   }
@@ -175,7 +185,7 @@ export class MovementHistory implements OnInit, OnDestroy {
   nextPage(): void {
     const pag = this.pagination();
     if (pag && pag.hasNextPage) {
-      const targetPage = pag.currentPage + 1;
+      const targetPage = Number(pag.currentPage) + 1;
       this.loadMovements(targetPage);
     }
   }
