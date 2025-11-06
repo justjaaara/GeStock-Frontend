@@ -18,6 +18,7 @@ import {
   ProductUI,
 } from '@/core-ui/interfaces/product';
 import { ProductService } from '@/core-ui/services/product-service/product-service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-product-form',
@@ -37,6 +38,7 @@ export class ProductForm implements OnChanges {
   productForm!: FormGroup;
   isSubmitting = signal(false);
   private productService = inject(ProductService);
+  private toastr = inject(ToastrService);
 
   // Autocomplete para categorías
   categorySearch = '';
@@ -181,9 +183,21 @@ export class ProductForm implements OnChanges {
         lotId: formValue.lotId ? Number(formValue.lotId) : undefined,
       };
 
-      // this.submitProduct.emit(productData);
-      this.productService.createProduct(productData).subscribe();
-      this.isSubmitting.set(false);
+      this.productService.createProduct(productData).subscribe({
+        next: (response) => {
+          this.toastr.success('Producto creado exitosamente', 'Éxito');
+          this.isSubmitting.set(false);
+          this.submitProduct.emit(response); // Emitir el evento para cerrar el modal
+        },
+        error: (error) => {
+          console.error('Error al crear producto:', error);
+          this.toastr.error(
+            error?.error?.message || 'Error al crear el producto. Intenta nuevamente.',
+            'Error'
+          );
+          this.isSubmitting.set(false);
+        },
+      });
     } else {
       Object.keys(this.productForm.controls).forEach((key) => {
         this.productForm.get(key)?.markAsTouched();

@@ -349,12 +349,10 @@ export class Inventory implements OnInit, OnDestroy {
     });
   }
 
-  handleCreateProduct(productData: CreateProductDto): void {
-    setTimeout(() => {
-      this.toastr.success('Producto creado con éxito', 'Creación Exitosa');
-      this.closeCreateProductModal();
-      this.loadInventory();
-    }, 1000);
+  handleCreateProduct(productData: any): void {
+    // El toast ya se muestra en el componente product-form
+    this.closeCreateProductModal();
+    this.loadInventory();
   }
 
   private loadCategories(): void {
