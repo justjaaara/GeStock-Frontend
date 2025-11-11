@@ -1,0 +1,36 @@
+<div class="movement-stats-card">
+  <div class="stats-header">
+    <h4>Estadísticas de Movimientos</h4>
+    <small class="period">
+      @if (stats) {
+      {{ stats.startDate | date : 'MMM yyyy' }}
+      }
+    </small>
+  </div>
+
+  <div class="stats-content">
+    @if (isLoading) {
+    <div class="loading">Cargando estadísticas...</div>
+    } @else if (stats) {
+    <div class="stat-item most-moved">
+      <div class="icon"><img src="/icon/arrow_up.svg" alt="Más Movido" /></div>
+      <div class="info">
+        <div class="label">Más Movido</div>
+        <div class="value">{{ stats.mostMovedProduct }}</div>
+        <div class="count">{{ stats.mostMovedCount }} movimientos</div>
+      </div>
+    </div>
+
+    <div class="stat-item least-moved">
+      <div class="icon"><img src="/icon/arrow_down.svg" alt="Menos Movido" /></div>
+      <div class="info">
+        <div class="label">Menos Movido</div>
+        <div class="value">{{ stats.leastMovedProduct }}</div>
+        <div class="count">{{ stats.leastMovedCount }} movimientos</div>
+      </div>
+    </div>
+    } @else {
+    <div class="no-data">No hay datos disponibles</div>
+    }
+  </div>
+</div>

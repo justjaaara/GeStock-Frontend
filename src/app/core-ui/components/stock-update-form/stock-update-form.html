@@ -1,0 +1,160 @@
+<div class="stock-update-form">
+  <!-- Indicador de paso -->
+  <div class="steps-indicator">
+    <div class="step" [class.active]="currentStep() === 1" [class.completed]="currentStep() > 1">
+      <span class="step-number">1</span>
+      <span class="step-label">Producto</span>
+    </div>
+    <div class="step-line" [class.active]="currentStep() > 1"></div>
+    <div class="step" [class.active]="currentStep() === 2">
+      <span class="step-number">2</span>
+      <span class="step-label">Cantidad</span>
+    </div>
+  </div>
+
+  <!-- PASO 1: Seleccionar producto y tipo de movimiento -->
+  @if (currentStep() === 1) {
+  <form [formGroup]="step1Form" (ngSubmit)="onStep1Submit()" class="form-section">
+    <h3>Paso 1: Selecciona el Producto</h3>
+
+    <div class="form-group">
+      <label for="productCode">Código del Producto</label>
+      <input
+        id="productCode"
+        type="text"
+        formControlName="productCode"
+        placeholder="Ej: BEBIDAS-001"
+        class="form-control"
+        [class.is-invalid]="productCode?.invalid && productCode?.touched"
+        [disabled]="loadingProduct()"
+      />
+      @if (productCode?.invalid && productCode?.touched) {
+      <div class="form-error">El código del producto es requerido</div>
+      }
+    </div>
+
+    <div class="form-group">
+      <label for="type">Tipo de Movimiento</label>
+      <select formControlName="type" id="type" class="form-control" [disabled]="loadingProduct()">
+        <option value="ENTRADA">📦 Entrada (Ingreso de Stock)</option>
+        <option value="SALIDA">📤 Salida (Egreso de Stock)</option>
+      </select>
+    </div>
+
+    <div class="form-actions">
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="step1Form.invalid || loadingProduct()"
+      >
+        @if (loadingProduct()) {
+        <span>Buscando producto...</span>
+        } @else {
+        <span>Siguiente →</span>
+        }
+      </button>
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="onCancel()"
+        [disabled]="loadingProduct()"
+      >
+        Cancelar
+      </button>
+    </div>
+  </form>
+  }
+
+  <!-- PASO 2: Ingresar cantidad -->
+  @if (currentStep() === 2 && productData()) {
+  <form [formGroup]="step2Form" (ngSubmit)="onStep2Submit()" class="form-section">
+    <h3>Paso 2: Confirma la Cantidad</h3>
+
+    <!-- Información del producto (no editable) -->
+    <div class="product-info">
+      <div class="info-item">
+        <label>Producto:</label>
+        <span class="info-value">{{ productData().productName }}</span>
+      </div>
+      <div class="info-item">
+        <label>Código:</label>
+        <span class="info-value">{{ productData().productCode }}</span>
+      </div>
+      <div class="info-item">
+        <label>Stock Actual:</label>
+        <span class="info-value">{{ productData().currentStock }} </span>
+      </div>
+      <div class="info-item">
+        <label>Categoría:</label>
+        <span class="info-value">{{ productData().productCategory }}</span>
+      </div>
+      <div class="info-item">
+        <label>Tipo de Movimiento:</label>
+        <span
+          class="info-value"
+          [ngClass]="step1Form.get('type')?.value === 'ENTRADA' ? 'type-entrada' : 'type-salida'"
+        >
+          {{ step1Form.get('type')?.value === 'ENTRADA' ? '📦 Entrada' : '📤 Salida' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Formulario de cantidad -->
+    <div class="form-group">
+      <label for="quantity"
+        >Cantidad a {{ step1Form.get('type')?.value === 'ENTRADA' ? 'Ingresar' : 'Extraer' }}</label
+      >
+      <input
+        id="quantity"
+        type="number"
+        formControlName="quantity"
+        placeholder="Ej: 10"
+        class="form-control"
+        [class.is-invalid]="quantity?.invalid && quantity?.touched"
+        [disabled]="isLoading"
+      />
+      @if (quantity?.invalid && quantity?.touched) {
+      <div class="form-error">La cantidad es requerida y debe ser mayor a 0</div>
+      }
+    </div>
+
+    <!-- Razón del movimiento -->
+    <div class="form-group">
+      <label for="movementReason">Razón del Movimiento</label>
+      <select
+        id="movementReason"
+        formControlName="movementReason"
+        class="form-control"
+        [class.is-invalid]="movementReason?.invalid && movementReason?.touched"
+        [disabled]="isLoading"
+      >
+        <option value="">Selecciona una razón...</option>
+        <option value="AJUSTE INVENTARIO">Ajuste de Inventario</option>
+        <option value="DEVOLUCION CLIENTE">Devolución de Cliente</option>
+        <option value="DAÑO">Daño</option>
+      </select>
+      @if (movementReason?.invalid && movementReason?.touched) {
+      <div class="form-error">La razón del movimiento es requerida</div>
+      }
+    </div>
+
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="goBackToStep1()"
+        [disabled]="isLoading"
+      >
+        ← Atrás
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="step2Form.invalid || isLoading">
+        @if (isLoading) {
+        <span>Actualizando...</span>
+        } @else {
+        <span>Actualizar Stock</span>
+        }
+      </button>
+    </div>
+  </form>
+  }
+</div>

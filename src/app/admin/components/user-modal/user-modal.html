@@ -1,0 +1,92 @@
+<div class="modal-overlay" (click)="close()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2>Crear Nuevo Usuario</h2>
+            <button class="close-button" (click)="close()" type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+                <div class="form-group">
+                    <label for="name" (click)="focusField('name')">Nombre:</label>
+                    <app-input-field id="name" formControlName="Nombre" placeholder="Ingresa el nombre completo"
+                        textColor="#174376" backgroundColor="#F3F6FA" width="100%" height="40px">
+                    </app-input-field>
+                    @if (getFieldError('Nombre')) {
+                    <span class="error-message">{{ getFieldError('Nombre') }}</span>
+                    }
+                </div>
+
+                <div class="form-group">
+                    <label for="email" (click)="focusField('email')">Email:</label>
+                    <app-input-field id="email" formControlName="Email" type="email"
+                        placeholder="Ingresa el correo electrónico" textColor="#174376" backgroundColor="#F3F6FA"
+                        width="100%" height="40px">
+                    </app-input-field>
+                    @if (getFieldError('Email')) {
+                    <span class="error-message">{{ getFieldError('Email') }}</span>
+                    }
+                </div>
+
+                <div class="form-group">
+                    <label for="role">Rol del usuario:</label>
+                    <select name="role" id="role" formControlName="Rol" class="role-select">
+                        <option [value]="null" disabled selected>Selecciona un rol</option>
+                        @for (role of availableRoles; track role.roleId) {
+                        <option [value]="role.roleId">{{ role.roleName }}</option>
+                        }
+                    </select>
+                    @if (getFieldError('Rol')) {
+                    <span class="error-message">{{ getFieldError('Rol') }}</span>
+                    }
+                </div>
+
+                <div class="form-group">
+                    <label for="password" (click)="focusField('password')">Contraseña:</label>
+                    <app-input-field id="password" formControlName="Contraseña" type="password"
+                        [showPasswordToggle]="true" placeholder="Ingresa la contraseña" textColor="#174376"
+                        backgroundColor="#F3F6FA" width="100%" height="40px">
+                    </app-input-field>
+                    @if (getFieldError('Contraseña')) {
+                    <span class="error-message">{{ getFieldError('Contraseña') }}</span>
+                    }
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm-password" (click)="focusField('confirm-password')">Confirmar Contraseña:</label>
+                    <app-input-field id="confirm-password" formControlName="Confirmar contraseña" type="password"
+                        [showPasswordToggle]="true" placeholder="Confirma la contraseña" textColor="#174376"
+                        backgroundColor="#F3F6FA" width="100%" height="40px">
+                    </app-input-field>
+                    @if (getFieldError('Confirmar contraseña')) {
+                    <span class="error-message">{{ getFieldError('Confirmar contraseña') }}</span>
+                    }
+                </div>
+
+                <div class="messages">
+                    @if (successMessage) {
+                    <div class="success-message">{{ successMessage }}</div>
+                    }
+                    @if (errorMessage) {
+                    <div class="error-message-alert">{{ errorMessage }}</div>
+                    }
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" (click)="close()">
+                        Cancelar
+                    </button>
+                    <button type="submit" [disabled]="isLoading" class="btn-submit">
+                        {{ isLoading ? 'Creando...' : 'Crear Usuario' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,156 @@
+<section class="panel">
+  <header class="panel-header">
+    <h4>Lista de cierres históricos</h4>
+
+    <div class="controls">
+      <div class="field">
+        <label>Mes</label>
+        <select>
+          <option>Todos</option>
+          <option>Enero</option>
+          <option>Febrero</option>
+          <option>Marzo</option>
+          <option>Abril</option>
+          <option>Mayo</option>
+          <option>Junio</option>
+          <option>Julio</option>
+          <option>Agosto</option>
+          <option>Septiembre</option>
+          <option>Octubre</option>
+          <option>Noviembre</option>
+          <option>Diciembre</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Año</label>
+        <select>
+          <option>Todos</option>
+          <option>2025</option>
+          <option>2024</option>
+          <option>2023</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>&nbsp;</label>
+        <button class="btn primary">Filtrar</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID Cierre</th>
+          <th>Fecha Cierre</th>
+          <th>Mes</th>
+          <th>Año</th>
+          <th>Usuario</th>
+          <th>Estado</th>
+          <th class="ta-right">Acciones</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @if (closures().length === 0) {
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 2rem">No hay cierres disponibles</td>
+        </tr>
+        } @else { @for (closure of closures(); track closure.headerId) {
+        <tr>
+          <td>
+            <a class="link-id" href="javascript:void(0)">#{{ closure.headerId }}</a>
+          </td>
+          <td>{{ closure.closureDate | date : 'dd/MM/yyyy' }}</td>
+          <td>{{ closure.closureMonth }}</td>
+          <td>{{ closure.closureYear }}</td>
+          <td>{{ closure.userName }}</td>
+          <td>{{ closure.status }}</td>
+          <td class="actions ta-right">
+            <button
+              *ngIf="isAdmin()"
+              class="icon-btn"
+              title="Ver Detalle"
+              (click)="viewDetails(closure)"
+            >
+              👁️
+            </button>
+            <button class="icon-btn" title="Exportar PDF">📄</button>
+            <button class="icon-btn" title="Exportar Excel">📊</button>
+          </td>
+        </tr>
+        } }
+      </tbody>
+    </table>
+  </div>
+
+  <footer class="panel-foot">
+    <button class="btn nav" [disabled]="page() === 1" (click)="prevPage()">← Anterior</button>
+    <div class="page-info">
+      Página {{ page() }} de {{ totalPages() }} ({{ totalClosures() }} cierres)
+    </div>
+    <button class="btn nav primary" [disabled]="page() === totalPages()" (click)="nextPage()">
+      Siguiente →
+    </button>
+  </footer>
+</section>
+
+<app-modal
+  [isOpen]="isModalOpen()"
+  [title]="modalTitle()"
+  [customContent]="true"
+  [showFooter]="false"
+  (isOpenChange)="closeModal()"
+>
+  <div class="closure-details">
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID Cierre</th>
+            <th>Producto</th>
+            <th>Stock Final</th>
+            <th>Lote</th>
+            <th>Usuario</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (closureDetails().length === 0) {
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 2rem">Cargando detalles...</td>
+          </tr>
+          } @else { @for (detail of closureDetails(); track detail.closureId) {
+          <tr>
+            <td>{{ detail.closureId }}</td>
+            <td>{{ detail.productName }}</td>
+            <td>{{ detail.finalStock }}</td>
+            <td>{{ detail.lotId || 'N/A' }}</td>
+            <td>{{ detail.userName }}</td>
+            <td>{{ detail.closureDate | date : 'dd/MM/yyyy HH:mm' }}</td>
+          </tr>
+          } }
+        </tbody>
+      </table>
+    </div>
+
+    @if (detailsTotalPages() > 1) {
+    <div class="modal-pagination">
+      <button class="btn nav" [disabled]="detailsPage() === 1" (click)="prevDetailsPage()">
+        ← Anterior
+      </button>
+      <div class="page-info">
+        Página {{ detailsPage() }} de {{ detailsTotalPages() }} ({{ detailsTotalItems() }}
+        productos)
+      </div>
+      <button
+        class="btn nav primary"
+        [disabled]="detailsPage() === detailsTotalPages()"
+        (click)="nextDetailsPage()"
+      >
+        Siguiente →
+      </button>
+    </div>
+    }
+  </div>
+</app-modal>

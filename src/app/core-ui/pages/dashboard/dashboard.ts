@@ -2,76 +2,153 @@ import { StatCard } from '@/shared/components/stat-card/stat-card';
 import { UiModal } from '@/shared/components/ui-modal/ui-modal';
 import { Header } from '@/shared/services/header';
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  computed,
+  signal,
+  inject,
+  afterNextRender,
+} from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { Auth } from '@/auth/services/auth';
+import { AlertsService } from '@/alerts/services/alerts.service';
+import { StockAlert } from '@/alerts/interfaces/alerts';
+import { ProductsService } from '@/core-ui/services/products';
 
 type Movimiento = {
-  id: number; 
-  date: string; 
+  id: number;
+  date: string;
   product: string;
-  type: 'Entrada' | 'Salida'; 
+  type: 'Entrada' | 'Salida';
   cant: number;
-  user: string; 
-  status: 'OK' | 'Rev.'; 
+  user: string;
+  status: 'OK' | 'Rev.';
   balance: number;
 };
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [StatCard, CommonModule, UiModal],
+  imports: [StatCard, CommonModule, UiModal, RouterLink],
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.css'
+  styleUrl: './dashboard.css',
 })
 export class Dashboard implements OnInit, OnDestroy {
-
   newOpen = false;
 
-  constructor(private header: Header) { }
+  // Servicios inyectados
+  private header = inject(Header);
+  private authService = inject(Auth);
+  private alertsService = inject(AlertsService);
+  private productsService = inject(ProductsService);
+
+  // Obtener rol del usuario
+  userRole = this.authService.userRole;
+  isAdmin = computed(() => this.userRole() === 'ADMIN');
+
+  // Señales para alertas
+  alerts = signal<StockAlert[]>([]);
+  alertsLoading = signal(false);
+  totalAlerts = signal(0);
+
+  // Señales para productos
+  totalProducts = signal(0);
+  productsLoading = signal(false);
+
+  constructor() {
+    // Usar afterNextRender para asegurar que todo esté inicializado
+    afterNextRender(() => {
+      this.loadAlerts();
+      this.loadProductStats();
+    });
+  }
 
   ngOnInit(): void {
     this.header.title.set('Visión General');
-    this.header.breadcrumbs.set([{label:'Inicio', link:'/'}, {label:'Dashboard'}]);
+    this.header.breadcrumbs.set([{ label: 'Inicio', link: '/' }, { label: 'Dashboard' }]);
     this.header.showSearch.set(true);
-    this.header.actionsTopbar.set([
-      { label: '', icon: '🌙', onClick: () => console.log('Nuevo') },
-      { label: 'Nuevo', icon: '➕', onClick: () => this.openNew() },
-      { label: 'Admin v1', icon: '🟢', onClick: () => console.log('Admin') }
-    ]);
-    this.header.actionsTitle.set([
-      { label: 'Exportar', onClick: () => console.log('Exportar') },
-      { label: 'Reportes rapidos', onClick: () => console.log('Nuevo') }
-    ]);
+    this.header.actionsTopbar.set([{ label: 'Nuevo', icon: '➕', onClick: () => this.openNew() }]);
+    this.header.actionsTitle.set([]);
   }
 
   ngOnDestroy(): void {
     this.header.reset();
   }
 
-  movs: Movimiento[] = [
-    { id: 5481, date: '02/09/2025', product: 'Papel A4',   type: 'Entrada', cant: 120, user: 'Admin', status: 'OK',  balance: 620 },
-    { id: 5480, date: '02/09/2025', product: 'Tóner HP 12A', type: 'Salida',  cant: -2,  user: 'Laura', status: 'Rev.', balance: 18 },
-    { id: 5479, date: '02/09/2025', product: 'Caja Clips', type: 'Entrada', cant: 50,  user: 'Admin', status: 'OK',  balance: 182 },
-    { id: 5478, date: '01/09/2025', product: 'Papel A4',   type: 'Salida',  cant: -30, user: 'Laura', status: 'Rev.', balance: 500 },
-    { id: 5477, date: '01/09/2025', product: 'Tóner HP 12A', type: 'Entrada', cant: 5,   user: 'Admin', status: 'OK',  balance: 20 },
-  ];
+  loadAlerts(): void {
+    this.alertsLoading.set(true);
 
-  stockTop = [
-    { label: 'Papel A4',     value: 12 },
-    { label: 'Tóner HP 12A', value: 24 },
-    { label: 'Cajas Archivo',value: 8  },
-    { label: 'Resmas Carta', value: 17 },
-    { label: 'Carpetas',     value: 28 },
-  ];
+    this.alertsService.getAllStockAlerts().subscribe({
+      next: (alerts) => {
+        this.alerts.set(alerts);
+        this.totalAlerts.set(alerts.length);
+        this.alertsLoading.set(false);
+      },
+      error: (error) => {
+        console.error('❌ Error cargando alertas:', error);
+        this.alertsLoading.set(false);
+      },
+    });
+  }
 
-  get maxStock() { return Math.max(...this.stockTop.map(x => x.value)); }
+  loadProductStats(): void {
+    this.productsLoading.set(true);
 
-  barHeight(v: number) { return (v / this.maxStock) * 100; }
+    this.productsService.getProductStats().subscribe({
+      next: (stats) => {
+        this.totalProducts.set(stats.totalProducts);
+        this.productsLoading.set(false);
+      },
+      error: (error) => {
+        console.error('❌ Error cargando estadísticas de productos:', error);
+        console.error('Detalles del error:', {
+          status: error.status,
+          statusText: error.statusText,
+          message: error.message,
+          url: error.url,
+        });
+        // Establecer un valor por defecto en caso de error
+        this.totalProducts.set(0);
+        this.productsLoading.set(false);
+      },
+    });
+  }
 
-  alerts = [
-    { sev: 'Crítico', text: 'Tóner HP 12A debajo mínimo' },
-    { sev: 'Bajo',    text: 'Papel A4 punto de reorden' },
-    { sev: 'Info',    text: 'Nueva orden pendiente aprobación' },
-  ];
+  // Obtener las primeras 3 alertas para el dashboard
+  get topAlerts() {
+    return this.alerts().slice(0, 3);
+  }
+
+  // Determinar severidad basada en el tipo de alerta
+  getAlertSeverity(alert: StockAlert): string {
+    if (alert.alertType === 'Sin Stock') return 'Crítico';
+    if (alert.alertType === 'Crítico') return 'Crítico';
+    return 'Bajo';
+  }
+
+  // Datos de movimientos - solo para admin (vacío por ahora, se implementará después)
+  movs: Movimiento[] = [];
+
+  // Stock bajo - se calculará desde las alertas
+  get stockTop() {
+    return this.alerts()
+      .slice(0, 5)
+      .map((alert) => ({
+        label: alert.productName,
+        value: alert.currentStock,
+      }));
+  }
+
+  get maxStock() {
+    const values = this.stockTop.map((x) => x.value);
+    return values.length > 0 ? Math.max(...values) : 1;
+  }
+
+  barHeight(v: number) {
+    return (v / this.maxStock) * 100;
+  }
 
   openNew() {
     this.newOpen = true;
@@ -83,7 +160,6 @@ export class Dashboard implements OnInit, OnDestroy {
 
   saveNew(e: Event) {
     e.preventDefault();
-    console.log('Simulacro guardado');
     this.closeNew();
   }
 }

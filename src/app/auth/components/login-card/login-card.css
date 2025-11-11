@@ -1,4 +1,4 @@
-.register-card {
+.login-card {
   background: transparent;
   border: none;
   box-shadow: none;
@@ -29,7 +29,7 @@
   }
 }
 
-.register-card form {
+.login-card form {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -139,4 +139,24 @@
   font-size: 0.875rem;
   width: 100%;
   text-align: center;
+}
+
+.forgot-password-link {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.forgot-password-link a {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.2s;
+  cursor: pointer;
+}
+
+.forgot-password-link a:hover {
+  text-decoration: underline;
+  text-shadow: 0 0 8px rgba(74, 158, 255, 0.5);
+  cursor: p 
 }

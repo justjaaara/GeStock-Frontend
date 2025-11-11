@@ -1,0 +1,120 @@
+<form [formGroup]="editForm" (ngSubmit)="onSubmit()" class="product-edit-form">
+  <!-- Información Básica -->
+  <div class="form-section">
+    <h3 class="section-title">Información del Producto</h3>
+
+    <div class="form-row">
+      <div class="form-field">
+        <label class="form-label" for="productName">
+          Nombre del Producto
+          <span class="required">*</span>
+        </label>
+        <input
+          id="productName"
+          type="text"
+          class="form-input"
+          formControlName="productName"
+          placeholder="Nombre del producto"
+          maxlength="40"
+          [class.error]="isFieldInvalid('productName')"
+        />
+        @if (isFieldInvalid('productName')) {
+        <span class="error-message">{{ getErrorMessage('productName') }}</span>
+        }
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="productDescription"> Descripción </label>
+        <textarea
+          id="productDescription"
+          class="form-textarea"
+          formControlName="productDescription"
+          placeholder="Descripción del producto (opcional)"
+          maxlength="200"
+          rows="3"
+          [class.error]="isFieldInvalid('productDescription')"
+        ></textarea>
+        @if (isFieldInvalid('productDescription')) {
+        <span class="error-message">{{ getErrorMessage('productDescription') }}</span>
+        }
+      </div>
+    </div>
+
+    <!-- Categoría -->
+    <div class="form-row">
+      <div class="form-field">
+        <label class="form-label" for="category">
+          Categoría
+          <span class="required">*</span>
+        </label>
+        <div class="category-field" [class.error]="isFieldInvalid('categoryId')">
+          <input
+            type="text"
+            class="form-input category-input"
+            [(ngModel)]="categorySearch"
+            [ngModelOptions]="{ standalone: true }"
+            placeholder="Buscar categoría..."
+            (input)="filterCategories()"
+            (focus)="showCategoryDropdown.set(true)"
+          />
+          @if (showCategoryDropdown() && filteredCategories().length > 0) {
+          <div class="category-dropdown">
+            @for (category of filteredCategories(); track category.categoryId) {
+            <div class="category-option" (click)="selectCategory(category)">
+              {{ category.categoryName }}
+            </div>
+            }
+          </div>
+          } @if (selectedCategory()) {
+          <div class="selected-badge">
+            {{ selectedCategory()?.categoryName }}
+            <button type="button" class="remove-badge" (click)="clearCategory()">×</button>
+          </div>
+          }
+        </div>
+        @if (isFieldInvalid('categoryId')) {
+        <span class="error-message">{{ getErrorMessage('categoryId') }}</span>
+        }
+      </div>
+    </div>
+
+    <!-- Precio -->
+    <div class="form-row">
+      <div class="form-field">
+        <label class="form-label" for="unitPrice">
+          Precio Unitario
+          <span class="required">*</span>
+        </label>
+        <div class="input-with-prefix">
+          <span class="input-prefix">$</span>
+          <input
+            id="unitPrice"
+            type="number"
+            class="form-input with-prefix"
+            formControlName="unitPrice"
+            placeholder="0.00"
+            step="0.01"
+            min="0"
+            [class.error]="isFieldInvalid('unitPrice')"
+          />
+        </div>
+        @if (isFieldInvalid('unitPrice')) {
+        <span class="error-message">{{ getErrorMessage('unitPrice') }}</span>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Botones de acción -->
+  <div class="form-actions">
+    <button type="button" class="btn-secondary" (click)="onCancel()">Cancelar</button>
+    <button type="submit" class="btn-primary" [disabled]="editForm.invalid || isSubmitting()">
+      @if (isSubmitting()) {
+      <span class="btn-spinner"></span>
+      <span>Guardando...</span>
+      } @else {
+      <span>Guardar Cambios</span>
+      }
+    </button>
+  </div>
+</form>

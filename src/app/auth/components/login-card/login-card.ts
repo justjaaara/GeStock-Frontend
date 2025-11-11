@@ -1,13 +1,15 @@
-import { Component,  inject, signal, QueryList, ViewChildren } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Auth } from '@/auth/services/auth';
-import { Router } from '@angular/router';
 import { LoginRequest } from '@/auth/interfaces/auth';
+import { Auth } from '@/auth/services/auth';
+import { CommonModule } from '@angular/common';
+import { Component, inject, QueryList, signal, ViewChildren } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 import { InputField } from '../../../shared/components/input/input-field';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-login-card',
-  imports: [ReactiveFormsModule, InputField],
+  imports: [ReactiveFormsModule, InputField, CommonModule, RouterLink],
   templateUrl: './login-card.html',
   styleUrl: './login-card.css',
 })
@@ -15,6 +17,7 @@ export class LoginCard {
   private formBuilder = inject(FormBuilder);
   private authService = inject(Auth);
   private router = inject(Router);
+  private toastr = inject(ToastrService);
 
   @ViewChildren(InputField) inputFields!: QueryList<InputField>;
 
@@ -30,7 +33,7 @@ export class LoginCard {
   }
 
   focusField(fieldId: string): void {
-    const inputField = this.inputFields?.find(field => field.id === fieldId);
+    const inputField = this.inputFields?.find((field) => field.id === fieldId);
     if (inputField) {
       inputField.focusInput();
     }
@@ -49,7 +52,7 @@ export class LoginCard {
       this.authService.login(loginData).subscribe({
         next: (response) => {
           this.isLoading.set(false);
-          // Redirige al dashboard
+          this.toastr.success('Inicio de sesión exitoso', 'Bienvenido');
           this.router.navigate(['/dashboard']);
         },
         error: (error) => {
@@ -57,14 +60,14 @@ export class LoginCard {
           console.error('Error en login:', error);
 
           if (error.status === 401) {
-            this.errorMessage.set(
-              'Credenciales inválidas. Verifica tu email y contraseña.'
-            );
-    
+            this.errorMessage.set('Credenciales inválidas. Verifica tu email y contraseña.');
+            this.toastr.error('Credenciales inválidas', 'Error de autenticación');
           } else if (error.status >= 500) {
             this.errorMessage.set('Error interno del servidor.');
+            this.toastr.error('Error interno del servidor', 'Error');
           } else {
             this.errorMessage.set('Error al iniciar sesión. Intenta nuevamente.');
+            this.toastr.error('Error al iniciar sesión', 'Error');
           }
         },
       });

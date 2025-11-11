@@ -1,68 +1,82 @@
-<div class="shell">
-  <app-sidebar appName="GeStock"></app-sidebar>
+<div class="shell" [class.sidebar-closed]="!sidebarService.isOpen()">
+  <app-sidebar appName="GeStock" [isOpen]="sidebarService.isOpen()"></app-sidebar>
+
+  <!-- Overlay para móvil -->
+  @if (sidebarService.isMobile() && sidebarService.isOpen()) {
+  <div class="sidebar-overlay" (click)="sidebarService.close()"></div>
+  }
+
   <main class="content">
     <!-- Topbar -->
     <header class="topbar">
-      <button class="icon-btn" aria-label="toggle menu">≡</button>
-      @if (header.showSearch()) {
-      <input class="search" placeholder="Buscar productos, proveedores..." />
-      }
-
+      <button class="icon-btn" aria-label="toggle menu" (click)="toggleSidebar()">☰</button>
 
       <!-- acciones Topbar -->
       <nav class="actions">
         @for (a of header.actionsTopbar(); track a.label) {
-        <a [routerLink]="a.link || null" (click)="a.onClick?.()" class="btn" [class.primary]="a.variant==='primary'">
+        <a
+          [routerLink]="a.link || null"
+          (click)="a.onClick?.()"
+          class="btn"
+          [class.primary]="a.variant === 'primary'"
+        >
           @if (a.icon) {
-          <span class="ico">{{a.icon}}</span>
-          } {{a.label}}
+          <span class="ico">{{ a.icon }}</span>
+          } {{ a.label }}
         </a>
         }
+
+        <!-- Botón de usuario con nombre -->
+        <button class="btn user-btn">
+          <span class="ico"><img src="icon/point_green.svg" alt="Usuario" /></span>
+          {{ getUserName() }}
+        </button>
+
+        <!-- Botón de cerrar sesión -->
+        <button (click)="openLogoutModal()" class="btn" title="Cerrar sesión">Cerrar Sesión</button>
       </nav>
     </header>
 
     <!-- Breadcrumbs -->
     @if (header.breadcrumbs().length) {
-      <div class="breadcrumbs">
-        @for (bc of header.breadcrumbs(); track bc.label; let last = $last) {
-          <ng-container>
-            <!-- Si tiene link, es <a>; si no, texto plano muted -->
-            @if (bc.link) {
-              <a [routerLink]="bc.link">{{ bc.label }}</a>
-            } @else {
-              <span class="muted">{{ bc.label }}</span>
-            }
-
-            <!-- Separador solo si NO es el último -->
-            @if (!last) {
-              <span class="sep">/</span>
-            }
-            
-          </ng-container>
+    <div class="breadcrumbs">
+      @for (bc of header.breadcrumbs(); track bc.label; let last = $last) {
+      <ng-container>
+        @if (bc.link) {
+        <a [routerLink]="bc.link">{{ bc.label }}</a>
+        } @else {
+        <span class="muted">{{ bc.label }}</span>
+        } @if (!last) {
+        <span class="sep">/</span>
         }
-      </div>
+      </ng-container>
+      }
+    </div>
     }
-
 
     <!-- Page title -->
     @if (header.title() || header.actionsTitle().length) {
-      <div class="title-row">
-        <h2 class="page-title">{{ header.title() }}</h2>
+    <div class="title-row">
+      <h2 class="page-title">{{ header.title() }}</h2>
 
-        @if (header.actionsTitle().length) {
-          <nav class="actions title-actions">
-            @for (a of header.actionsTitle(); track a.label) {
-              <a [routerLink]="a.link || null" (click)="a.onClick?.()" class="btn"
-                [class.primary]="a.variant==='primary'">
-                @if (a.icon) {
-                  <span class="ico">{{a.icon}}</span>
-                }
-                {{a.label}}
-              </a>
-            }
-          </nav>
+      @if (header.actionsTitle().length) {
+      <nav class="actions title-actions">
+        @for (a of header.actionsTitle(); track a.label) {
+        <a
+          [routerLink]="a.link || null"
+          (click)="a.onClick?.()"
+          class="btn"
+          [class.primary]="a.variant === 'primary'"
+        >
+          @if (a.icon) {
+          <span class="ico">{{ a.icon }}</span>
+          }
+          {{ a.label }}
+        </a>
         }
-      </div>
+      </nav>
+      }
+    </div>
     }
 
     <!-- Main page content -->
@@ -70,4 +84,17 @@
       <router-outlet></router-outlet>
     </section>
   </main>
+
+  <!-- Modal de confirmación de logout -->
+  <app-modal
+    [isOpen]="showLogoutModal()"
+    title="Cerrar Sesión"
+    [message]="'¿Estás seguro que deseas cerrar sesión, ' + getUserName() + '?'"
+    icon="🚪"
+    confirmText="Sí, cerrar sesión"
+    cancelText="Cancelar"
+    variant="danger"
+    (confirm)="confirmLogout()"
+    (cancel)="cancelLogout()"
+  ></app-modal>
 </div>

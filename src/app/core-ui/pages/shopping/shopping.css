@@ -1,8 +1,9 @@
 /* ========== GRID & PANELES ========== */
 .grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 14px;
+    margin-bottom: 16px;
 }
 
 .panel {
@@ -11,6 +12,19 @@
     border: 1px solid #e5eaf2;
     border-radius: 14px;
     padding: 16px;
+}
+
+.loading-message,
+.empty-message {
+    padding: 40px 20px;
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+}
+
+.loading-message p,
+.empty-message p {
+    margin: 0;
 }
 
 .panel-header {
@@ -50,6 +64,12 @@
     line-height: 1;
     color: #6b7a90;
     font-weight: 500;
+}
+
+.ico img {
+    display: block;
+    width: 20px;
+    height: 20px;
 }
 
 .field input {
